@@ -1,0 +1,5602 @@
+[
+  {
+    "id": "U20000",
+    "title": "Launch a Food Truck",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Launch a Food Truck'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Creative Arts"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Food Truck, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20001",
+    "title": "Open a Themed Cafe",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Open a Themed Cafe'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Geography"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "Open a Themed Cafe, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20002",
+    "title": "Manage a Professional Sports Team",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Physical Education",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Manage a Professional Sports Team'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "fitness",
+      "teamwork",
+      "strategy"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Science"
+    ],
+    "setting": "stadium & gym",
+    "gradeInt": 12,
+    "image_prompt": "Manage a Professional Sports Team, stadium & gym, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20003",
+    "title": "Run a Record Label",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Music Discovery",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Run a Record Label'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "rhythm",
+      "composition",
+      "listening"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "recording booth & stage",
+    "gradeInt": 12,
+    "image_prompt": "Run a Record Label, recording booth & stage, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20004",
+    "title": "Start a Clothing Brand",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Start a Clothing Brand'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "History & Religion"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Start a Clothing Brand, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20005",
+    "title": "Develop a Video Game Studio",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Develop a Video Game Studio'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Life Essentials"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Develop a Video Game Studio, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20006",
+    "title": "Run a Pet Adoption Agency",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Run a Pet Adoption Agency'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Geography"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "Run a Pet Adoption Agency, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20007",
+    "title": "Launch a Tech Startup",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Launch a Tech Startup'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Geography"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Tech Startup, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20008",
+    "title": "Manage a Movie Theater",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Manage a Movie Theater'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Language Lab"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Manage a Movie Theater, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20009",
+    "title": "Create a Subscription Box Service",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Create a Subscription Box Service'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "History & Religion"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Create a Subscription Box Service, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20010",
+    "title": "Run an Eco-Tourism Agency",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Run an Eco-Tourism Agency'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Science"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Run an Eco-Tourism Agency, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20011",
+    "title": "Design and Sell a Toy Line",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Design and Sell a Toy Line'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "History & Religion"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Design and Sell a Toy Line, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20012",
+    "title": "Manage a Farm or Ranch",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Manage a Farm or Ranch'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Language Lab"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Manage a Farm or Ranch, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20013",
+    "title": "Start a Tech Repair Shop",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Start a Tech Repair Shop'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Native Language"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Start a Tech Repair Shop, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20014",
+    "title": "Become a Real Estate Developer",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Become a Real Estate Developer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Mental Wellness"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Become a Real Estate Developer, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20015",
+    "title": "Launch a Graphic Design Agency",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Launch a Graphic Design Agency'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "History & Religion"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Graphic Design Agency, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20016",
+    "title": "Run a Landscaping Business",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Run a Landscaping Business'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "History & Religion"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Run a Landscaping Business, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20017",
+    "title": "Open a Bookstore",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Open a Bookstore'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "History & Religion"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Open a Bookstore, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20018",
+    "title": "Create a Board Game",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Create a Board Game'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Mathematics"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Create a Board Game, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20019",
+    "title": "Manage a Hotel",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Manage a Hotel'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Creative Arts"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Manage a Hotel, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20020",
+    "title": "Start a Podcast Network",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Start a Podcast Network'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Physical Education"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Start a Podcast Network, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20021",
+    "title": "Run a Car Customization Shop",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Run a Car Customization Shop'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Science"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "Run a Car Customization Shop, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20022",
+    "title": "Launch a Courier Service",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Launch a Courier Service'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "History & Religion"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Courier Service, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20023",
+    "title": "Create a Custom Sneaker Brand",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Create a Custom Sneaker Brand'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Native Language"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Create a Custom Sneaker Brand, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20024",
+    "title": "Manage an Art Gallery",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Manage an Art Gallery'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Mathematics"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Manage an Art Gallery, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20025",
+    "title": "Start a Tutoring Center",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Start a Tutoring Center'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Music Discovery"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Start a Tutoring Center, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20026",
+    "title": "Run an Antique Shop",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Run an Antique Shop'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Science"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Run an Antique Shop, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20027",
+    "title": "Open a Bakery",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Open a Bakery'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Language Lab"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Open a Bakery, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20028",
+    "title": "Create a Mobile App for a Social Cause",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Create a Mobile App for a Social Cause'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Life Essentials"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Create a Mobile App for a Social Cause, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20029",
+    "title": "Plan and Execute a Major Music Festival",
+    "source_category": "Entrepreneurship & Business",
+    "subject": "Music Discovery",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Entrepreneurship & Business → undervisningsramme: 'Plan and Execute a Major Music Festival'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "rhythm",
+      "composition",
+      "listening"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Creative Arts"
+    ],
+    "setting": "recording booth & stage",
+    "gradeInt": 12,
+    "image_prompt": "Plan and Execute a Major Music Festival, recording booth & stage, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20030",
+    "title": "Mission to Mars",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Mission to Mars'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Mathematics"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Mission to Mars, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20031",
+    "title": "Deep Sea Submarine Expedition",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Deep Sea Submarine Expedition'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Music Discovery"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Deep Sea Submarine Expedition, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20032",
+    "title": "Dinosaur Safari Park",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Dinosaur Safari Park'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Music Discovery"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Dinosaur Safari Park, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20033",
+    "title": "Volcano Response Team",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Volcano Response Team'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Native Language"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Volcano Response Team, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20034",
+    "title": "Build a Lunar Base",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Build a Lunar Base'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Mathematics"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Build a Lunar Base, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20035",
+    "title": "Storm Chasers",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Storm Chasers'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Mental Wellness"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Storm Chasers, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20036",
+    "title": "Amazon Rainforest Research Outpost",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Amazon Rainforest Research Outpost'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Music Discovery"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "Amazon Rainforest Research Outpost, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20037",
+    "title": "Solve a Medical Mystery",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Solve a Medical Mystery'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Native Language"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Solve a Medical Mystery, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20038",
+    "title": "Journey to the Center of the Earth",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Journey to the Center of the Earth'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "History & Religion"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Journey to the Center of the Earth, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20039",
+    "title": "Design a Satellite Network",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Design a Satellite Network'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Computer & Technology"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Design a Satellite Network, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20040",
+    "title": "Antarctic Ice Core Mission",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Antarctic Ice Core Mission'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Physical Education"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "Antarctic Ice Core Mission, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20041",
+    "title": "The Human Body Voyage",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Human Body Voyage'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Creative Arts"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Human Body Voyage, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20042",
+    "title": "Genetic Engineering Lab",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Genetic Engineering Lab'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Computer & Technology"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Genetic Engineering Lab, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20043",
+    "title": "Asteroid Mining Operation",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Asteroid Mining Operation'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Physical Education"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Asteroid Mining Operation, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20044",
+    "title": "Run a Natural History Museum",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Run a Natural History Museum'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Mathematics"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Run a Natural History Museum, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20045",
+    "title": "Forensic Science Investigation",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Forensic Science Investigation'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Computer & Technology"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Forensic Science Investigation, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20046",
+    "title": "Build a Particle Accelerator",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Build a Particle Accelerator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Life Essentials"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Build a Particle Accelerator, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20047",
+    "title": "Explore an Alien World",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Explore an Alien World'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Mathematics"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Explore an Alien World, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20048",
+    "title": "Manage a National Park",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Manage a National Park'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Native Language"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "Manage a National Park, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20049",
+    "title": "The Weather Machine",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Weather Machine'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Weather Machine, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20050",
+    "title": "Bio-Dome Designer",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Bio-Dome Designer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Native Language"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Bio-Dome Designer, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20051",
+    "title": "Time-Travel Safari",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Time-Travel Safari'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Language Lab"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Time-Travel Safari, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20052",
+    "title": "The Search for Planet X",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Search for Planet X'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Geography"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Search for Planet X, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20053",
+    "title": "Run a Seismology Lab",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Run a Seismology Lab'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Language Lab"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Run a Seismology Lab, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20054",
+    "title": "The Coral Reef Restoration Project",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Coral Reef Restoration Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Native Language"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "The Coral Reef Restoration Project, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20055",
+    "title": "Mastering the Elements",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Mastering the Elements'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Physical Education"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Mastering the Elements, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20056",
+    "title": "The Physics of Superheroes",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Physics of Superheroes'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Mathematics"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Physics of Superheroes, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20057",
+    "title": "Build a Fusion Reactor",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Build a Fusion Reactor'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Language Lab"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Build a Fusion Reactor, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20058",
+    "title": "The Beekeeper's Challenge",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Beekeeper's Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Creative Arts"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Beekeeper's Challenge, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20059",
+    "title": "The Archaeologist's Quest",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Archaeologist's Quest'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "The Archaeologist's Quest, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20060",
+    "title": "Space Telescope Operator",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Space Telescope Operator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Music Discovery"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "Space Telescope Operator, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20061",
+    "title": "The Water Cycle Adventure",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Water Cycle Adventure'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Life Essentials"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "The Water Cycle Adventure, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20062",
+    "title": "Animal Migration Trackers",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Animal Migration Trackers'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Native Language"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "Animal Migration Trackers, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20063",
+    "title": "The Sound Lab",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Sound Lab'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Life Essentials"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Sound Lab, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20064",
+    "title": "Light and Optics Puzzles",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'Light and Optics Puzzles'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Creative Arts"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "Light and Optics Puzzles, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20065",
+    "title": "The Renewable Energy Challenge",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Renewable Energy Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Geography"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Renewable Energy Challenge, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20066",
+    "title": "The Invasive Species Task Force",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Invasive Species Task Force'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Creative Arts"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Invasive Species Task Force, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20067",
+    "title": "The Planetary Geologist",
+    "source_category": "Science & Exploration",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Planetary Geologist'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Science"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "The Planetary Geologist, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20068",
+    "title": "The Human Genome Project",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Human Genome Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Creative Arts"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Human Genome Project, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20069",
+    "title": "The Terraforming Project",
+    "source_category": "Science & Exploration",
+    "subject": "Science",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Science & Exploration → undervisningsramme: 'The Terraforming Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "inquiry",
+      "data analysis",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Mathematics"
+    ],
+    "setting": "mobile lab van",
+    "gradeInt": 12,
+    "image_prompt": "The Terraforming Project, mobile lab van, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20070",
+    "title": "Direct a Short Animated Film",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Direct a Short Animated Film'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Mathematics"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Direct a Short Animated Film, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20071",
+    "title": "Produce a Podcast Series",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Produce a Podcast Series'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Produce a Podcast Series, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20072",
+    "title": "Create a Comic Book or Graphic Novel",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Create a Comic Book or Graphic Novel'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Create a Comic Book or Graphic Novel, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20073",
+    "title": "Launch a Virtual Band",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Music Discovery",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Launch a Virtual Band'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "rhythm",
+      "composition",
+      "listening"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Language Lab"
+    ],
+    "setting": "recording booth & stage",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Virtual Band, recording booth & stage, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20074",
+    "title": "Design a Video Game Level",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Design a Video Game Level'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Design a Video Game Level, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20075",
+    "title": "Become a Photojournalist",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Become a Photojournalist'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Physical Education"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Become a Photojournalist, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20076",
+    "title": "Write and Illustrate a Children's Book",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Write and Illustrate a Children's Book'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Write and Illustrate a Children's Book, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20077",
+    "title": "Build a World for a Fantasy Novel",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Build a World for a Fantasy Novel'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Geography"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Build a World for a Fantasy Novel, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20078",
+    "title": "Host a TV Cooking Show",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Host a TV Cooking Show'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Music Discovery"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Host a TV Cooking Show, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20079",
+    "title": "Design a Broadway Show",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Design a Broadway Show'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Design a Broadway Show, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20080",
+    "title": "Create a Viral Social Media Challenge",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Create a Viral Social Media Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Create a Viral Social Media Challenge, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20081",
+    "title": "Become a Digital Architect",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Become a Digital Architect'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Music Discovery"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Become a Digital Architect, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20082",
+    "title": "Launch a Fashion Magazine",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Launch a Fashion Magazine'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Mental Wellness"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Fashion Magazine, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20083",
+    "title": "Compose a Film Score",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Music Discovery",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Compose a Film Score'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "rhythm",
+      "composition",
+      "listening"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Mathematics"
+    ],
+    "setting": "recording booth & stage",
+    "gradeInt": 12,
+    "image_prompt": "Compose a Film Score, recording booth & stage, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20084",
+    "title": "Create a Stop-Motion Animation",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Create a Stop-Motion Animation'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "History & Religion"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Create a Stop-Motion Animation, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20085",
+    "title": "Design a Brand Identity",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Design a Brand Identity'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Science"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Design a Brand Identity, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20086",
+    "title": "Curate a Digital Art Exhibition",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Curate a Digital Art Exhibition'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Music Discovery"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Curate a Digital Art Exhibition, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20087",
+    "title": "Become a VJ (Video Jockey)",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Become a VJ (Video Jockey)'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Mental Wellness"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Become a VJ (Video Jockey), studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20088",
+    "title": "Write a \"Choose Your Own Adventure\" Story",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'Write a \"Choose Your Own Adventure\" Story'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Physical Education"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "Write a \"Choose Your Own Adventure\" Story, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20089",
+    "title": "The Mural Project",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Mural Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Music Discovery"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Mural Project, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20090",
+    "title": "The Poetry Slam",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Poetry Slam'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Mathematics"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Poetry Slam, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20091",
+    "title": "The Documentary Crew",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Documentary Crew'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Mathematics"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Documentary Crew, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20092",
+    "title": "The Ad Agency",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Ad Agency'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Geography"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Ad Agency, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20093",
+    "title": "The Foley Artist",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Foley Artist'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Music Discovery"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Foley Artist, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20094",
+    "title": "The Typeface Designer",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Typeface Designer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Music Discovery"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Typeface Designer, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20095",
+    "title": "The Interior Designer",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Interior Designer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Physical Education"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Interior Designer, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20096",
+    "title": "The Puppet Master",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Puppet Master'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Physical Education"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Puppet Master, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20097",
+    "title": "The Infographic Animator",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Infographic Animator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Mathematics"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Infographic Animator, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20098",
+    "title": "The Album Art Creator",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Album Art Creator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Album Art Creator, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20099",
+    "title": "The Theatrical Lighting Designer",
+    "source_category": "Creative Arts & Media Production",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Creative Arts & Media Production → undervisningsramme: 'The Theatrical Lighting Designer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Computer & Technology"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Theatrical Lighting Designer, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20100",
+    "title": "Run for Mayor of a Virtual City",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Run for Mayor of a Virtual City'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Science"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Run for Mayor of a Virtual City, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20101",
+    "title": "Design a New Law",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Design a New Law'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Music Discovery"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Design a New Law, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20102",
+    "title": "Launch a Non-Profit Organization",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Launch a Non-Profit Organization'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Native Language"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Launch a Non-Profit Organization, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20103",
+    "title": "Organize a Community Service Project",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Organize a Community Service Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Native Language"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Organize a Community Service Project, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20104",
+    "title": "The Mock Trial",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Mock Trial'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Computer & Technology"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Mock Trial, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20105",
+    "title": "The Diplomat",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Diplomat'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Mental Wellness"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Diplomat, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20106",
+    "title": "Build an Accessible Community Park",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Build an Accessible Community Park'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Science"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Build an Accessible Community Park, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20107",
+    "title": "The Investigative Journalist",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Investigative Journalist'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Geography"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Investigative Journalist, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20108",
+    "title": "Create a Public Health Campaign",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Create a Public Health Campaign'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Native Language"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "Create a Public Health Campaign, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20109",
+    "title": "The Community Garden Project",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Community Garden Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Community Garden Project, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20110",
+    "title": "Mediate a Conflict",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Mediate a Conflict'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Physical Education"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Mediate a Conflict, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20111",
+    "title": "The Historical Preservation Society",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Historical Preservation Society'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Life Essentials"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Historical Preservation Society, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20112",
+    "title": "Design a Memorial or Monument",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Design a Memorial or Monument'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Life Essentials"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Design a Memorial or Monument, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20113",
+    "title": "The Ethical AI Committee",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Ethical AI Committee'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Geography"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Ethical AI Committee, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20114",
+    "title": "Run a Polling and Data Analytics Firm",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Run a Polling and Data Analytics Firm'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Native Language"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Run a Polling and Data Analytics Firm, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20115",
+    "title": "The Disaster Relief Coordinator",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Disaster Relief Coordinator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Life Essentials"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Disaster Relief Coordinator, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20116",
+    "title": "Create a \"Good Trouble\" Social Movement",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'Create a \"Good Trouble\" Social Movement'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Science"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "Create a \"Good Trouble\" Social Movement, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20117",
+    "title": "The City Planner",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The City Planner'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Mental Wellness"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The City Planner, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20118",
+    "title": "The National Budget Challenge",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The National Budget Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Computer & Technology"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The National Budget Challenge, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20119",
+    "title": "The Constitutional Convention",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Constitutional Convention'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Music Discovery"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Constitutional Convention, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20120",
+    "title": "The Animal Rights Advocate",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Animal Rights Advocate'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Mathematics"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Animal Rights Advocate, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20121",
+    "title": "The Digital Citizenship Ambassador",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Digital Citizenship Ambassador'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Native Language"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Digital Citizenship Ambassador, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20122",
+    "title": "The Cultural Exchange Program",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "Language Lab",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Cultural Exchange Program'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "vocabulary",
+      "conversation",
+      "listening"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Computer & Technology"
+    ],
+    "setting": "city language café",
+    "gradeInt": 12,
+    "image_prompt": "The Cultural Exchange Program, city language café, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20123",
+    "title": "The Fair Trade Marketplace",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Fair Trade Marketplace'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Mathematics"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Fair Trade Marketplace, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20124",
+    "title": "The Public Transportation Redesign",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Public Transportation Redesign'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Native Language"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Public Transportation Redesign, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20125",
+    "title": "The Oral History Project",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Oral History Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Mental Wellness"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Oral History Project, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20126",
+    "title": "The Voter Registration Drive",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Voter Registration Drive'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Science"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Voter Registration Drive, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20127",
+    "title": "The Free Library Initiative",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Free Library Initiative'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Science"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Free Library Initiative, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20128",
+    "title": "The Anti-Bullying Campaign",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Anti-Bullying Campaign'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Creative Arts"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Anti-Bullying Campaign, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20129",
+    "title": "The Global Peace Summit",
+    "source_category": "Civics, Community & Social Good",
+    "subject": "History & Religion",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Civics, Community & Social Good → undervisningsramme: 'The Global Peace Summit'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "source analysis",
+      "ethics",
+      "civics"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Language Lab"
+    ],
+    "setting": "city hall & archives",
+    "gradeInt": 12,
+    "image_prompt": "The Global Peace Summit, city hall & archives, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20130",
+    "title": "Design and Build a Rollercoaster",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'Design and Build a Rollercoaster'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Music Discovery"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "Design and Build a Rollercoaster, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20131",
+    "title": "The Rube Goldberg Machine Challenge",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Rube Goldberg Machine Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Rube Goldberg Machine Challenge, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20132",
+    "title": "The Bridge Builder",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Bridge Builder'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Science"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Bridge Builder, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20133",
+    "title": "Robotics Competition",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'Robotics Competition'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Life Essentials"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Robotics Competition, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20134",
+    "title": "The Skyscraper Challenge",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Skyscraper Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Creative Arts"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Skyscraper Challenge, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20135",
+    "title": "Create a \"Smart Home\"",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'Create a \"Smart Home\"'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Geography"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Create a \"Smart Home\", makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20136",
+    "title": "The Egg Drop Experiment",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Egg Drop Experiment'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Creative Arts"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Egg Drop Experiment, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20137",
+    "title": "Build a Custom Computer",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'Build a Custom Computer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "History & Religion"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "Build a Custom Computer, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20138",
+    "title": "The Shipwreck Survivor",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Shipwreck Survivor'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Shipwreck Survivor, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20139",
+    "title": "Design a Water Park",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'Design a Water Park'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "Design a Water Park, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20140",
+    "title": "The Trebuchet Challenge",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Trebuchet Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Computer & Technology"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Trebuchet Challenge, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20141",
+    "title": "Automate a Factory",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'Automate a Factory'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Computer & Technology"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "Automate a Factory, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20142",
+    "title": "The Wind-Powered Car",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Wind-Powered Car'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Wind-Powered Car, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20143",
+    "title": "The Soundproof Room",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Soundproof Room'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Science"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Soundproof Room, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20144",
+    "title": "The Mars Rover Design",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Mars Rover Design'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "History & Religion"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Mars Rover Design, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20145",
+    "title": "The Prosthetic Limb Project",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Prosthetic Limb Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Life Essentials"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Prosthetic Limb Project, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20146",
+    "title": "The Vertical Farm",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Vertical Farm'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Vertical Farm, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20147",
+    "title": "The Escape Room Designer",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Escape Room Designer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Creative Arts"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Escape Room Designer, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20148",
+    "title": "The Drone Delivery System",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Drone Delivery System'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Physical Education"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "The Drone Delivery System, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20149",
+    "title": "The Green Building Challenge",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Green Building Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Green Building Challenge, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20150",
+    "title": "The Submersible Design",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Submersible Design'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Creative Arts"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Submersible Design, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20151",
+    "title": "The Hovercraft Race",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Hovercraft Race'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Hovercraft Race, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20152",
+    "title": "The Automated Mini-Golf Course",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Automated Mini-Golf Course'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Science"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Automated Mini-Golf Course, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20153",
+    "title": "The Kinetic Sculpture",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Kinetic Sculpture'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "History & Religion"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Kinetic Sculpture, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20154",
+    "title": "The Water Rocket Competition",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Water Rocket Competition'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Science"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Water Rocket Competition, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20155",
+    "title": "The Earthquake Simulator",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Earthquake Simulator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Earthquake Simulator, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20156",
+    "title": "The Solar-Powered Oven",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Solar-Powered Oven'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Solar-Powered Oven, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20157",
+    "title": "The Hydraulic Crane",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Hydraulic Crane'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Music Discovery"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Hydraulic Crane, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20158",
+    "title": "The Maglev Train",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Maglev Train'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Maglev Train, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20159",
+    "title": "The Wearable Tech Project",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Wearable Tech Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Native Language"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "The Wearable Tech Project, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20160",
+    "title": "The Amphibious Vehicle",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Amphibious Vehicle'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "History & Religion"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Amphibious Vehicle, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20161",
+    "title": "The Codebreaker's Machine",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Codebreaker's Machine'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Mental Wellness"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "The Codebreaker's Machine, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20162",
+    "title": "The Domino Topple",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Domino Topple'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Domino Topple, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20163",
+    "title": "The Paper Airplane Challenge",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Paper Airplane Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Paper Airplane Challenge, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20164",
+    "title": "The Self-Driving Car AI",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Computer & Technology",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Self-Driving Car AI'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "computational thinking",
+      "programming",
+      "systems design"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "makerspace & app lab",
+    "gradeInt": 12,
+    "image_prompt": "The Self-Driving Car AI, makerspace & app lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20165",
+    "title": "The Miniature City",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Miniature City'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Language Lab"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Miniature City, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20166",
+    "title": "The Musical Instrument Maker",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Creative Arts",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Musical Instrument Maker'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "ideation",
+      "iteration",
+      "presentation"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Life Essentials"
+    ],
+    "setting": "studio & gallery",
+    "gradeInt": 12,
+    "image_prompt": "The Musical Instrument Maker, studio & gallery, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20167",
+    "title": "The Personal Flight Device",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Personal Flight Device'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Native Language",
+      "Science"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Personal Flight Device, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20168",
+    "title": "The Automated Greenhouse",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Automated Greenhouse'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Automated Greenhouse, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20169",
+    "title": "The Recycled Art Bot",
+    "source_category": "Engineering & Hands-On Design",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Engineering & Hands-On Design → undervisningsramme: 'The Recycled Art Bot'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "Language Lab"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Recycled Art Bot, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20170",
+    "title": "The First Car Purchase",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The First Car Purchase'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Music Discovery"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The First Car Purchase, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20171",
+    "title": "The College Application Journey",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The College Application Journey'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Creative Arts"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The College Application Journey, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20172",
+    "title": "The Personal Budget Challenge",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Personal Budget Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Mental Wellness"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Personal Budget Challenge, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20173",
+    "title": "Plan a Trip Around the World",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Geography",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'Plan a Trip Around the World'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "map skills",
+      "spatial thinking",
+      "human–environment"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "History & Religion"
+    ],
+    "setting": "GIS & map lab",
+    "gradeInt": 12,
+    "image_prompt": "Plan a Trip Around the World, GIS & map lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20174",
+    "title": "The Healthy Habits Challenge",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Healthy Habits Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Mental Wellness"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Healthy Habits Challenge, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20175",
+    "title": "The Home Renovation Project",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Home Renovation Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Music Discovery"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Home Renovation Project, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20176",
+    "title": "The Stock Market Game",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Stock Market Game'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Language Lab",
+      "Science"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Stock Market Game, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20177",
+    "title": "The Mindful Life",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mental Wellness",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Mindful Life'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "self-awareness",
+      "self-management",
+      "relationships"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Native Language"
+    ],
+    "setting": "calm room & garden",
+    "gradeInt": 12,
+    "image_prompt": "The Mindful Life, calm room & garden, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20178",
+    "title": "The Career Explorer",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Career Explorer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Mental Wellness"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Career Explorer, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20179",
+    "title": "The Apartment Hunt",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Apartment Hunt'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Creative Arts"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Apartment Hunt, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20180",
+    "title": "The DIY Project",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The DIY Project'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Mathematics"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The DIY Project, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20181",
+    "title": "The Meal Planning Master",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Meal Planning Master'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "History & Religion"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Meal Planning Master, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20182",
+    "title": "The Public Speaking Challenge",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mental Wellness",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Public Speaking Challenge'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "self-awareness",
+      "self-management",
+      "relationships"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "History & Religion"
+    ],
+    "setting": "calm room & garden",
+    "gradeInt": 12,
+    "image_prompt": "The Public Speaking Challenge, calm room & garden, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20183",
+    "title": "The Digital Detox",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mental Wellness",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Digital Detox'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "self-awareness",
+      "self-management",
+      "relationships"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Life Essentials",
+      "Physical Education"
+    ],
+    "setting": "calm room & garden",
+    "gradeInt": 12,
+    "image_prompt": "The Digital Detox, calm room & garden, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20184",
+    "title": "The First Aid Simulator",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The First Aid Simulator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Creative Arts",
+      "Native Language"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The First Aid Simulator, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20185",
+    "title": "The Time Management Expert",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Time Management Expert'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mathematics",
+      "Mental Wellness"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Time Management Expert, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20186",
+    "title": "The Credit Score Simulator",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Credit Score Simulator'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Creative Arts"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Credit Score Simulator, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20187",
+    "title": "The Job Interview",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Job Interview'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Creative Arts"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Job Interview, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20188",
+    "title": "The \"Adulting\" Simulation",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The \"Adulting\" Simulation'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Science"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The \"Adulting\" Simulation, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20189",
+    "title": "The Philanthropist",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Philanthropist'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Native Language"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Philanthropist, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20190",
+    "title": "The Taxpayer",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Taxpayer'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Music Discovery",
+      "Native Language"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Taxpayer, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20191",
+    "title": "The Home Chef",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Home Chef'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Science",
+      "Mathematics"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Home Chef, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20192",
+    "title": "The Car Maintenance Basics",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Car Maintenance Basics'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Computer & Technology",
+      "Language Lab"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Car Maintenance Basics, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20193",
+    "title": "The Retirement Planner",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mathematics",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Retirement Planner'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "problem solving",
+      "data",
+      "modeling"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Mental Wellness",
+      "History & Religion"
+    ],
+    "setting": "math makerspace",
+    "gradeInt": 12,
+    "image_prompt": "The Retirement Planner, math makerspace, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20194",
+    "title": "The Negotiation Game",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Negotiation Game'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Computer & Technology"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Negotiation Game, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20195",
+    "title": "The Digital Portfolio",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Digital Portfolio'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "Mathematics"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Digital Portfolio, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20196",
+    "title": "The Event Planner",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Event Planner'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "History & Religion",
+      "Native Language"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Event Planner, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20197",
+    "title": "The Critical Thinker's Gauntlet",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Critical Thinker's Gauntlet'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Language Lab"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Critical Thinker's Gauntlet, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20198",
+    "title": "The Language of Leadership",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Mental Wellness",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Language of Leadership'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "self-awareness",
+      "self-management",
+      "relationships"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Geography",
+      "Computer & Technology"
+    ],
+    "setting": "calm room & garden",
+    "gradeInt": 12,
+    "image_prompt": "The Language of Leadership, calm room & garden, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  },
+  {
+    "id": "U20199",
+    "title": "The Lifelong Learner",
+    "source_category": "Personal Growth & Life Skills",
+    "subject": "Life Essentials",
+    "age_min": 5,
+    "age_max": 18,
+    "age_band": "Adaptive 5–18",
+    "pitch": "Personal Growth & Life Skills → undervisningsramme: 'The Lifelong Learner'. Aktivitet tilpasses 5–18 år med differentierede mål og artefakter.",
+    "core_skills": [
+      "financial literacy",
+      "household management",
+      "career readiness"
+    ],
+    "assessment_ideas": [
+      "exit ticket",
+      "artifact rubric",
+      "performance checklist",
+      "peer feedback"
+    ],
+    "cross_subject_links": [
+      "Physical Education",
+      "History & Religion"
+    ],
+    "setting": "real-world lab",
+    "gradeInt": 12,
+    "image_prompt": "The Lifelong Learner, real-world lab, diverse students collaborating, cinematic lighting, vibrant, 16:9, no text, no watermark"
+  }
+]

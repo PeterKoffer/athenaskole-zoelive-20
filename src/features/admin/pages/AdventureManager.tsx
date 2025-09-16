@@ -17,14 +17,13 @@ export default function AdventureManager() {
     adultGenerated: number;
   } | null>(null);
 
-  const handleImportAdventures = async () => {
+  const handleImportAdventures = async (filename: string) => {
     setImporting(true);
     try {
-      // Import the 300 new adventures from the JSON file
-      const response = await fetch('/src/data/nelie_adventures_300_lang_geo_music_pe.json');
+      const response = await fetch(`/src/data/${filename}`);
       const data = await response.json();
       
-      // Transform new format to expected format
+      // Transform format to expected format
       const transformedData = data.map((adventure: any) => ({
         universeId: adventure.id,
         gradeInt: adventure.gradeInt,
@@ -95,12 +94,12 @@ export default function AdventureManager() {
               Import Adventures
             </CardTitle>
             <CardDescription>
-              Import 300 new adventures focused on Language, Geography, Music, and PE
+              Import adventures into the database
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <Button 
-              onClick={handleImportAdventures}
+              onClick={() => handleImportAdventures('nelie_adventures_300_lang_geo_music_pe.json')}
               disabled={importing}
               className="w-full"
             >
@@ -112,7 +111,26 @@ export default function AdventureManager() {
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
-                  Import 300 New Adventures
+                  Import 300 Language/Geography/Music/PE
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              onClick={() => handleImportAdventures('nelie_adventures_200_from_user_mapped_12_subjects.json')}
+              disabled={importing}
+              className="w-full"
+              variant="outline"
+            >
+              {importing ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import 200 Mapped to 12 Subjects
                 </>
               )}
             </Button>
