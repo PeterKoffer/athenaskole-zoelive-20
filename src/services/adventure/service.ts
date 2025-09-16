@@ -51,7 +51,7 @@ export class AdventureService {
   /**
    * Get cached backstory or generate one as fallback
    */
-  private static async getMagicalBackstory(pack: UniversePack, gradeLevel: string, language: string = 'da'): Promise<string> {
+  private static async getMagicalBackstory(pack: UniversePack, gradeLevel: string, language: string = 'en'): Promise<string> {
     try {
       return await BackstoryService.getOrGenerateBackstory(pack, gradeLevel, language);
     } catch (error) {
@@ -63,7 +63,7 @@ export class AdventureService {
   /**
    * Convert UniversePack to AdventureUniverse format
    */
-  private static async universePackToAdventure(pack: UniversePack, gradeLevel: string = "6-8", language: string = 'da'): Promise<AdventureUniverse> {
+  private static async universePackToAdventure(pack: UniversePack, gradeLevel: string = "6-8", language: string = 'en'): Promise<AdventureUniverse> {
     // Convert grade level to integer for image system
     const gradeInt = gradeLevel === "K-2" ? 1 : 
                      gradeLevel === "3-5" ? 4 : 
@@ -154,18 +154,18 @@ export class AdventureService {
       }
 
       // Convert to AdventureUniverse format (now async due to backstory loading)
-      const selectedUniverse = await this.universePackToAdventure(selectedPack, criteria.gradeLevel || "6-8", 'da');
+      const selectedUniverse = await this.universePackToAdventure(selectedPack, criteria.gradeLevel || "6-8", 'en');
 
       // Generate content based on the universe pack
       const content: AdventureContent = {
         id: `content-${selectedPack.id}`,
         universe_id: selectedPack.id,
-        summary: `Nu hvor du er trådt ind i eventyret, er det tid til at dykke dybt ned i ${selectedPack.title}! Denne ${selectedPack.category.toLowerCase()} oplevelse vil udfordre dig til at tænke kreativt, løse problemer fra den virkelige verden, og opdage nye måder at anvende din viden på.`,
+        summary: `Now that you've stepped into the adventure, it's time to dive deep into ${selectedPack.title}! This ${selectedPack.category.toLowerCase()} experience will challenge you to think creatively, solve real-world problems, and discover new ways to apply your knowledge.`,
         objectives: [
-          `Forstå nøglekoncepterne bag ${selectedPack.title}`,
-          `Anvend problemløsningsevner i en ${selectedPack.category.toLowerCase()} sammenhæng`,
-          `Skab noget konkret relateret til ${selectedPack.title}`,
-          `Reflektér over læringsoplevelsen og præsentér dine fund`
+          `Understand the key concepts behind ${selectedPack.title}`,
+          `Apply problem-solving skills in a ${selectedPack.category.toLowerCase()} context`,
+          `Create something tangible related to ${selectedPack.title}`,
+          `Reflect on the learning experience and present your findings`
         ],
         activities: this.generateActivitiesFromBeats(selectedPack, criteria.gradeLevel || "6-8")
       };

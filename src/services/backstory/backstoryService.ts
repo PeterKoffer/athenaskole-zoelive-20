@@ -22,7 +22,7 @@ export class BackstoryService {
     gradeInt: number, 
     options: BackstoryOptions = {}
   ): Promise<string | null> {
-    const { expires = 300, language = 'da' } = options;
+    const { expires = 300, language = 'en' } = options;
     const path = `${universeId}/${gradeInt}/backstory_${language}.txt`;
     
     try {
@@ -55,7 +55,7 @@ export class BackstoryService {
   /**
    * Generate a magical backstory based on universe pack and grade level
    */
-  static generateMagicalBackstory(pack: UniversePack, gradeLevel: string, language: string = 'da'): string {
+  static generateMagicalBackstory(pack: UniversePack, gradeLevel: string, language: string = 'en'): string {
     const gradeInt = gradeLevel === "K-2" ? 1 : 
                      gradeLevel === "3-5" ? 4 : 
                      gradeLevel === "6-8" ? 6 : 
@@ -116,7 +116,7 @@ export class BackstoryService {
     universeId: string, 
     gradeInt: number, 
     backstoryText: string, 
-    language: string = 'da'
+    language: string = 'en'
   ): Promise<boolean> {
     const path = `${universeId}/${gradeInt}/backstory_${language}.txt`;
     
@@ -146,7 +146,7 @@ export class BackstoryService {
   static async getOrGenerateBackstory(
     pack: UniversePack, 
     gradeLevel: string, 
-    language: string = 'da'
+    language: string = 'en'
   ): Promise<string> {
     const gradeInt = gradeLevel === "K-2" ? 1 : 
                      gradeLevel === "3-5" ? 4 : 
