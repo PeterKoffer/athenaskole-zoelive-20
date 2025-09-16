@@ -9,23 +9,26 @@
 - `docs/NELIE_Foundational_Principles.md` - **NELIE's kerneprincipper**
 - `docs/Rules.md` - **Alle projektregler**
 
-### **📋 ARKITEKTUR & IMPLEMENTATION:**
+### **📋 ARKITEKTUR & BESLUTNINGER:**
 - `docs/ARCHITECTURE.md` - App arkitektur og struktur
+- `docs/ADR-0001-nelie-orchestrator.md` - **NELIE orchestrator arkitektur**
+- `docs/ADR-0002-simulation-dsl.md` - **Simulation DSL beslutning**
 - `docs/ENGINEERING_GUIDE.md` - Praktisk implementerings guide
 - `docs/ENHANCED_NELIE_README.md` - NELIE lesson system
 - `docs/SIMULATION_PLATFORM.md` - Universe simulation engine
-- `docs/TRAINING_GROUND_PROMPT_TEMPLATE.md` - Training Ground parametre
 
 ### **🔧 SYSTEMER & INTEGRATION:**
-- `docs/PARAMETER_DATA_SOURCES.md` - Data kilder og mapping
+- `docs/PARAMETER_DATA_SOURCES_UPDATED.md` - **Nyeste data kilder mapping**
+- `docs/TRAINING_GROUND_PROMPT_TEMPLATE_UPDATED.md` - **Nyeste Training Ground parametre**
 - `docs/CURRICULUM_INDEX.md` - Pensum normalisering schema
+- `docs/CURRICULUM_COVERAGE_UPDATED.md` - **Nyeste pensum dækning status**
 - `docs/GAME_INTEGRATION_GUIDE.md` - Spil integration og tracking
 - `docs/UNIFIED_QUESTION_GENERATION.md` - Spørgsmål generering
 - `docs/COST_CONTROL.md` - AI omkostnings kontrol
 - `docs/I18N_STRATEGY.md` - Flersproget strategi
 
-### **📊 DÆKNING & PLANLÆGNING:**
-- `docs/CURRICULUM_COVERAGE.md` - Pensum dækning
+### **✅ VERIFIKATION & KVALITET:**
+- `docs/VERIFICATION_CHECKLIST.md` - **System verifikations tjekliste**
 - `docs/ASSISTANT_BRIEF.md` - Dagens fokus og prioriteter
 
 **🚨 INGEN kode må skrives uden at have gennemlæst disse regler og specifikationer!**
