@@ -7,6 +7,7 @@ import AdventureDisplay from "../components/AdventureDisplay";
 import { useAuth } from "@/hooks/useAuth";
 import type { AdventureUniverse } from "@/services/adventure/service";
 import adventureIllustration from "@/assets/adventure-illustration.jpg";
+import digitalDetoxCover from "@/assets/digital-detox-cover.webp";
 import UniverseImage from "@/components/UniverseImage";
 
 export default function TodaysAdventure() {
@@ -120,7 +121,7 @@ export default function TodaysAdventure() {
                     />
                   ) : (
                     <img 
-                      src={adventureIllustration} 
+                      src={data.universe?.title?.includes('Digital Detox') ? digitalDetoxCover : adventureIllustration} 
                       alt={`Today's Learning Adventure: ${data.universe?.title || 'Adventure'}`}
                       className="w-full h-64 object-cover"
                     />

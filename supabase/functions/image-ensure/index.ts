@@ -138,10 +138,10 @@ Deno.serve(async (req) => {
       contentType.includes("gif")  ? "gif"  : "jpg";
 
     // ---- 4) Upload to Storage
-    const safeTitle = toAscii(titleIn);
-    const path = `${universeId}/${Date.now()}-${slug(safeTitle)}.${ext}`;
+    // Use the expected path format: universeId/gradeInt/cover.webp
+    const path = `${universeId}/${gradeInt}/cover.webp`;
     const up = await supa.storage.from(bucket).upload(path, bytes, {
-      contentType,
+      contentType: "image/webp", // Always save as webp for consistency
       upsert: true,
     });
     if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
