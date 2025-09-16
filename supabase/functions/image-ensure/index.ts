@@ -63,8 +63,18 @@ Deno.serve(async (req) => {
   }
 
   const universeId = String(body.universeId ?? query.universeId ?? "default");
-  const width  = Math.max(16, Math.min(4096, Number(body.width  ?? query.width  ?? 1216)));
-  const height = Math.max(16, Math.min(4096, Number(body.height ?? query.height ?? 640)));
+  const requestedWidth  = Number(body.width  ?? query.width  ?? 1024);
+  const requestedHeight = Number(body.height ?? query.height ?? 1024);
+  
+  // OpenAI gpt-image-1 only supports specific sizes
+  const getValidOpenAISize = (w: number, h: number): string => {
+    if (w === h) return "1024x1024";
+    if (w > h) return "1792x1024";
+    return "1024x1792";
+  };
+  
+  const openaiSize = getValidOpenAISize(requestedWidth, requestedHeight);
+  const [width, height] = openaiSize.split('x').map(Number);
   const gradeInt = Number.isFinite(Number(body.gradeInt ?? query.gradeInt))
     ? Number(body.gradeInt ?? query.gradeInt)
     : undefined;
@@ -87,7 +97,7 @@ Deno.serve(async (req) => {
         model: 'gpt-image-1',
         prompt: prompt,
         n: 1,
-        size: `${width}x${height}`,
+        size: openaiSize,
         quality: 'standard',
         response_format: 'b64_json'
       }),
@@ -99,14 +109,19 @@ Deno.serve(async (req) => {
     }
 
     const openaiData = await openaiResponse.json();
+    
+    if (!openaiData.data || !openaiData.data[0] || !openaiData.data[0].b64_json) {
+      return bad("Invalid OpenAI response format", 502);
+    }
+    
     const base64Image = openaiData.data[0].b64_json;
     
     // ---- 2) Convert base64 to bytes
-    const bytes = new Uint8Array(
-      atob(base64Image)
-        .split('')
-        .map(char => char.charCodeAt(0))
-    );
+    const binaryString = atob(base64Image);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
     const contentType = "image/png";
 
     // ---- 3) Decide extension
