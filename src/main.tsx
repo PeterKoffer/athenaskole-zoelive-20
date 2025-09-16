@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { AuthProvider } from "@/hooks/useAuth";
 import "./index.css";
 
 // Bootstrap auth cache wiring
@@ -33,10 +34,12 @@ root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <ErrorBoundary>
-          <App />
-          <Toaster />
-        </ErrorBoundary>
+        <AuthProvider>
+          <ErrorBoundary>
+            <App />
+            <Toaster />
+          </ErrorBoundary>
+        </AuthProvider>
       </TooltipProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
