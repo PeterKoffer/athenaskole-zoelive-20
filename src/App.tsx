@@ -12,10 +12,9 @@ import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
-import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 
-import DailyProgramPage from "./pages/DailyProgramPage";
-import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
+
+import DailyPage from "./pages/DailyPage";
 
 function App() {
   return (
@@ -32,12 +31,20 @@ function App() {
           element={<ProtectedRoute><TrainingGround /></ProtectedRoute>}
         />
         <Route
+          path="/daily"
+          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+        />
+        <Route
           path="/daily-program"
-          element={<ProtectedRoute><DailyProgramPage /></ProtectedRoute>}
+          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/daily-session"
+          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
         />
         <Route
           path="/daily-universe-lesson"
-          element={<ProtectedRoute><DailyUniverseLessonPage /></ProtectedRoute>}
+          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
         />
         <Route
           path="/school-dashboard"
@@ -62,10 +69,6 @@ function App() {
         <Route
           path="/subject/:subject"
           element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/daily-session"
-          element={<ProtectedRoute><DailyLearningSessionPage /></ProtectedRoute>}
         />
 
         {/* fallback */}

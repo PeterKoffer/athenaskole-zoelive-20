@@ -1,7 +1,7 @@
 
 import { Home, Brain, Sparkles } from "lucide-react";
 import Index from "./pages/Index";
-import DailyProgramPage from "./pages/DailyProgramPage";
+import DailyPage from "./pages/DailyPage";
 import ConsolidatedSimulatorPage from "./pages/ConsolidatedSimulatorPage";
 
 export const navItems = [
@@ -12,10 +12,10 @@ export const navItems = [
     page: Index,
   },
   {
-    title: "Daily Program",
-    to: "/daily-program",
+    title: "Daily Learning",
+    to: "/daily",
     icon: <Sparkles className="h-4 w-4" />,
-    page: DailyProgramPage,
+    page: DailyPage,
   },
   {
     title: "Simulator",
