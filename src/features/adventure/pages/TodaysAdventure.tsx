@@ -103,21 +103,59 @@ export default function TodaysAdventure() {
               </div>
             )}
 
+            {data && (
+              <div className="space-y-4">
+                {/* Adventure Illustration and Description */}
+                <div className="relative rounded-xl overflow-hidden">
+                  <img 
+                    src={data.universe?.imageUrl || adventureIllustration} 
+                    alt={`Today's Learning Adventure: ${data.universe?.title || 'Adventure'}`}
+                    className="w-full h-64 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      Today's Adventure: {data.universe?.title || 'Learning Quest'}
+                    </h3>
+                    <p className="text-white/90 text-sm">
+                      {data.universe?.description || 'Join us on an exciting learning journey!'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Adventure Activities Preview */}
+                {data.content?.activities && (
+                  <div className="bg-black/20 rounded-lg p-6 border border-white/10">
+                    <h4 className="text-lg font-semibold text-white mb-3">What Awaits You Today</h4>
+                    <div className="space-y-3 text-white/90">
+                      {data.content.activities.slice(0, 3).map((activity: any, index: number) => (
+                        <div key={index} className="flex items-start gap-3">
+                          <div className={`w-2 h-2 ${index % 2 === 0 ? 'bg-cyan-400' : 'bg-purple-400'} rounded-full mt-2 flex-shrink-0`}></div>
+                          <p className="text-sm">{activity.instructions || activity.title}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Button */}
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={() => handleStartAdventure(data.universe, data.isRecap)}
+                    size="lg"
+                    className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Today's Adventure
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {error && (
               <div className="p-4 border border-red-400/50 bg-red-900/20 rounded-md">
                 <p className="text-red-200 text-sm font-medium">❌ Error:</p>
                 <p className="text-red-100 text-sm">{error}</p>
-              </div>
-            )}
-            
-            {data && (
-              <div className="mt-6">
-                <AdventureDisplay 
-                  universe={data.universe}
-                  content={data.content}
-                  isRecap={data.isRecap}
-                  onStartAdventure={handleStartAdventure}
-                />
               </div>
             )}
           </CardContent>
