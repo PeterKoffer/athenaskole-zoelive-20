@@ -27,10 +27,10 @@ export default function TodaysAdventure() {
     try {
       const result = await AdventureService.getTodaysAdventure({
         userId: user.id,
-        gradeLevel: "6-12", // TODO: Get from user profile
+        gradeLevel: "6-8", // Fixed to match expected format
         preferences: {
           curriculum: "DK",
-          difficulty: "average",
+          difficulty: "average", 
           learningStyle: "visual",
           interests: ["technology", "games"],
         }
@@ -109,15 +109,23 @@ export default function TodaysAdventure() {
                 {/* Adventure Illustration and Description */}
                 <div className="relative rounded-xl overflow-hidden">
                   {data.universe?.metadata?.gradeInt ? (
-                    <UniverseImage
-                      universeId={data.universe.id}
-                      gradeInt={data.universe.metadata.gradeInt}
-                      title={data.universe.title}
-                      className="w-full h-64 object-cover"
-                      alt={`Today's Learning Adventure: ${data.universe.title}`}
-                      width={1024}
-                      height={576}
-                    />
+                    <>
+                      {console.log('Adventure Image Debug:', {
+                        universeId: data.universe.id,
+                        gradeInt: data.universe.metadata.gradeInt,
+                        title: data.universe.title,
+                        imagePrompt: data.universe.imagePrompt
+                      })}
+                      <UniverseImage
+                        universeId={data.universe.id}
+                        gradeInt={data.universe.metadata.gradeInt}
+                        title={data.universe.title}
+                        className="w-full h-64 object-cover"
+                        alt={`Today's Learning Adventure: ${data.universe.title}`}
+                        width={1024}
+                        height={576}
+                      />
+                    </>
                   ) : (
                     <img 
                       src={adventureIllustration} 
