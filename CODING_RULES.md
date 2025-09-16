@@ -5,11 +5,15 @@
 - `docs/ASSISTANT_BRIEF.md` - Dagens fokus og prioriteter
 - `docs/PRODUCT_SPEC.md` - Produktspecifikation og krav
 - `docs/Rules.md` - Alle projektregler
+- `docs/NELIE_Foundational_Principles.md` - **KRITISK: NELIE's kerneprincipper**
+- `docs/ENHANCED_NELIE_README.md` - **KRITISK: NELIE lesson system**
 - `docs/TRAINING_GROUND_PROMPT_TEMPLATE.md` - Training Ground parametre
 - `docs/PARAMETER_DATA_SOURCES.md` - Data kilder og mapping
 - `docs/ARCHITECTURE.md` - App arkitektur og struktur
 - `docs/ENGINEERING_GUIDE.md` - Praktisk implementerings guide
 - `docs/CURRICULUM_COVERAGE.md` - Pensum dækning
+- `docs/GAME_INTEGRATION_GUIDE.md` - Spil integration og tracking
+- `docs/UNIFIED_QUESTION_GENERATION.md` - Spørgsmål generering system
 - Alle andre relevante dokumenter i `docs/` folderen
 
 **INGEN kode må skrives uden at have gennemlæst disse regler og parametre!**
