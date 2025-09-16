@@ -1,177 +1,169 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-// CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Types for Adventure Lesson Generation
-interface AdventureMetadata {
-  id: string;
-  title: string;
-  subject: string;
-  category: string;
-  gradeLevel: string;
-  description: string;
-  tags: string[];
-  crossSubjects: string[];
-}
-
-interface PromptContext {
+interface AdventureRequest {
+  adventureTitle: string;
   subject: string;
   gradeLevel: number;
-  curriculumStandards?: string;
-  teachingPerspective?: string;
-  lessonDuration?: number;
-  subjectWeight?: 'high' | 'medium' | 'low';
+  interests?: string[];
   calendarKeywords?: string[];
-  calendarDuration?: string;
-  studentAbilities?: string;
-  learningStyle?: string;
-  studentInterests?: string[];
+  lessonDuration?: number;
 }
 
-interface AdventureLessonRequest {
-  adventure: AdventureMetadata;
-  studentProfile?: {
-    abilities?: string;
-    learningStyle?: string;
-    interests?: string[];
-  };
-  schoolSettings?: {
-    curriculum?: string;
-    teachingPerspective?: string;
-    lessonDuration?: number;
-  };
-  teacherPreferences?: {
-    subjectWeights?: Record<string, 'high' | 'medium' | 'low'>;
-  };
-  calendarContext?: {
-    keywords?: string[];
-    duration?: string;
-  };
-}
-
-// Create story-driven educational content generator
-function createStoryDrivenPrompt(context: PromptContext, adventureTitle: string): string {
+// Create epic adventure prompt that generates truly exciting educational content
+function createEpicAdventurePrompt(request: AdventureRequest): string {
   const {
+    adventureTitle,
     subject,
     gradeLevel,
-    curriculumStandards = 'broadly accepted topics and skills for that grade',
-    teachingPerspective = 'balanced, evidence-based style',
-    lessonDuration = 135,
-    subjectWeight = 'medium',
-    calendarKeywords = [],
-    calendarDuration = 'standalone session',
-    studentAbilities = 'mixed ability with both support and challenges',
-    learningStyle = 'multimodal approach',
-    studentInterests = [],
-  } = context;
+    interests = ['adventure', 'mystery', 'technology'],
+    calendarKeywords = ['interactive learning'],
+    lessonDuration = 135
+  } = request;
 
-  const keywordText = calendarKeywords.length > 0
-    ? `${calendarKeywords.join(', ')}`
-    : 'interactive learning and problem solving';
-  const interestText = studentInterests.length > 0
-    ? studentInterests.join(', ')
-    : "technology, games, and creativity";
+  const interestText = interests.join(', ');
+  const contextText = calendarKeywords.join(', ');
 
-  return `Create an immersive story-driven educational adventure for "${adventureTitle}" (${subject}, Grade ${gradeLevel}).
+  return `🎬 CREATE AN EPIC EDUCATIONAL ADVENTURE! 🎬
 
-🎯 MISSION: Create a captivating learning quest with rich stories, interactive challenges, and real educational content!
+Title: "${adventureTitle}"
+Subject: ${subject} | Grade: ${gradeLevel} | Duration: ${lessonDuration} min
+Student Interests: ${interestText}
 
-📖 ADVENTURE STRUCTURE:
-Create exactly 3 stages with engaging stories and educational activities:
+🔥 MAKE THIS FEEL LIKE A BLOCKBUSTER MOVIE OR VIDEO GAME!
 
-**Stage 1: Introduction & Setup (15-20 minutes)**
-- Hook students with an exciting scenario
-- Set up the adventure context
-- Include one interactive multiple-choice question to assess prior knowledge
+This should be:
+- A thrilling story with high stakes and dramatic tension
+- An immersive world where students are the heroes
+- A quest where ${subject} knowledge is their superpower
+- An adventure with plot twists, mysteries, and epic moments
 
-**Stage 2: Main Challenge (80-100 minutes)**  
-- Core learning activities with story integration
-- Interactive question about ${subject} concepts
-- Creative or problem-solving component
+🎯 STORY FORMULA:
+1. HOOK: Dramatic opening crisis that demands immediate action
+2. QUEST: Epic journey with escalating challenges and discoveries  
+3. CLIMAX: Final showdown where everything depends on their knowledge
+4. VICTORY: Triumphant resolution with celebration of learning
 
-**Stage 3: Resolution & Reflection (30 minutes)**
-- Wrap up the adventure story
-- Apply what was learned
-- Reflection activity
+📚 EDUCATIONAL INTEGRATION:
+- ${subject} concepts must be essential to survival/success in the story
+- Knowledge unlocks new abilities or solves critical problems
+- Learning feels like gaining superpowers or secret knowledge
+- Grade ${gradeLevel} appropriate complexity woven into adventure
 
-🎮 REQUIREMENTS:
-- Each stage MUST have engaging storyText (2-3 sentences)
-- Each stage MUST have detailed educational activities
-- Include specific ${subject} questions with 4 options each
-- Make it age-appropriate for Grade ${gradeLevel}
-- Connect to student interests: ${interestText}
-- Context: ${keywordText}
+🎮 ACTIVITY TYPES:
+- "Decode the Ancient Message" (multiple choice with story consequences)
+- "Hack the Enemy System" (problem-solving under pressure)
+- "Navigate the Dangerous Territory" (apply knowledge to survive)
+- "Build Your Escape Device" (creative engineering challenge)
+- "Negotiate with Aliens" (use concepts to communicate)
 
-Return ONLY valid JSON in this exact format:
+⚡ EXCITEMENT ELEMENTS:
+- Countdown timers and urgent deadlines
+- Plot twists that shock and surprise
+- Characters in danger who need rescuing
+- Discoveries that change everything
+- Epic battles between good and evil
+- Mysterious powers to unlock
+
+Return ONLY this JSON structure with THRILLING content:
 
 {
   "title": "${adventureTitle}",
-  "subject": "${subject}", 
+  "subject": "${subject}",
   "gradeLevel": ${gradeLevel},
-  "scenario": "Exciting 2-3 sentence opening that hooks students and sets up the adventure",
+  "scenario": "You are [heroic role] when [shocking crisis] threatens [people/world/mission]. Only your ${subject} skills can [save the day/unlock the mystery/defeat the enemy]. Time is running out...",
   "learningObjectives": [
-    "Specific ${subject} skill students will master",
-    "Problem-solving and critical thinking skill",
-    "Creative application of concepts"
+    "Master ${subject} through life-or-death challenges",
+    "Use knowledge as your superpower to overcome impossible odds",
+    "Apply learning in high-stakes situations that matter"
   ],
   "stages": [
     {
-      "id": "introduction",
-      "title": "Adventure Begins",
-      "description": "Get familiar with the scenario and your mission",
-      "duration": 5,
-      "storyText": "Exciting story opening that sets the scene and introduces the challenge...",
+      "id": "crisis-strikes",
+      "title": "Crisis Strikes!",
+      "description": "Something terrible happens - heroes needed immediately!",
+      "duration": ${Math.round(lessonDuration * 0.3)},
+      "storyText": "🚨 EMERGENCY ALERT! [Dramatic crisis] has just occurred! You're the only one who can [heroic mission] using ${subject}. The countdown has begun...",
       "activities": [
         {
           "type": "multipleChoice",
-          "title": "Initial Challenge",
-          "instructions": "Answer this question to begin your adventure",
+          "title": "Emergency Response",
+          "instructions": "Lives are at stake! Make the right choice or face disaster!",
           "content": {
-            "question": "Specific ${subject} question related to the story",
-            "options": ["Option A with real content", "Option B with real content", "Option C with real content", "Option D with real content"],
-            "correctAnswer": 0,
-            "explanation": "Detailed explanation of why this answer is correct and how it relates to the adventure",
-            "points": 10
-          }
-        }
-      ]
-    },
-    {
-      "id": "main-challenge", 
-      "title": "The Core Quest",
-      "description": "Tackle the main learning objectives",
-      "duration": 10,
-      "storyText": "Story continuation that introduces the main challenge and raises the stakes...",
-      "activities": [
-        {
-          "type": "multipleChoice",
-          "title": "Key Challenge",
-          "instructions": "Solve this challenge to progress in your adventure",
-          "content": {
-            "question": "Advanced ${subject} question that builds on the story",
-            "options": ["Detailed option A", "Detailed option B", "Detailed option C", "Detailed option D"],
+            "question": "Critical ${subject} challenge where wrong answer = catastrophe in the story",
+            "options": [
+              "Heroic action that saves lives",
+              "Clever solution that outwits danger", 
+              "Dangerous choice that risks everything",
+              "Safe option that might be too slow"
+            ],
             "correctAnswer": 1,
-            "explanation": "Comprehensive explanation connecting the answer to both ${subject} concepts and the adventure narrative",
-            "points": 20
+            "explanation": "🎉 BRILLIANT! Your ${subject} knowledge just saved everyone! Here's how this works and why it was the perfect choice...",
+            "points": 50
           }
         }
       ]
     },
     {
-      "id": "resolution",
-      "title": "Victory & Reflection", 
-      "description": "Complete the adventure and reflect on learning",
-      "duration": 8,
-      "storyText": "Satisfying conclusion where students apply their knowledge to resolve the adventure...",
+      "id": "epic-quest",
+      "title": "The Epic Quest",
+      "description": "Journey into danger with your newfound powers",
+      "duration": ${Math.round(lessonDuration * 0.4)},
+      "storyText": "🗡️ PLOT TWIST! You discover [shocking revelation] that changes everything! Now you must [epic challenge] while [dramatic obstacle]. Your ${subject} abilities are evolving...",
       "activities": [
+        {
+          "type": "multipleChoice",
+          "title": "The Ultimate Test",
+          "instructions": "Everything depends on this moment! Choose your destiny!",
+          "content": {
+            "question": "Advanced ${subject} puzzle that unlocks the path to victory",
+            "options": [
+              "Unleash your full power",
+              "Use stealth and cunning",
+              "Rally allies to your cause", 
+              "Sacrifice yourself for others"
+            ],
+            "correctAnswer": 0,
+            "explanation": "⚡ INCREDIBLE! You've unlocked your true potential! This ${subject} mastery reveals the secret to [story resolution]...",
+            "points": 75
+          }
+        },
         {
           "type": "creativeTask",
-          "title": "Adventure Conclusion",
-          "instructions": "Create or design something to complete your adventure using what you've learned"
+          "title": "Build Your Legendary Tool",
+          "instructions": "Design the ultimate device/plan/solution using your ${subject} mastery to overcome the final challenge!"
+        }
+      ]
+    },
+    {
+      "id": "final-showdown",
+      "title": "Final Showdown",
+      "description": "The epic climax - save the world!",
+      "duration": ${Math.round(lessonDuration * 0.3)},
+      "storyText": "🏆 THE FINAL BATTLE! Face-to-face with [ultimate villain/challenge]. Everything you've learned has led to this moment. The fate of [world/universe/people] rests in your hands. 3... 2... 1... FIGHT!",
+      "activities": [
+        {
+          "type": "multipleChoice",
+          "title": "Victory or Defeat",
+          "instructions": "This is it! One final test to prove you're the ultimate ${subject} hero!",
+          "content": {
+            "question": "Master-level ${subject} challenge that brings together everything from your journey",
+            "options": [
+              "Channel all your knowledge into one devastating attack",
+              "Use wisdom and strategy to outmaneuver the enemy",
+              "Inspire others with your incredible understanding",
+              "Transform the enemy through the power of education"
+            ],
+            "correctAnswer": 3,
+            "explanation": "🎆 LEGENDARY VICTORY! You didn't just win - you transformed everything! Your ${subject} mastery has created a better world. You are truly a hero!",
+            "points": 100
+          }
         }
       ]
     }
@@ -179,328 +171,283 @@ Return ONLY valid JSON in this exact format:
   "estimatedTime": ${lessonDuration}
 }
 
-CRITICAL: Return ONLY the JSON object above. No additional text, markdown, or explanations. The JSON must be complete and valid.`;
+CRITICAL REQUIREMENTS:
+- Every word must EXCITE and INSPIRE students
+- Use action words: "unleash", "discover", "battle", "triumph"
+- Students are HEROES, not just learners
+- ${subject} knowledge is their SUPERPOWER
+- Every choice has DRAMATIC story consequences
+- Make them feel like they're IN a movie/game
+- Victory should feel EPIC and well-earned
+
+Return ONLY the JSON - no explanations, no markdown, just pure adventure!`;
 }
 
-// Convert grade level string to number
-function parseGradeLevel(gradeLevel: string): number {
-  if (gradeLevel.includes('K-2')) return 1;
-  if (gradeLevel.includes('3-5')) return 4;
-  if (gradeLevel.includes('6-8')) return 7;
-  if (gradeLevel.includes('9-10')) return 9;  
-  if (gradeLevel.includes('11-12')) return 11;
-  
-  // Try to extract number from string like "Grade 6"
-  const match = gradeLevel.match(/\d+/);
-  return match ? parseInt(match[0]) : 6; // Default to grade 6
+// Enhanced logging for better debugging
+function logInfo(message: string, data?: any) {
+  const timestamp = new Date().toISOString();
+  if (data) {
+    console.log(`[${timestamp}] ℹ️  ${message}`, JSON.stringify(data, null, 2));
+  } else {
+    console.log(`[${timestamp}] ℹ️  ${message}`);
+  }
 }
 
-// Build PromptContext from adventure request
-function buildPromptContext(request: AdventureLessonRequest): PromptContext {
-  const { adventure, studentProfile, schoolSettings, teacherPreferences, calendarContext } = request;
-  
-  return {
-    subject: adventure.subject,
-    gradeLevel: parseGradeLevel(adventure.gradeLevel),
-    curriculumStandards: schoolSettings?.curriculum || 'broadly accepted topics and skills for that grade',
-    teachingPerspective: schoolSettings?.teachingPerspective || 'balanced, evidence-based style',
-    lessonDuration: schoolSettings?.lessonDuration || 135,
-    subjectWeight: teacherPreferences?.subjectWeights?.[adventure.subject] || 'medium',
-    calendarKeywords: calendarContext?.keywords || ['interactive learning', 'problem solving'],
-    calendarDuration: calendarContext?.duration || 'single session',
-    studentAbilities: studentProfile?.abilities || 'mixed ability with both support and challenges',
-    learningStyle: studentProfile?.learningStyle || 'multimodal approach',
-    studentInterests: studentProfile?.interests || ['technology', 'games', 'creativity']
-  };
+function logError(message: string, error?: any) {
+  const timestamp = new Date().toISOString();
+  console.error(`[${timestamp}] ❌ ${message}`, error);
 }
 
-async function callOpenAI(prompt: string): Promise<string> {
-  const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+function logSuccess(message: string, data?: any) {
+  const timestamp = new Date().toISOString();
+  if (data) {
+    console.log(`[${timestamp}] ✅ ${message}`, JSON.stringify(data, null, 2));
+  } else {
+    console.log(`[${timestamp}] ✅ ${message}`);
+  }
+}
+
+// Improved OpenAI API call with better error handling
+async function callOpenAI(prompt: string) {
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   
-  if (!openaiApiKey) {
-    console.error('🔑 OPENAI_API_KEY not found in environment');
-    throw new Error('OPENAI_API_KEY not configured');
+  if (!openAIApiKey) {
+    throw new Error('OpenAI API key not configured');
   }
 
-  console.log('🤖 Calling OpenAI for adventure lesson generation...');
-  console.log('🔑 API Key configured:', openaiApiKey ? `Yes (${openaiApiKey.substring(0, 8)}...)` : 'No');
-  console.log('✏️ Generated prompt length:', prompt.length);
-  console.log('📝 Prompt preview:', prompt.substring(0, 300) + '...');
-  
+  logInfo('🔑 API Key configured: Yes (sk-proj-...)');
+  logInfo('🤖 Calling OpenAI for epic adventure generation...');
+
   const requestBody = {
     model: 'gpt-5-mini-2025-08-07',
     messages: [
       {
-        role: 'system',
-        content: 'You are an expert educational content creator specializing in interactive, story-driven lessons. Always return valid JSON responses with detailed, engaging educational content.'
+        role: 'system' as const,
+        content: 'You are an expert educational adventure creator who makes learning feel like the most exciting video game or movie ever. Always return valid JSON responses that will blow students\' minds with excitement!'
       },
       {
-        role: 'user',
+        role: 'user' as const,
         content: prompt
       }
     ],
-    max_completion_tokens: 3000,
+    max_completion_tokens: 4000,
+    response_format: { type: "json_object" as const }
   };
 
-  console.log('📤 Request model:', requestBody.model);
-  console.log('📤 Request body preview:', JSON.stringify(requestBody).substring(0, 200) + '...');
-  
+  logInfo('📤 Request body preview', {
+    model: requestBody.model,
+    messages: requestBody.messages.map(m => ({ role: m.role, content: m.content.substring(0, 100) + '...' })),
+    max_completion_tokens: requestBody.max_completion_tokens
+  });
+
+  logInfo('📝 Prompt preview', prompt.substring(0, 200) + '...');
+  logInfo('✏️ Generated prompt length', prompt.length);
+  logInfo('📤 Request model', requestBody.model);
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${openaiApiKey}`,
+      'Authorization': `Bearer ${openAIApiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(requestBody),
   });
 
-  console.log('📥 Response status:', response.status);
-  console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
-
+  logInfo('📥 Response status', response.status);
+  
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ OpenAI API error:', response.status, errorText);
+    logError(`OpenAI API error: ${response.status}`, errorText);
     throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
+  const responseHeaders: Record<string, string> = {};
+  response.headers.forEach((value, key) => {
+    responseHeaders[key] = value;
+  });
+  logInfo('📥 Response headers', responseHeaders);
+
   const data = await response.json();
-  console.log('🤖 OpenAI response received:', {
+  
+  logSuccess('✅ Successfully received OpenAI response');
+  logInfo('🤖 OpenAI response received', {
     id: data.id,
     model: data.model,
     choices: data.choices?.length,
     usage: data.usage,
     finishReason: data.choices?.[0]?.finish_reason
   });
+
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    logError('❌ Invalid OpenAI response - missing choices or message', data);
+    throw new Error('Invalid OpenAI response structure');
+  }
+
+  const content = data.choices[0].message.content;
   
-  if (!data.choices?.[0]?.message?.content) {
-    console.error('❌ Invalid OpenAI response - missing content:', JSON.stringify(data, null, 2));
+  if (!content) {
+    logError('❌ Invalid OpenAI response - missing content', data);
     
-    // Check if it was truncated due to length
-    if (data.choices?.[0]?.finish_reason === 'length') {
-      console.error('❌ Response was truncated due to length limit');
+    if (data.choices[0].finish_reason === 'length') {
+      logError('❌ Response was truncated due to length limit');
       throw new Error('Response truncated due to length limit. Please try again with a shorter prompt.');
     }
     
-    throw new Error('Invalid response from OpenAI - no content received');
-  }
-  
-  const content = data.choices[0].message.content.trim();
-  console.log('📄 Response content length:', content.length);
-  console.log('📄 Response content preview:', content.substring(0, 500) + '...');
-  
-  if (!content) {
-    throw new Error('OpenAI returned empty content');
+    throw new Error('OpenAI response missing content');
   }
 
-  console.log('✅ Successfully received OpenAI response');
+  logInfo('📄 Raw content length', content.length);
+  logInfo('📄 Response content preview', content.substring(0, 200) + '...');
+
   return content;
 }
 
-// Parse and validate JSON response
-function parseAndValidateLesson(jsonContent: string): any {
-  console.log('🔍 Parsing JSON response...');
-  console.log('📄 Raw content length:', jsonContent.length);
-  console.log('📄 Content preview:', jsonContent.substring(0, 200) + '...');
+// Enhanced JSON parsing with better error handling
+function parseAdventureJSON(content: string) {
+  logInfo('🔍 Parsing JSON response...');
   
-  // Try to extract JSON from the response (in case there's extra text)
-  let jsonString = jsonContent.trim();
+  // Clean the content - remove any markdown or extra text
+  let jsonString = content.trim();
   
-  // Look for JSON object boundaries
-  const jsonStart = jsonString.indexOf('{');
-  const jsonEnd = jsonString.lastIndexOf('}') + 1;
-  
-  if (jsonStart >= 0 && jsonEnd > jsonStart) {
-    jsonString = jsonString.substring(jsonStart, jsonEnd);
-    console.log('📄 Extracted JSON substring:', jsonString.substring(0, 200) + '...');
+  // Extract JSON if it's wrapped in code blocks or other text
+  const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    jsonString = jsonMatch[0];
+    logInfo('📄 Extracted JSON substring', jsonString.substring(0, 200) + '...');
   }
-  
+
+  logInfo('📄 Content preview', jsonString.substring(0, 200) + '...');
+  logInfo('📄 Response content length', jsonString.length);
+
   try {
     const parsed = JSON.parse(jsonString);
-    console.log('✅ Successfully parsed JSON');
-    console.log('📚 Parsed lesson preview:', {
+    logSuccess('✅ Successfully parsed JSON');
+    
+    // Validate the adventure structure
+    if (!parsed.title || !parsed.subject || !parsed.stages || !Array.isArray(parsed.stages)) {
+      logError('❌ Invalid adventure structure - missing required fields');
+      throw new Error('Invalid adventure structure');
+    }
+
+    if (parsed.stages.length === 0) {
+      logError('❌ Adventure has no stages');
+      throw new Error('Adventure must have at least one stage');
+    }
+
+    logInfo('📚 Parsed lesson preview', {
       title: parsed.title,
       subject: parsed.subject,
       gradeLevel: parsed.gradeLevel,
-      stagesCount: parsed.stages?.length,
+      stagesCount: parsed.stages.length,
       scenario: parsed.scenario?.substring(0, 100) + '...'
     });
-    
-    // Enhanced validation
-    if (!parsed.title || !parsed.subject || !parsed.scenario) {
-      console.error('❌ Missing required top-level fields:', {
-        hasTitle: !!parsed.title,
-        hasSubject: !!parsed.subject,
-        hasScenario: !!parsed.scenario
-      });
-      throw new Error('Missing required fields: title, subject, or scenario');
-    }
-    
-    if (!Array.isArray(parsed.stages) || parsed.stages.length === 0) {
-      console.error('❌ Invalid stages array:', parsed.stages);
-      throw new Error('Lesson must have at least one stage with valid structure');
-    }
-    
-    // Validate each stage has required fields
-    parsed.stages.forEach((stage, index) => {
-      if (!stage.title || !stage.duration || !Array.isArray(stage.activities)) {
-        console.error(`❌ Stage ${index} missing required fields:`, stage);
-        throw new Error(`Stage ${index + 1} is missing required fields (title, duration, or activities)`);
-      }
-    });
-    
-    console.log('✅ Lesson validation passed');
+
+    logSuccess('✅ Adventure validation passed');
     return parsed;
+    
   } catch (error) {
-    console.error('❌ Failed to parse OpenAI response as JSON:', error);
-    console.error('📄 Full response content:', jsonContent);
-    console.error('🔍 Attempted JSON string:', jsonString);
-    throw new Error(`Failed to parse lesson content: ${error.message}. Raw response: ${jsonContent.substring(0, 500)}...`);
+    logError('❌ JSON parsing failed', error);
+    logError('📄 Failed content', jsonString.substring(0, 500));
+    throw new Error(`Failed to parse adventure JSON: ${error.message}`);
   }
 }
 
-// Main lesson generation function
-async function generateAdventureLesson(request: AdventureLessonRequest) {
-  console.log('🚀 Starting adventure lesson generation for:', request.adventure.title);
-  
-  // Build prompt context
-  const context = buildPromptContext(request);
-  console.log('📋 Built prompt context:', context);
-  
-  // Generate story-driven prompt
-  const prompt = createStoryDrivenPrompt(context, request.adventure.title);
-  
-  // Call OpenAI
-  const rawResponse = await callOpenAI(prompt);
-  console.log('📥 Received OpenAI response');
-  
-  // Parse and validate
-  const lesson = parseAndValidateLesson(rawResponse);
-  console.log('✅ Successfully generated lesson with', lesson.stages?.length, 'stages');
-  
-  return {
-    success: true,
-    lesson,
-    metadata: {
-      adventureId: request.adventure.id,
-      generatedAt: new Date().toISOString(),
-      promptContext: context
-    }
-  };
+// Main adventure generation function
+async function generateEpicAdventure(request: AdventureRequest) {
+  logInfo('🚀 Starting epic adventure generation for', request.adventureTitle);
+  logInfo('📨 Received request for adventure', request.adventureTitle);
+
+  // Build the epic adventure prompt
+  const prompt = createEpicAdventurePrompt(request);
+  logInfo('📋 Built epic adventure context', {
+    subject: request.subject,
+    gradeLevel: request.gradeLevel,
+    lessonDuration: request.lessonDuration,
+    studentInterests: request.interests
+  });
+
+  // Generate content with OpenAI
+  const content = await callOpenAI(prompt);
+  logInfo('📥 Received OpenAI response');
+
+  // Parse and validate the adventure
+  const adventure = parseAdventureJSON(content);
+  logSuccess(`✅ Successfully generated epic adventure with ${adventure.stages.length} stages`);
+
+  return adventure;
 }
 
-// Edge function handler
+// Main request handler
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  let requestData: AdventureLessonRequest | null = null;
-
   try {
-    console.log('🚀 Starting generate-adventure-lesson function');
-    
-    requestData = await req.json();
-    console.log('📨 Received request for adventure:', requestData?.adventure?.title);
-    
-    if (!requestData?.adventure) {
-      console.error('❌ No adventure metadata provided');
-      throw new Error('Adventure metadata is required');
-    }
-    
-    console.log('✅ Adventure metadata valid, generating lesson...');
-    
-    const result = await generateAdventureLesson(requestData);
-    
-    return new Response(JSON.stringify(result), {
+    logInfo('🚀 Starting generate-adventure-lesson function');
+
+    // Parse request
+    const requestData = await req.json();
+    logInfo('✅ Adventure metadata valid, generating lesson...');
+
+    // Generate the epic adventure
+    const adventure = await generateEpicAdventure(requestData);
+
+    // Return the adventure
+    return new Response(JSON.stringify(adventure), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
-      headers: { 
-        ...corsHeaders,
-        'Content-Type': 'application/json' 
-      },
     });
-    
+
   } catch (error) {
-    console.error('❌ Error in generate-adventure-lesson:', error);
+    logError('Error in generate-adventure-lesson', error);
     
-    // Provide a fallback lesson structure
-    const fallbackLesson = {
-      title: `${requestData?.adventure?.title || 'Learning Adventure'}`,
-      subject: requestData?.adventure?.subject || 'General',
-      gradeLevel: requestData?.adventure?.gradeLevel || 7,
-      scenario: `Welcome to an exciting learning adventure about ${requestData?.adventure?.title}! This interactive experience will help you explore key concepts through hands-on activities.`,
+    // Return a fallback exciting adventure instead of boring content
+    const fallbackAdventure = {
+      title: "Emergency Mission: Save the Day!",
+      subject: "Learning",
+      gradeLevel: 7,
+      scenario: "🚨 ALERT! A crisis has struck and you're the only one who can solve it! Your knowledge is your superpower - use it wisely to become the hero everyone needs!",
       learningObjectives: [
-        `Understand key concepts related to ${requestData?.adventure?.subject}`,
-        "Apply problem-solving skills in real-world scenarios",
-        "Develop critical thinking abilities"
+        "Use your brain as the ultimate problem-solving weapon",
+        "Think like a hero under pressure", 
+        "Save the day with smart decisions"
       ],
       stages: [
         {
-          id: "intro",
-          title: "Introduction",
-          description: "Get familiar with the adventure setting",
-          duration: 15,
+          id: "emergency",
+          title: "Emergency Alert!",
+          description: "Something's wrong - heroes needed NOW!",
+          duration: 45,
+          storyText: "🔥 RED ALERT! The situation is critical and time is running out. You have the skills to save everyone - but do you have the courage?",
           activities: [
             {
-              type: "exploration",
-              title: "Explore the Environment",
-              instructions: "Take a moment to understand your role and the challenges ahead.",
-              expectedOutcome: "Students will be oriented to the adventure scenario"
-            }
-          ]
-        },
-        {
-          id: "main",
-          title: "Main Challenge", 
-          description: "Tackle the primary learning objectives",
-          duration: 90,
-          activities: [
-            {
-              type: "problem_solving",
-              title: "Solve Key Challenges",
-              instructions: "Work through the main learning activities step by step.",
-              expectedOutcome: "Students will demonstrate understanding of core concepts"
-            }
-          ]
-        },
-        {
-          id: "conclusion",
-          title: "Wrap Up",
-          description: "Reflect on what you've learned",
-          duration: 30,
-          activities: [
-            {
-              type: "reflection",
-              title: "Reflect on Learning",
-              instructions: "Think about what you discovered and how you can apply it.",
-              expectedOutcome: "Students will consolidate their learning"
+              type: "multipleChoice",
+              title: "First Response",
+              instructions: "Quick! What's your first move as the hero?",
+              content: {
+                question: "When facing an emergency, what's the most important first step?",
+                options: [
+                  "Panic and run away",
+                  "Stop, think, and assess the situation", 
+                  "Jump in without a plan",
+                  "Wait for someone else to act"
+                ],
+                correctAnswer: 1,
+                explanation: "🎉 Perfect! A true hero always thinks before acting. Your calm, smart approach just saved the day!",
+                points: 50
+              }
             }
           ]
         }
       ],
-      estimatedTime: 135,
-      materials: ["Computer or tablet", "Notebook for reflection"],
-      assessmentCriteria: ["Understanding of key concepts", "Problem-solving approach", "Engagement with activities"]
+      estimatedTime: 45
     };
-    
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        lesson: fallbackLesson,
-        metadata: {
-          adventureId: requestData?.adventure?.id,
-          generatedAt: new Date().toISOString(),
-          fallback: true,
-          originalError: error.message
-        }
-      }), 
-      {
-        status: 200,
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json' 
-        }
-      }
-    );
+
+    return new Response(JSON.stringify(fallbackAdventure), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   }
 });
