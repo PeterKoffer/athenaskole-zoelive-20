@@ -90,52 +90,18 @@ export default function TodaysAdventure() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Adventure Illustration and Description */}
-            <div className="space-y-4">
-              <div className="relative rounded-xl overflow-hidden">
-                <img 
-                  src={adventureIllustration} 
-                  alt="Today's Learning Adventure" 
-                  className="w-full h-64 object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-xl font-bold text-white mb-2">Today's Adventure: Mathematical Mysteries</h3>
-                  <p className="text-white/90 text-sm">
-                    Join us on an exciting journey through the world of numbers and patterns!
-                  </p>
-                </div>
+            {loading && (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+                <span className="ml-3 text-white">Loading your adventure...</span>
               </div>
+            )}
 
-              <div className="bg-black/20 rounded-lg p-6 border border-white/10">
-                <h4 className="text-lg font-semibold text-white mb-3">What Awaits You Today</h4>
-                <div className="space-y-3 text-white/90">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm">Explore fascinating mathematical patterns in nature</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm">Solve interactive puzzles and brain teasers</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm">Discover how math connects to real-world applications</p>
-                  </div>
-                </div>
+            {!loading && !data && !error && (
+              <div className="text-center py-12">
+                <p className="text-white/90">Your adventure is being prepared...</p>
               </div>
-            </div>
-
-            {/* Action Button */}
-            <div className="flex justify-center">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Start Adventure
-              </Button>
-            </div>
+            )}
 
             {error && (
               <div className="p-4 border border-red-400/50 bg-red-900/20 rounded-md">
