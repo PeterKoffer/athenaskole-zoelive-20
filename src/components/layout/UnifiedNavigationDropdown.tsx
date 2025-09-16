@@ -57,9 +57,9 @@ const UnifiedNavigationDropdown = ({
 
   const dashboardItems = [
     {
-      title: "Daily Program",
-      href: "/daily-program",
-      description: "Access your daily learning activities and progress",
+      title: "Today's Adventure",
+      href: "/adventure",
+      description: "Start your daily learning adventure",
       icon: Calendar,
       show: true
     },
@@ -84,13 +84,6 @@ const UnifiedNavigationDropdown = ({
         description: "Manage your classes and student progress", 
         icon: GraduationCap,
         show: true
-      },
-      {
-        title: "Universe Admin",
-        href: "/admin/universe",
-        description: "Configure universe scheduling and timezone settings",
-        icon: Settings,
-        show: true
       }
     ] : []),
     ...(userRole === 'parent' ? [{
@@ -106,13 +99,6 @@ const UnifiedNavigationDropdown = ({
         href: "/admin-dashboard", 
         description: "Full system management and administration",
         icon: Shield,
-        show: true
-      },
-      {
-        title: "Universe Admin",
-        href: "/admin/universe",
-        description: "Configure universe scheduling and timezone settings",
-        icon: Settings,
         show: true
       }
     ] : [])
