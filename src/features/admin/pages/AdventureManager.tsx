@@ -40,7 +40,7 @@ export default function AdventureManager() {
     setGenerating(true);
     try {
       const result = await AdventureImageService.generateAgeImages({
-        batchSize: 3,
+        batchSize: 50, // Process 50 adventures at once instead of 3
         ageGroups: ageGroups as any
       });
       

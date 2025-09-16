@@ -137,7 +137,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { batchSize = 5, ageGroups = ['child', 'teen', 'adult'] } = await req.json();
+    const { batchSize = 50, ageGroups = ['child', 'teen', 'adult'] } = await req.json();
 
     console.log(`Starting batch generation for age groups: ${ageGroups.join(', ')}`);
 
