@@ -205,6 +205,15 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Debug info - remove later */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="bg-red-500/20 p-4 rounded text-white text-xs">
+                    <p>Debug - Activity Type: {activity.type}</p>
+                    <p>Debug - Has Content: {activity.content ? 'Yes' : 'No'}</p>
+                    <p>Debug - Activity Keys: {Object.keys(activity).join(', ')}</p>
+                  </div>
+                )}
+                
                 {activity.type === 'multipleChoice' && activity.content && (
                   <>
                     <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-lg border border-blue-400/30">
@@ -289,6 +298,59 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                         <p className="text-white/80 text-sm">Use your imagination and creativity!</p>
                       </div>
                     </div>
+                  </div>
+                )}
+                
+                {/* Fallback rendering for any unhandled activity types */}
+                {!['multipleChoice', 'creativeTask'].includes(activity.type) && (
+                  <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-lg border border-blue-400/30">
+                    <h3 className="font-semibold text-white mb-3 text-lg">Activity: {activity.title}</h3>
+                    <p className="text-white/90 mb-4">{activity.instructions}</p>
+                    
+                    {/* Show any content if available */}
+                    {activity.content && (
+                      <div className="space-y-4">
+                        {activity.content.question && (
+                          <div className="bg-white/10 p-4 rounded-lg">
+                            <h4 className="text-white font-medium mb-2">Question:</h4>
+                            <p className="text-white/90">{activity.content.question}</p>
+                          </div>
+                        )}
+                        
+                        {activity.content.options && Array.isArray(activity.content.options) && (
+                          <div className="space-y-2">
+                            <h4 className="text-white font-medium">Options:</h4>
+                            {activity.content.options.map((option: string, index: number) => (
+                              <Button
+                                key={index}
+                                onClick={() => handleAnswerSelect(index)}
+                                disabled={hasAnswered}
+                                variant="outline"
+                                className="w-full text-left justify-start border-white/30 text-white hover:bg-white/10"
+                              >
+                                {String.fromCharCode(65 + index)}. {option}
+                              </Button>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {showExplanation && activity.content.explanation && (
+                          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-4 rounded-lg border border-green-400/30">
+                            <p className="text-white/95">{activity.content.explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Generic activity completion button */}
+                    {!activity.content?.options && (
+                      <Button 
+                        onClick={() => setCompletedActivities(prev => new Set(prev).add(currentStage))}
+                        className="mt-4 bg-gradient-to-r from-purple-500 to-blue-500"
+                      >
+                        Mark as Complete
+                      </Button>
+                    )}
                   </div>
                 )}
               </CardContent>
