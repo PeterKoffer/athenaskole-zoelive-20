@@ -182,6 +182,24 @@ async function callOpenAI(prompt: string): Promise<any> {
   }
 
   console.log('🤖 Calling OpenAI for adventure lesson generation...');
+  console.log('🔑 API Key configured:', openaiApiKey ? `Yes (${openaiApiKey.substring(0, 8)}...)` : 'No');
+  
+  const requestBody = {
+    model: 'gpt-5-mini-2025-08-07', // Latest fast model with better reliability
+    messages: [
+      {
+        role: 'system',
+        content: 'You are an expert educational content generator. Return only valid JSON as requested.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    max_completion_tokens: 3000, // Updated parameter name for newer models
+  };
+
+  console.log('📤 Request model:', requestBody.model);
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -189,27 +207,15 @@ async function callOpenAI(prompt: string): Promise<any> {
       'Authorization': `Bearer ${openaiApiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini', // Fast and cost-effective for lesson generation
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert educational content generator. Return only valid JSON as requested.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.8, // Some creativity but not too random
-      max_tokens: 3000, // Enough for a full lesson
-    }),
+    body: JSON.stringify(requestBody),
   });
+
+  console.log('📥 Response status:', response.status);
 
   if (!response.ok) {
     const errorText = await response.text();
     console.error('OpenAI API error:', response.status, errorText);
-    throw new Error(`OpenAI API error: ${response.status}`);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
@@ -219,6 +225,7 @@ async function callOpenAI(prompt: string): Promise<any> {
     throw new Error('Invalid response from OpenAI');
   }
 
+  console.log('✅ Successfully received OpenAI response');
   return data.choices[0].message.content;
 }
 
