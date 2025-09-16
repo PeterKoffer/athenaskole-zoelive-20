@@ -10,12 +10,14 @@ import adventureIllustration from "@/assets/adventure-illustration.jpg";
 import digitalDetoxCover from "@/assets/digital-detox-cover.webp";
 import UniverseImage from "@/components/UniverseImage";
 import { supabase } from "@/integrations/supabase/client";
+import AdventureLessonPlayer from "@/components/adventure/AdventureLessonPlayer";
 
 export default function TodaysAdventure() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lessonData, setLessonData] = useState<any>(null);
 
   async function loadTodaysAdventure() {
     if (!user?.id) {
@@ -100,12 +102,8 @@ export default function TodaysAdventure() {
         console.log('📚 Lesson preview:', lessonData.lesson.title);
         console.log('🎯 Number of stages:', lessonData.lesson.stages?.length);
         
-        // TODO: Navigate to adventure lesson display
-        // For now, just log the success
-        alert(`Adventure lesson "${lessonData.lesson.title}" generated successfully! 
-        
-Stages: ${lessonData.lesson.stages?.length}
-Estimated time: ${lessonData.lesson.estimatedTime} minutes`);
+        // Set the lesson data to show the lesson player
+        setLessonData(lessonData.lesson);
         
         // TODO: Save adventure completion when database table is ready
         // await AdventureService.completeAdventure(user.id, universe.id, isRecap);
@@ -127,6 +125,27 @@ Estimated time: ${lessonData.lesson.estimatedTime} minutes`);
       loadTodaysAdventure();
     }
   }, [user?.id, data, loading]);
+
+  const handleLessonBack = () => {
+    setLessonData(null);
+  };
+
+  const handleLessonComplete = () => {
+    setLessonData(null);
+    // TODO: Save adventure completion when database table is ready
+    // await AdventureService.completeAdventure(user.id, data?.universe?.id, false);
+  };
+
+  // Show lesson player if lesson data is available
+  if (lessonData) {
+    return (
+      <AdventureLessonPlayer
+        lessonData={lessonData}
+        onBack={handleLessonBack}
+        onComplete={handleLessonComplete}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
