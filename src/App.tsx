@@ -15,7 +15,7 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 
 
 import DailyPage from "./pages/DailyPage";
-import UniverseLesson from "./features/daily-program/pages/UniverseLesson";
+import TodaysAdventure from "./features/adventure/pages/TodaysAdventure";
 import ScenarioRunner from "./features/daily-program/pages/ScenarioRunner";
 import TrainingGroundHome from "./features/training-ground/pages/TrainingGroundHome";
 
@@ -55,7 +55,11 @@ function App() {
          />
          <Route
            path="/universe"
-           element={<ProtectedRoute><UniverseLesson /></ProtectedRoute>}
+           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
+         />
+         <Route
+           path="/adventure"
+           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
          />
          <Route
            path="/scenario/:scenarioId"

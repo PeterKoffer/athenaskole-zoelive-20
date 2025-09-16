@@ -1,19 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Target, Clock, Users, Play, Star } from "lucide-react";
-import type { Universe, UniverseContent } from "@/services/universe/dailyUniverseService";
+import { BookOpen, Target, Clock, Users, Play, Star, RotateCcw } from "lucide-react";
+import type { AdventureUniverse, AdventureContent } from "@/services/adventure/service";
 
-interface DailyUniverseDisplayProps {
-  universe: Universe;
-  content?: UniverseContent;
-  onStartJourney: (universe: Universe) => void;
+interface AdventureDisplayProps {
+  universe: AdventureUniverse;
+  content?: AdventureContent;
+  isRecap: boolean;
+  onStartAdventure: (universe: AdventureUniverse, isRecap: boolean) => void;
 }
 
-export default function DailyUniverseDisplay({ universe, content, onStartJourney }: DailyUniverseDisplayProps) {
+export default function AdventureDisplay({ universe, content, isRecap, onStartAdventure }: AdventureDisplayProps) {
   
-  const handleStartJourney = () => {
-    onStartJourney(universe);
+  const handleStartAdventure = () => {
+    onStartAdventure(universe, isRecap);
   };
 
   return (
@@ -21,6 +22,14 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
       {/* Hero Section */}
       <Card className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10" />
+        {isRecap && (
+          <div className="absolute top-4 right-4 z-20">
+            <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200">
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Recap Adventure
+            </Badge>
+          </div>
+        )}
         <CardHeader className="relative z-10">
           <div className="flex items-start justify-between">
             <div className="space-y-2">
@@ -29,8 +38,16 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
                 <Badge variant="secondary">{universe.subject}</Badge>
                 <Badge variant="outline">{universe.grade_level}</Badge>
               </div>
-              <CardTitle className="text-2xl font-bold">{universe.title}</CardTitle>
-              <p className="text-muted-foreground max-w-2xl">{universe.description}</p>
+              <CardTitle className="text-2xl font-bold">
+                {isRecap && "🔄 "}
+                {universe.title}
+              </CardTitle>
+              <p className="text-muted-foreground max-w-2xl">
+                {isRecap 
+                  ? `Time to revisit and deepen your understanding of this exciting adventure! ${universe.description}`
+                  : universe.description
+                }
+              </p>
             </div>
             {universe.image_url && (
               <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted">
@@ -45,13 +62,20 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
         </CardHeader>
       </Card>
 
-      {/* Daily Program Overview */}
+      {/* Adventure Type Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
             <Clock className="w-8 h-8 mx-auto mb-2 text-primary" />
-            <h3 className="font-semibold">Full School Day</h3>
-            <p className="text-sm text-muted-foreground">Complete learning experience across all subjects</p>
+            <h3 className="font-semibold">
+              {isRecap ? "Recap Session" : "Today's Adventure"}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {isRecap 
+                ? "Reinforce and expand your knowledge"
+                : "Complete learning experience across all subjects"
+              }
+            </p>
           </CardContent>
         </Card>
         
@@ -59,7 +83,9 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
           <CardContent className="p-4 text-center">
             <Target className="w-8 h-8 mx-auto mb-2 text-primary" />
             <h3 className="font-semibold">Learning Goals</h3>
-            <p className="text-sm text-muted-foreground">Curriculum-aligned objectives</p>
+            <p className="text-sm text-muted-foreground">
+              {isRecap ? "Deepen existing knowledge" : "Curriculum-aligned objectives"}
+            </p>
           </CardContent>
         </Card>
         
@@ -67,7 +93,9 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
           <CardContent className="p-4 text-center">
             <Users className="w-8 h-8 mx-auto mb-2 text-primary" />
             <h3 className="font-semibold">Personalized</h3>
-            <p className="text-sm text-muted-foreground">Adapted to your learning style</p>
+            <p className="text-sm text-muted-foreground">
+              {isRecap ? "Building on your progress" : "Adapted to your learning style"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -78,20 +106,25 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="w-5 h-5" />
-              Today's Learning Journey
+              {isRecap ? "Recap Learning Journey" : "Today's Learning Journey"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {content.summary && (
               <div>
                 <h4 className="font-semibold mb-2">Overview</h4>
-                <p className="text-muted-foreground">{content.summary}</p>
+                <p className="text-muted-foreground">
+                  {isRecap && "This recap will help you consolidate your learning. "}
+                  {content.summary}
+                </p>
               </div>
             )}
             
             {content.objectives && content.objectives.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-2">Learning Objectives</h4>
+                <h4 className="font-semibold mb-2">
+                  {isRecap ? "Reinforcement Objectives" : "Learning Objectives"}
+                </h4>
                 <ul className="space-y-1">
                   {content.objectives.map((objective, index) => (
                     <li key={index} className="flex items-start gap-2">
@@ -107,7 +140,10 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
               <div>
                 <h4 className="font-semibold mb-2">Activities & Experiences</h4>
                 <div className="text-sm text-muted-foreground">
-                  Interactive learning activities will be revealed as you progress through your universe
+                  {isRecap 
+                    ? "Advanced activities and challenges will be revealed to deepen your understanding"
+                    : "Interactive learning activities will be revealed as you progress through your adventure"
+                  }
                 </div>
               </div>
             )}
@@ -119,7 +155,7 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
       {universe.metadata && (
         <Card>
           <CardHeader>
-            <CardTitle>Universe Details</CardTitle>
+            <CardTitle>Adventure Details</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -149,12 +185,22 @@ export default function DailyUniverseDisplay({ universe, content, onStartJourney
       {/* Action Button */}
       <div className="text-center">
         <Button 
-          onClick={handleStartJourney}
+          onClick={handleStartAdventure}
           size="lg"
           className="px-8"
+          variant={isRecap ? "secondary" : "default"}
         >
-          <Play className="w-5 h-5 mr-2" />
-          Start Today's Learning Journey
+          {isRecap ? (
+            <>
+              <RotateCcw className="w-5 h-5 mr-2" />
+              Start Recap Adventure
+            </>
+          ) : (
+            <>
+              <Play className="w-5 h-5 mr-2" />
+              Start Today's Adventure
+            </>
+          )}
         </Button>
       </div>
     </div>

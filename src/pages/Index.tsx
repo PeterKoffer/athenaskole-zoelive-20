@@ -15,15 +15,15 @@ const Index = () => {
     school_staff: "/school-dashboard",
     teacher: "/teacher-dashboard",
     parent: "/parent-dashboard",
-    student: "/daily-program",
+    student: "/adventure",
   };
 
   const handleGetStarted = () => {
     if (user && userRole) {
-      const targetPath = targetPaths[userRole] || "/daily-program";
+      const targetPath = targetPaths[userRole] || "/adventure";
       navigate(targetPath);
     } else if (user) {
-      navigate("/daily-program");
+      navigate("/adventure");
     } else {
       navigate("/auth");
     }

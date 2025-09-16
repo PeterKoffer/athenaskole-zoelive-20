@@ -1,34 +1,34 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Zap, RefreshCw } from "lucide-react";
-import { DailyUniverseService } from "@/services/universe/dailyUniverseService";
-import DailyUniverseDisplay from "../components/DailyUniverseDisplay";
+import { Clock, Compass, RefreshCw } from "lucide-react";
+import { AdventureService } from "@/services/adventure/service";
+import AdventureDisplay from "../components/AdventureDisplay";
 import { useAuth } from "@/hooks/useAuth";
-import type { Universe } from "@/services/universe/dailyUniverseService";
+import type { AdventureUniverse } from "@/services/adventure/service";
 
-// Removed contentClient dependency - now using DailyUniverseService directly
-
-export default function UniverseLesson() {
+export default function TodaysAdventure() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [generationTime, setGenerationTime] = useState<number | null>(null);
 
-  async function loadTodaysProgram() {
+  async function loadTodaysAdventure() {
+    if (!user?.id) {
+      setError("Please log in to access your adventures");
+      return;
+    }
+
     setLoading(true); 
     setError(null);
     setGenerationTime(null);
     const startTime = Date.now();
     
     try {
-      // Load today's universe from your collection of 326+ universes
-      const result = await DailyUniverseService.getTodaysUniverse({
-        userId: user?.id,
+      const result = await AdventureService.getTodaysAdventure({
+        userId: user.id,
         gradeLevel: "6-12", // TODO: Get from user profile
         preferences: {
           curriculum: "DK",
@@ -49,14 +49,25 @@ export default function UniverseLesson() {
     }
   }
 
-  const handleStartJourney = (universe: Universe) => {
-    // TODO: Navigate to scenario runner or start the universe experience
-    console.log('🚀 Starting learning journey with universe:', universe);
-    // navigate(`/scenario/${universe.id}`, { state: { universe } });
+  const handleStartAdventure = async (universe: AdventureUniverse, isRecap: boolean) => {
+    if (!user?.id) return;
+    
+    console.log('🚀 Starting adventure:', universe.title, isRecap ? '(Recap)' : '(New)');
+    
+    // TODO: Navigate to adventure experience
+    // navigate(`/adventure/${universe.id}`, { 
+    //   state: { 
+    //     universe, 
+    //     isRecap,
+    //     startTime: new Date().toISOString()
+    //   } 
+    // });
+    
+    // For now, just mark as started (you might want to do this when actually completed)
+    // await AdventureService.completeAdventure(user.id, universe.id, isRecap);
   };
 
   const clearCache = () => {
-    // Clear the data to force a fresh universe selection
     setData(null);
     console.log('🧹 Cache cleared - next selection will be fresh');
   };
@@ -68,14 +79,14 @@ export default function UniverseLesson() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Daily Program — Your Learning Universe</CardTitle>
-                <p className="text-muted-foreground">Complete school day experience across all subjects</p>
+                <CardTitle>Today's Adventure</CardTitle>
+                <p className="text-muted-foreground">Your daily learning adventure awaits!</p>
               </div>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={clearCache}
-                title="Clear cache to force fresh generation"
+                title="Clear cache to get a different adventure"
               >
                 Clear Cache
               </Button>
@@ -84,7 +95,7 @@ export default function UniverseLesson() {
           <CardContent className="space-y-4">
             <div className="text-center">
               <Button 
-                onClick={loadTodaysProgram} 
+                onClick={loadTodaysAdventure} 
                 disabled={loading} 
                 size="lg"
                 className="w-full max-w-md mx-auto"
@@ -92,12 +103,12 @@ export default function UniverseLesson() {
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Loading Today's Learning Universe...
+                    Discovering Your Adventure...
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 mr-2" />
-                    View Daily Program
+                    <Compass className="w-4 h-4 mr-2" />
+                    Discover Today's Adventure
                   </>
                 )}
               </Button>
@@ -120,20 +131,20 @@ export default function UniverseLesson() {
             {!error && !data && !loading && (
               <div className="p-4 border border-muted rounded-md text-center">
                 <p className="text-muted-foreground text-sm">
-                  Ready to start your learning journey? Click "View Daily Program" to discover today's universe.
+                  Ready to start your learning adventure? Click "Discover Today's Adventure" to begin.
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Each day brings a new learning adventure from our collection of 326+ universes
+                  Each adventure is unique and never repeats - unless it's time for a recap!
                 </p>
               </div>
             )}
             
-            
             {data && (
-              <DailyUniverseDisplay 
+              <AdventureDisplay 
                 universe={data.universe}
                 content={data.content}
-                onStartJourney={handleStartJourney}
+                isRecap={data.isRecap}
+                onStartAdventure={handleStartAdventure}
               />
             )}
           </CardContent>

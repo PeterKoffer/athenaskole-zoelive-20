@@ -1096,6 +1096,39 @@ export type Database = {
         }
         Relationships: []
       }
+      student_adventures: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          is_recap: boolean
+          performance_score: number | null
+          student_id: string
+          universe_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          is_recap?: boolean
+          performance_score?: number | null
+          student_id: string
+          universe_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          is_recap?: boolean
+          performance_score?: number | null
+          student_id?: string
+          universe_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       student_profiles: {
         Row: {
           created_at: string | null
