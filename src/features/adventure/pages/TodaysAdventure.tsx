@@ -107,8 +107,8 @@ export default function TodaysAdventure() {
 Stages: ${lessonData.lesson.stages?.length}
 Estimated time: ${lessonData.lesson.estimatedTime} minutes`);
         
-        // Mark as started (optional)
-        await AdventureService.completeAdventure(user.id, universe.id, isRecap);
+        // TODO: Save adventure completion when database table is ready
+        // await AdventureService.completeAdventure(user.id, universe.id, isRecap);
       } else {
         throw new Error('Lesson generation failed');
       }
