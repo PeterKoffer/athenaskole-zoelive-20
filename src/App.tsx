@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
+import WelcomePage from "./pages/WelcomePage";
 
 
 import TodaysAdventure from "./features/adventure/pages/TodaysAdventure";
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         {/* public */}
         <Route path="/" element={<Index />} />
+        <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/sitemap" element={<SiteMapPage />} />
 

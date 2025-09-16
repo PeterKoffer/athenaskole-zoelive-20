@@ -51,15 +51,16 @@ const Index = () => {
     );
   }
 
-  // Show marketing content for unauthenticated users
+  // Redirect unauthenticated users to welcome page
+  if (!user) {
+    navigate("/welcome");
+    return null;
+  }
+
+  // Show loading or redirect message for other authenticated users
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <HomeMainContent user={user} onGetStarted={handleGetStarted} />
-      {user && (
-        <div className="fixed bottom-4 right-4 z-50">
-          <RoleSwitcher />
-        </div>
-      )}
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <p>Redirecting...</p>
     </div>
   );
 };
