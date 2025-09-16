@@ -20,11 +20,21 @@ export default function AdventureManager() {
   const handleImportAdventures = async () => {
     setImporting(true);
     try {
-      // Import the 300 adventures from the JSON file
-      const response = await fetch('/src/data/image_jobs_300.json');
-      const adventures = await response.json();
+      // Import the 300 new adventures from the JSON file
+      const response = await fetch('/src/data/nelie_adventures_300_lang_geo_music_pe.json');
+      const data = await response.json();
       
-      const result = await AdventureImageService.importAdventures(adventures);
+      // Transform new format to expected format
+      const transformedData = data.map((adventure: any) => ({
+        universeId: adventure.id,
+        gradeInt: adventure.gradeInt,
+        title: adventure.title,
+        prompt: adventure.image_prompt,
+        description: adventure.pitch,
+        subject: adventure.subject
+      }));
+      
+      const result = await AdventureImageService.importAdventures(transformedData);
       
       toast.success(`Import completed: ${result.imported} imported, ${result.skipped} skipped, ${result.errors} errors`);
       await loadStatus();
@@ -85,7 +95,7 @@ export default function AdventureManager() {
               Import Adventures
             </CardTitle>
             <CardDescription>
-              Import 300 adventure ideas from JSON file
+              Import 300 new adventures focused on Language, Geography, Music, and PE
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -102,7 +112,7 @@ export default function AdventureManager() {
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
-                  Import 300 Adventures
+                  Import 300 New Adventures
                 </>
               )}
             </Button>
