@@ -74,7 +74,7 @@ async function generateImageWithOpenAI(prompt: string, size: string): Promise<st
         model: 'gpt-image-1',
         prompt: prompt,
         n: 1,
-        size: size === '1024x1024' ? '1024x1024' : size === '1280x720' ? '1024x1536' : '1024x1536',
+        size: '1024x1024', // Use consistent size for all age groups
         quality: 'medium',
         output_format: 'webp',
       }),
@@ -137,7 +137,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { batchSize = 50, ageGroups = ['child', 'teen', 'adult'] } = await req.json();
+    const { batchSize = 10, ageGroups = ['child', 'teen', 'adult'] } = await req.json();
 
     console.log(`Starting batch generation for age groups: ${ageGroups.join(', ')}`);
 
@@ -217,7 +217,7 @@ serve(async (req) => {
         processed++;
         
         // Small delay between adventures to avoid rate limits
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
