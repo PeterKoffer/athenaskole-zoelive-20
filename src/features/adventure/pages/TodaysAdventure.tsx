@@ -78,10 +78,10 @@ export default function TodaysAdventure() {
         {/* Welcome Section */}
         <div className="text-center text-white mb-8">
           <h1 className="text-4xl font-bold mb-4">
-            Velkommen til dagens eventyr, {user?.user_metadata?.first_name || 'Elev'}! 🌟
+            Welcome to today's adventure, {user?.user_metadata?.first_name || 'Student'}! 🌟
           </h1>
           <p className="text-xl text-cyan-200 mb-6">
-            Dit personlige læringsæventyr venter på dig
+            Your personalized learning adventure awaits
           </p>
           <div className="max-w-2xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
@@ -90,13 +90,13 @@ export default function TodaysAdventure() {
                   🎓
                 </div>
                 <div className="text-left">
-                  <h3 className="text-lg font-semibold text-white">Dagens Eventyr</h3>
-                  <p className="text-cyan-200 text-sm">Udforsk, lær og voks sammen med os</p>
+                  <h3 className="text-lg font-semibold text-white">Today's Adventure</h3>
+                  <p className="text-cyan-200 text-sm">Explore, learn and grow with us</p>
                 </div>
               </div>
               <p className="text-white/90 text-sm leading-relaxed">
-                Hver dag bringer et nyt spændende læringseventyr specielt designet til dig. 
-                Klik på knappen nedenfor for at opdage, hvad der venter dig i dag!
+                Each day brings a new exciting learning adventure specially designed for you. 
+                Click the button below to discover what awaits you today!
               </p>
             </div>
           </div>
@@ -106,17 +106,17 @@ export default function TodaysAdventure() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-white">Dit Eventyr</CardTitle>
-                <p className="text-cyan-200">Klar til at begynde din læringsrejse?</p>
+                <CardTitle className="text-white">Your Adventure</CardTitle>
+                <p className="text-cyan-200">Ready to begin your learning journey?</p>
               </div>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={clearCache}
-                title="Ryd cache for at få et andet eventyr"
+                title="Clear cache to get a different adventure"
                 className="border-white/30 text-white hover:bg-white/20"
               >
-                Ryd Cache
+                Clear Cache
               </Button>
             </div>
           </CardHeader>
@@ -131,12 +131,12 @@ export default function TodaysAdventure() {
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Opdager Dit Eventyr...
+                    Discovering Your Adventure...
                   </>
                 ) : (
                   <>
                     <Compass className="w-4 h-4 mr-2" />
-                    Opdag Dagens Eventyr
+                    Discover Today's Adventure
                   </>
                 )}
               </Button>
@@ -151,7 +151,7 @@ export default function TodaysAdventure() {
 
             {error && (
               <div className="p-4 border border-red-400/50 bg-red-900/20 rounded-md">
-                <p className="text-red-200 text-sm font-medium">❌ Fejl:</p>
+                <p className="text-red-200 text-sm font-medium">❌ Error:</p>
                 <p className="text-red-100 text-sm">{error}</p>
               </div>
             )}
@@ -159,10 +159,10 @@ export default function TodaysAdventure() {
             {!error && !data && !loading && (
               <div className="p-4 border border-white/20 bg-white/5 rounded-md text-center">
                 <p className="text-white/90 text-sm">
-                  Klar til at starte dit læringsæventyr? Klik på "Opdag Dagens Eventyr" for at begynde.
+                  Ready to start your learning adventure? Click "Discover Today's Adventure" to begin.
                 </p>
                 <p className="text-xs text-white/70 mt-2">
-                  Hvert eventyr er unikt og gentager sig aldrig - medmindre det er tid til en gennemgang!
+                  Each adventure is unique and never repeats - unless it's time for a recap!
                 </p>
               </div>
             )}
