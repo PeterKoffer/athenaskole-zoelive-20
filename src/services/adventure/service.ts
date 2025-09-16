@@ -184,35 +184,35 @@ export class AdventureService {
   }
 
   /**
-   * Generate instructions for a specific beat
+   * Generate engaging, age-appropriate instructions for adventure activities
    */
   private static generateInstructionsForBeat(beat: any, pack: UniversePack): string {
-    const baseInstruction = `In this ${beat.kind.replace('_', ' ')} activity for "${pack.title}":`;
+    const adventureTitle = pack.title;
     
     switch (beat.kind) {
       case 'visual_hook':
-        return `${baseInstruction} Start by visualizing what your ${pack.title.toLowerCase()} adventure will look like. What's the setting? Who are the key people involved? What challenges might you face?`;
+        return `🎬 Dive into the exciting world of ${adventureTitle}! Imagine the thrilling setting, meet the key players, and discover the amazing challenges you'll face on your adventure!`;
       
       case 'make_something':
-        return `${baseInstruction} Create a concrete item that will help you in your ${pack.title.toLowerCase()} journey. This could be a plan, design, prototype, or tool.`;
+        return `🛠️ Unleash your creativity! Design and build something incredible that will be your secret weapon for conquering the ${adventureTitle} mission. Will it be a clever plan, cool design, or awesome prototype?`;
       
       case 'investigate':
-        return `${baseInstruction} Research and gather important information. What do you need to know to succeed? What constraints or challenges exist?`;
+        return `🕵️ Become an expert detective! Research and uncover the vital clues you need to master this challenge. What secrets will you discover? What obstacles will you outsmart?`;
       
       case 'practice':
-        return `${baseInstruction} Practice key skills through quick exercises and challenges. Build confidence in the fundamentals you'll need.`;
+        return `🎯 Power up your skills! Train like a champion through fun exercises and exciting challenges. Build your confidence and become unstoppable!`;
       
       case 'apply':
-        return `${baseInstruction} Put your knowledge to work! Solve a real problem or overcome a specific challenge in your ${pack.title.toLowerCase()}.`;
+        return `⚡ Time to shine! Put your amazing knowledge to work and solve real problems like a true hero. Show the world what you can accomplish!`;
       
       case 'reflect':
-        return `${baseInstruction} Think about what you've learned and accomplished. What worked well? What would you do differently?`;
+        return `🌟 Celebrate your incredible journey! Look back at all the awesome things you've learned and achieved. What made you feel like a superstar? What would you do even better next time?`;
       
       case 'present':
-        return `${baseInstruction} Share your results and insights. Show what you've created and explain what you learned along the way.`;
+        return `📢 Share your greatness with the world! Show off your amazing creations and inspire others with your incredible discoveries and insights!`;
       
       default:
-        return `${baseInstruction} Complete this learning activity as part of your ${pack.title.toLowerCase()} adventure.`;
+        return `🚀 Get ready for an amazing ${adventureTitle} experience that will blow your mind and make learning the best part of your day!`;
     }
   }
 
