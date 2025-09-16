@@ -66,7 +66,13 @@ export type Database = {
           grade_int: number
           id: string
           image_generated: boolean | null
+          image_generated_adult: boolean | null
+          image_generated_child: boolean | null
+          image_generated_teen: boolean | null
           image_url: string | null
+          image_url_adult: string | null
+          image_url_child: string | null
+          image_url_teen: string | null
           prompt: string | null
           subject: string | null
           title: string
@@ -79,7 +85,13 @@ export type Database = {
           grade_int: number
           id?: string
           image_generated?: boolean | null
+          image_generated_adult?: boolean | null
+          image_generated_child?: boolean | null
+          image_generated_teen?: boolean | null
           image_url?: string | null
+          image_url_adult?: string | null
+          image_url_child?: string | null
+          image_url_teen?: string | null
           prompt?: string | null
           subject?: string | null
           title: string
@@ -92,7 +104,13 @@ export type Database = {
           grade_int?: number
           id?: string
           image_generated?: boolean | null
+          image_generated_adult?: boolean | null
+          image_generated_child?: boolean | null
+          image_generated_teen?: boolean | null
           image_url?: string | null
+          image_url_adult?: string | null
+          image_url_child?: string | null
+          image_url_teen?: string | null
           prompt?: string | null
           subject?: string | null
           title?: string

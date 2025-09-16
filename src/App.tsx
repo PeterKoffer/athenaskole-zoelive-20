@@ -14,10 +14,10 @@ import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import WelcomePage from "./pages/WelcomePage";
 
-
 import TodaysAdventure from "./features/adventure/pages/TodaysAdventure";
 import AdventureRunner from "./features/adventure/pages/AdventureRunner";
 import TrainingGroundHome from "./features/training-ground/pages/TrainingGroundHome";
+import AdventureManager from "./features/admin/pages/AdventureManager";
 
 function App() {
   return (
@@ -62,10 +62,14 @@ function App() {
           path="/calendar"
           element={<ProtectedRoute><CalendarPage /></ProtectedRoute>}
         />
-        <Route
-          path="/subject/:subject"
-          element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>}
-        />
+         <Route
+           path="/subject/:subject"
+           element={<ProtectedRoute><SubjectLearningPage /></ProtectedRoute>}
+         />
+         <Route
+           path="/admin/adventures"
+           element={<ProtectedRoute><AdventureManager /></ProtectedRoute>}
+         />
 
         {/* fallback */}
         <Route path="*" element={<Index />} />
