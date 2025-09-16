@@ -75,7 +75,7 @@ async function generateImageWithOpenAI(prompt: string, size: string): Promise<st
         prompt: prompt,
         n: 1,
         size: size === '1024x1024' ? '1024x1024' : size === '1280x720' ? '1024x1536' : '1024x1536',
-        quality: 'standard',
+        quality: 'medium',
         output_format: 'webp',
       }),
     });
