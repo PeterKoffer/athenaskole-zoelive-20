@@ -53,8 +53,8 @@ interface AdventureLessonRequest {
   };
 }
 
-// Daily Lesson Prompt Generator
-function createDailyLessonPrompt(context: PromptContext, adventureTitle: string): string {
+// Create story-driven educational content generator
+function createStoryDrivenPrompt(context: PromptContext, adventureTitle: string): string {
   const {
     subject,
     gradeLevel,
@@ -70,75 +70,88 @@ function createDailyLessonPrompt(context: PromptContext, adventureTitle: string)
   } = context;
 
   const keywordText = calendarKeywords.length > 0
-    ? `the context of ${calendarKeywords.join(', ')} over the next ${calendarDuration}`
-    : 'general, timeless examples appropriate for any time of year';
+    ? `${calendarKeywords.join(', ')}`
+    : 'interactive learning and problem solving';
   const interestText = studentInterests.length > 0
     ? studentInterests.join(', ')
-    : "the student's general interests";
+    : "technology, games, and creativity";
 
-  return `You are a world-class ${subject} teacher and imaginative storyteller creating an immersive, game-like lesson for Grade ${gradeLevel} based on the adventure "${adventureTitle}".
-The lesson must align fully with ${curriculumStandards} and follow the school's ${teachingPerspective} teaching approach.
+  return `Create an immersive story-driven educational adventure for "${adventureTitle}" (${subject}, Grade ${gradeLevel}).
 
-Design a dynamic, interactive learning adventure lasting about ${lessonDuration} minutes.
-${subject} is a ${subjectWeight} priority in our curriculum, so adjust depth accordingly.
-Incorporate ${keywordText} and adapt to the student's level — ${studentAbilities} — and preferred learning style — ${learningStyle}.
-Incorporate their personal interests: ${interestText}.
+🎯 MISSION: Transform learning into an epic quest! Students become heroes solving real-world challenges using ${subject} skills.
 
-The adventure must have:
-1) An exciting opening scenario that hooks the student immediately — they are solving a mystery, helping someone, exploring a strange world, or repairing a crisis related to "${adventureTitle}".
-2) Multiple stages or "scenes", each with:
-   - A short chunk of story (very concise).
-   - An activity or challenge directly tied to ${subject}.
-   - Clear instructions for the activity.
-3) A variety of challenge types (not just multiple choice). Include a mix of:
-   - multipleChoice, fillBlank, puzzle, matching, sequencing, experiment, creativeTask
-4) Pacing that fills the whole ${lessonDuration} minutes — provide OPTIONAL "bonusMissions" so faster students stay engaged, while slower students can still reach the ending.
-5) A satisfying conclusion that rewards the student.
+📖 STORY STRUCTURE:
+- Hook: Dramatic opening scenario (mystery, crisis, magical discovery)
+- Character: Student becomes a detective, scientist, explorer, or inventor
+- Stakes: What happens if they don't succeed? Make it exciting!
+- Journey: Each stage reveals new clues and challenges
+- Victory: Satisfying conclusion where knowledge saves the day
 
-Return ONLY JSON in this exact schema (no extra prose):
+🎮 INTERACTIVE ELEMENTS (${lessonDuration} minutes total):
+Create exactly 4-6 stages with varied activities:
+1. Detective Work: Questions that reveal clues
+2. Puzzle Solving: Logic challenges using ${subject} concepts  
+3. Experiments: Hands-on discovery activities
+4. Creative Missions: Build, design, or create something
+5. Team Challenges: Collaboration and discussion
+6. Final Quest: Apply everything learned
+
+🎨 ENGAGEMENT BOOSTERS:
+- Character names from student interests: ${interestText}
+- Context: ${keywordText}
+- Rewards: Points, badges, unlocking next levels
+- Choices: "What do you investigate first?"
+- Surprises: Plot twists and discoveries
+
+Return a detailed lesson plan in this exact JSON format:
 
 {
-  "title": "string",
-  "scenario": "string",
+  "title": "${adventureTitle}",
+  "subject": "${subject}",
+  "gradeLevel": ${gradeLevel},
+  "scenario": "Exciting story opening that sets the adventure in motion",
+  "learningObjectives": ["Specific ${subject} skill 1", "Specific ${subject} skill 2", "Problem-solving and critical thinking"],
   "stages": [
     {
-      "story": "string",
-      "activityType": "multipleChoice | fillBlank | puzzle | matching | sequencing | experiment | creativeTask",
-      "activity": {
-        "question": "string",
-        "options": ["string", "string", "string", "string"],
-        "correct": 0,
-        "expectedAnswer": "string",
-        "rubric": "string",
-        "explanation": "string"
-      },
-      "imagePrompts": [
-        "string (describe an image to generate for this scene or concept)",
-        "string"
-      ]
+      "id": "stage1",
+      "title": "Stage Title (e.g., 'The Mystery Begins')",
+      "description": "What happens in this stage",
+      "duration": 25,
+      "storyText": "Short, exciting narrative that hooks students",
+      "activities": [
+        {
+          "type": "multipleChoice",
+          "title": "Activity Title",
+          "instructions": "Clear, engaging instructions",
+          "content": {
+            "question": "Story-integrated question using ${subject}",
+            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "correctAnswer": 0,
+            "explanation": "Why this answer helps solve the mystery/challenge",
+            "points": 10
+          }
+        }
+      ],
+      "materials": ["List of materials needed"],
+      "assessmentCriteria": ["What students should demonstrate"]
     }
   ],
   "bonusMissions": [
     {
-      "story": "string",
-      "activityType": "multipleChoice | fillBlank | puzzle | matching | sequencing | experiment | creativeTask",
-      "activity": { "question": "string", "options": [], "expectedAnswer": "string", "rubric": "string", "explanation": "string" },
-      "imagePrompts": ["string"]
+      "title": "Extra Challenge Title",
+      "description": "Optional advanced activity",
+      "type": "creativeTask",
+      "instructions": "Create something amazing!",
+      "duration": 15
     }
   ],
-  "objectives": ["string", "string"],
-  "estimatedTime": ${lessonDuration}
-}
-
-Rules:
-- Keep story chunks short and energetic.
-- Each stage must include exactly one activity.
-- Activities must directly teach or practice ${subject} content aligned with ${curriculumStandards}.
-- Use ${studentAbilities} and ${learningStyle} to tailor wording and supports.  
-- Use ${interestText} for light theming (names, settings, examples).
-- Provide 1–3 imagePrompts per stage for visuals (scenes, diagrams, characters).
-- Ensure exactly ONE correct answer for multipleChoice. Provide expectedAnswer for non-MC activities.
-- Do NOT include any text outside the JSON.`;
+  "estimatedTime": ${lessonDuration},
+  "gameElements": {
+    "points": "How students earn points",
+    "achievements": ["Badge 1", "Badge 2"],
+    "progression": "How they unlock new stages"
+  }
+}`;
 }
 
 // Convert grade level string to number
@@ -163,7 +176,7 @@ function buildPromptContext(request: AdventureLessonRequest): PromptContext {
     gradeLevel: parseGradeLevel(adventure.gradeLevel),
     curriculumStandards: schoolSettings?.curriculum || 'broadly accepted topics and skills for that grade',
     teachingPerspective: schoolSettings?.teachingPerspective || 'balanced, evidence-based style',
-    lessonDuration: schoolSettings?.lessonDuration || 35,
+    lessonDuration: schoolSettings?.lessonDuration || 135,
     subjectWeight: teacherPreferences?.subjectWeights?.[adventure.subject] || 'medium',
     calendarKeywords: calendarContext?.keywords || ['interactive learning', 'problem solving'],
     calendarDuration: calendarContext?.duration || 'single session',
@@ -272,8 +285,8 @@ async function generateAdventureLesson(request: AdventureLessonRequest) {
   const context = buildPromptContext(request);
   console.log('📋 Built prompt context:', context);
   
-  // Generate prompt
-  const prompt = createDailyLessonPrompt(context, request.adventure.title);
+  // Generate story-driven prompt
+  const prompt = createStoryDrivenPrompt(context, request.adventure.title);
   
   // Call OpenAI
   const rawResponse = await callOpenAI(prompt);
