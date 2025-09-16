@@ -1,9 +1,11 @@
 # CODING RULES - LÆS INDEN HVER KODE GENERERING
 
-## 🚨 OBLIGATORISK: LÆS ALLE DOKUMENTER FØRST
+## 🚨 OBLIGATORISK: LÆS SOLIDT FUNDAMENT FØRST
 **INDEN du skriver en eneste linje kode, SKAL du læse:**
 
-### **🎯 KERNEDOKUMENTER (ALTID FØRST):**
+### **🏛️ FUNDAMENT (START HER):**
+- `docs/SOLID_FOUNDATION.md` - **KERNEFUNDAMENT for hele projektet**
+- `docs/CRITICAL_FLOWS.md` - **Kritiske brugerflows og implementation**
 - `docs/PRODUCT_OVERVIEW.md` - **ZoeLive produktmål og globale parametre**
 - `docs/NELIE_SPEC.md` - **NELIE AI tutor specifikation**
 - `docs/NELIE_Foundational_Principles.md` - **NELIE's kerneprincipper**
