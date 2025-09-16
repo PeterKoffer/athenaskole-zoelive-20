@@ -7,7 +7,7 @@ const WelcomePage = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate("/auth");
+    navigate("/adventure");
   };
 
   return (
