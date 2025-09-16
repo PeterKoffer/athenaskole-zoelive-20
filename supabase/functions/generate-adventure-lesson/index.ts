@@ -123,7 +123,7 @@ Return ONLY valid JSON in this exact format:
       "id": "introduction",
       "title": "Adventure Begins",
       "description": "Get familiar with the scenario and your mission",
-      "duration": 15,
+      "duration": 5,
       "storyText": "Exciting story opening that sets the scene and introduces the challenge...",
       "activities": [
         {
@@ -144,7 +144,7 @@ Return ONLY valid JSON in this exact format:
       "id": "main-challenge", 
       "title": "The Core Quest",
       "description": "Tackle the main learning objectives",
-      "duration": 90,
+      "duration": 10,
       "storyText": "Story continuation that introduces the main challenge and raises the stakes...",
       "activities": [
         {
@@ -165,7 +165,7 @@ Return ONLY valid JSON in this exact format:
       "id": "resolution",
       "title": "Victory & Reflection", 
       "description": "Complete the adventure and reflect on learning",
-      "duration": 30,
+      "duration": 8,
       "storyText": "Satisfying conclusion where students apply their knowledge to resolve the adventure...",
       "activities": [
         {
