@@ -189,14 +189,14 @@ async function callOpenAI(prompt: string): Promise<any> {
     messages: [
       {
         role: 'system',
-        content: 'You are an expert educational content generator. Return only valid JSON as requested.'
+        content: 'You are an expert educational content generator. Create a complete lesson plan and return only valid JSON as requested. Be concise but comprehensive.'
       },
       {
         role: 'user',
         content: prompt
       }
     ],
-    max_completion_tokens: 3000, // Updated parameter name for newer models
+    max_completion_tokens: 4000, // Increased token limit to prevent truncation
   };
 
   console.log('📤 Request model:', requestBody.model);
@@ -219,14 +219,26 @@ async function callOpenAI(prompt: string): Promise<any> {
   }
 
   const data = await response.json();
+  console.log('🤖 OpenAI response data:', JSON.stringify(data, null, 2));
   
   if (!data.choices?.[0]?.message?.content) {
-    console.error('Invalid OpenAI response:', data);
-    throw new Error('Invalid response from OpenAI');
+    console.error('Invalid OpenAI response - missing content:', JSON.stringify(data));
+    
+    // Check if it was truncated due to length
+    if (data.choices?.[0]?.finish_reason === 'length') {
+      throw new Error('Response truncated due to length limit. Please try again with a shorter prompt.');
+    }
+    
+    throw new Error('Invalid response from OpenAI - no content received');
+  }
+  
+  const content = data.choices[0].message.content.trim();
+  if (!content) {
+    throw new Error('OpenAI returned empty content');
   }
 
   console.log('✅ Successfully received OpenAI response');
-  return data.choices[0].message.content;
+  return content;
 }
 
 // Parse and validate JSON response
