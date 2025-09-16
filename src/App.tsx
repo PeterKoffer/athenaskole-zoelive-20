@@ -37,10 +37,6 @@ function App() {
            element={<ProtectedRoute><TrainingGroundHome /></ProtectedRoute>}
          />
          <Route
-           path="/adventure"
-           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
-         />
-         <Route
            path="/adventure/:adventureId"
            element={<ProtectedRoute><AdventureRunner /></ProtectedRoute>}
          />
