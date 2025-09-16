@@ -109,23 +109,15 @@ export default function TodaysAdventure() {
                 {/* Adventure Illustration and Description */}
                 <div className="relative rounded-xl overflow-hidden">
                   {data.universe?.metadata?.gradeInt ? (
-                    <>
-                      {console.log('Adventure Image Debug:', {
-                        universeId: data.universe.id,
-                        gradeInt: data.universe.metadata.gradeInt,
-                        title: data.universe.title,
-                        imagePrompt: data.universe.imagePrompt
-                      })}
-                      <UniverseImage
-                        universeId={data.universe.id}
-                        gradeInt={data.universe.metadata.gradeInt}
-                        title={data.universe.title}
-                        className="w-full h-64 object-cover"
-                        alt={`Today's Learning Adventure: ${data.universe.title}`}
-                        width={1024}
-                        height={576}
-                      />
-                    </>
+                    <UniverseImage
+                      universeId={data.universe.id}
+                      gradeInt={data.universe.metadata.gradeInt}
+                      title={data.universe.title}
+                      className="w-full h-64 object-cover"
+                      alt={`Today's Learning Adventure: ${data.universe.title}`}
+                      width={1024}
+                      height={576}
+                    />
                   ) : (
                     <img 
                       src={adventureIllustration} 

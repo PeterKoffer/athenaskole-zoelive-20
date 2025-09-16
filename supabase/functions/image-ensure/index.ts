@@ -1,7 +1,7 @@
 // @ts-nocheck
 // supabase/functions/image-ensure/index.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { bflGenerateImage } from "../_shared/imageProviders.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -41,20 +41,15 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const bucket = Deno.env.get("UNIVERSE_IMAGES_BUCKET") ?? "universe-images";
 
-  const bflKey   = Deno.env.get("BFL_API_KEY");
-  const bflBase  = Deno.env.get("BFL_API_BASE")  ?? "https://api.bfl.ai";
-  const bflModel = Deno.env.get("BFL_MODEL")     ?? "flux-pro-1.1";
-  const bflEndpoint = `${bflBase}/v1/${bflModel}`;
+  const openaiKey = Deno.env.get("OPENAI_API_KEY");
 
-  console.log("[image-ensure] BFL config:", { 
-    hasKey: Boolean(bflKey), 
-    keyLength: bflKey?.length || 0,
-    keyPrefix: bflKey?.substring(0, 8) + "...",
-    endpoint: bflEndpoint 
+  console.log("[image-ensure] OpenAI config:", { 
+    hasKey: Boolean(openaiKey), 
+    keyLength: openaiKey?.length || 0,
   });
   
-  if (!srv)    return bad("Missing SERVICE_ROLE_KEY", 500);
-  if (!bflKey) return bad("Missing BFL_API_KEY", 500);
+  if (!srv)      return bad("Missing SERVICE_ROLE_KEY", 500);
+  if (!openaiKey) return bad("Missing OPENAI_API_KEY", 500);
 
   const supa = createClient(supabaseUrl, srv, { auth: { persistSession: false } });
 
@@ -81,22 +76,38 @@ Deno.serve(async (req) => {
       `${titleIn}${gradeInt ? `, engaging classroom cover image for grade ${gradeInt}` : ""}, vibrant, friendly, clean composition`);
 
   try {
-    // ---- 1) Generate via BFL (helper knows auth/header details)
-    // Passing endpoint is harmless even if the helper ignores it.
-    const { url: bflUrl } = await bflGenerateImage({
-      prompt, width, height, apiKey: bflKey,
-      endpoint: bflEndpoint,
-      negativePrompt: body.negativePrompt ?? query.negativePrompt ?? undefined,
-      seed: body.seed ?? (query.seed ? Number(query.seed) : undefined),
-      cfgScale: body.cfgScale ?? (query.cfgScale ? Number(query.cfgScale) : undefined),
-      steps: body.steps ?? (query.steps ? Number(query.steps) : undefined),
+    // ---- 1) Generate via OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt: prompt,
+        n: 1,
+        size: `${width}x${height}`,
+        quality: 'standard',
+        response_format: 'b64_json'
+      }),
     });
 
-    // ---- 2) Download bytes from delivery URL
-    const resp = await fetch(bflUrl);
-    if (!resp.ok) return bad(`Failed to fetch generated image: ${resp.status}`, 502);
-    const bytes = new Uint8Array(await resp.arrayBuffer());
-    const contentType = resp.headers.get("content-type") ?? "image/jpeg";
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      return bad(`OpenAI API failed: ${openaiResponse.status} ${errorText}`, 502);
+    }
+
+    const openaiData = await openaiResponse.json();
+    const base64Image = openaiData.data[0].b64_json;
+    
+    // ---- 2) Convert base64 to bytes
+    const bytes = new Uint8Array(
+      atob(base64Image)
+        .split('')
+        .map(char => char.charCodeAt(0))
+    );
+    const contentType = "image/png";
 
     // ---- 3) Decide extension
     const ext =
@@ -117,18 +128,16 @@ Deno.serve(async (req) => {
     const pub = supa.storage.from(bucket).getPublicUrl(path);
 
     return ok({
-      impl: "bfl-upload-v1",
+      impl: "openai-upload-v1",
       width, height,
       bucket, path,
       publicUrl: pub.data.publicUrl,
-      bflUrl,         // keep for debugging/observability
-      endpoint: bflEndpoint,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    // Surface BFL 403s clearly
+    // Surface OpenAI auth errors clearly
     if (/401|403|Not authenticated|Unauthorized/i.test(msg)) {
-      return bad(`BFL auth failed (check BFL_API_KEY): ${msg}`, 502);
+      return bad(`OpenAI auth failed (check OPENAI_API_KEY): ${msg}`, 502);
     }
     return bad(msg, 502);
   }
