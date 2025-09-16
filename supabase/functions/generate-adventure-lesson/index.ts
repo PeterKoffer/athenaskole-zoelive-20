@@ -301,15 +301,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let requestData: AdventureLessonRequest | null = null;
+  
   try {
-    const request: AdventureLessonRequest = await req.json();
-    console.log('📨 Received adventure lesson request for:', request.adventure?.title);
+    requestData = await req.json();
+    console.log('📨 Received adventure lesson request for:', requestData.adventure?.title);
     
-    if (!request.adventure) {
+    if (!requestData.adventure) {
       throw new Error('Adventure metadata is required');
     }
     
-    const result = await generateAdventureLesson(request);
+    const result = await generateAdventureLesson(requestData);
     
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -324,9 +326,9 @@ serve(async (req) => {
     
     // Provide a fallback lesson structure for testing
     const fallbackLesson = {
-      title: `${request.adventure?.title || 'Learning Adventure'}`,
-      subject: request.adventure?.subject || 'General',
-      gradeLevel: request.adventure?.gradeLevel || 7,
+      title: `${requestData?.adventure?.title || 'Learning Adventure'}`,
+      subject: requestData?.adventure?.subject || 'General',
+      gradeLevel: requestData?.adventure?.gradeLevel || 7,
       scenario: `Welcome to an exciting learning adventure about ${request.adventure?.title}! This interactive experience will help you explore key concepts through hands-on activities.`,
       learningObjectives: [
         `Understand key concepts related to ${request.adventure?.subject}`,
@@ -387,7 +389,7 @@ serve(async (req) => {
         success: true,
         lesson: fallbackLesson,
         metadata: {
-          adventureId: request.adventure?.id,
+          adventureId: requestData?.adventure?.id,
           generatedAt: new Date().toISOString(),
           fallback: true,
           originalError: error.message
