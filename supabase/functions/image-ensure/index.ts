@@ -86,6 +86,8 @@ Deno.serve(async (req) => {
       `${titleIn}${gradeInt ? `, engaging classroom cover image for grade ${gradeInt}` : ""}, vibrant, friendly, clean composition`);
 
   try {
+    console.log("[image-ensure] Starting OpenAI image generation...", { prompt, openaiSize });
+    
     // ---- 1) Generate via OpenAI
     const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -94,7 +96,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-image-1',
+        model: 'dall-e-3',
         prompt: prompt,
         n: 1,
         size: openaiSize,
@@ -103,14 +105,19 @@ Deno.serve(async (req) => {
       }),
     });
 
+    console.log("[image-ensure] OpenAI response status:", openaiResponse.status);
+
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text();
+      console.error("[image-ensure] OpenAI API error:", errorText);
       return bad(`OpenAI API failed: ${openaiResponse.status} ${errorText}`, 502);
     }
 
     const openaiData = await openaiResponse.json();
+    console.log("[image-ensure] OpenAI response received, processing...");
     
     if (!openaiData.data || !openaiData.data[0] || !openaiData.data[0].b64_json) {
+      console.error("[image-ensure] Invalid OpenAI response format:", openaiData);
       return bad("Invalid OpenAI response format", 502);
     }
     
