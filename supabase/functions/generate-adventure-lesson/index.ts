@@ -60,7 +60,7 @@ function createDailyLessonPrompt(context: PromptContext, adventureTitle: string)
     gradeLevel,
     curriculumStandards = 'broadly accepted topics and skills for that grade',
     teachingPerspective = 'balanced, evidence-based style',
-    lessonDuration = 35,
+    lessonDuration = 135,
     subjectWeight = 'medium',
     calendarKeywords = [],
     calendarDuration = 'standalone session',

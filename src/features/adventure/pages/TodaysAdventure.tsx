@@ -76,7 +76,7 @@ export default function TodaysAdventure() {
           schoolSettings: {
             curriculum: 'broadly accepted topics and skills for that grade',
             teachingPerspective: 'balanced, evidence-based style',
-            lessonDuration: 35
+            lessonDuration: 135  // 2.25 hours when no teacher parameters set
           },
           teacherPreferences: {
             subjectWeights: {
