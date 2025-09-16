@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { UniversePacks } from "@/content/universe.catalog";
 import type { UniversePack } from "@/content/types";
+import { BackstoryService } from "../backstory/backstoryService";
 
 export interface AdventureUniverse {
   id: string;
@@ -48,62 +49,29 @@ export interface AdventureSelectionCriteria {
 export class AdventureService {
   
   /**
-   * Generate magical, age-appropriate backstory to hook students into the adventure
+   * Get cached backstory or generate one as fallback
    */
-  private static generateMagicalBackstory(pack: UniversePack, gradeLevel: string): string {
-    const gradeInt = gradeLevel === "K-2" ? 1 : 
-                     gradeLevel === "3-5" ? 4 : 
-                     gradeLevel === "6-8" ? 6 : 
-                     gradeLevel === "9-10" ? 9 : 11;
-
-    const isYoung = gradeInt <= 5; // K-5 gets more magical language
-    const isMiddle = gradeInt >= 6 && gradeInt <= 8; // 6-8 gets adventure language  
-    const isOlder = gradeInt >= 9; // 9+ gets challenge/discovery language
-
-    const adventureTitle = pack.title;
-    const subject = pack.subjectHint;
-    const category = pack.category.toLowerCase();
-
-    // Create backstory templates based on age and adventure type
-    if (isYoung) {
-      const youngStories = [
-        `🌟 En dag når du går forbi en gammel, glemte ${adventureTitle.toLowerCase()}, begynder den pludselig at skinne magisk! Du opdager, at den gemmer på fantastiske hemmeligheder, der kan hjælpe dig med at lære om ${subject}. Hvad mon der sker, hvis du tager mod udfordringen?`,
-        `✨ I din baghave finder du en mystisk bog om ${adventureTitle}. Når du åbner den, springer ordene ud af siderne og inviterer dig med på det mest spændende eventyr! Er du klar til at springe ind i ${subject}-verdenen?`,
-        `🎪 Den gamle cirkusvogn på hjørnet har altid været tom - indtil i dag! Pludselig summer den af aktivitet med ${adventureTitle}, og du får chancen for at blive dagens helt ved at mestre ${subject} på en helt ny måde!`
-      ];
-      return youngStories[Math.floor(Math.random() * youngStories.length)];
+  private static async getMagicalBackstory(pack: UniversePack, gradeLevel: string, language: string = 'da'): Promise<string> {
+    try {
+      return await BackstoryService.getOrGenerateBackstory(pack, gradeLevel, language);
+    } catch (error) {
+      console.error('Error getting backstory, using fallback:', error);
+      return BackstoryService.generateMagicalBackstory(pack, gradeLevel, language);
     }
-
-    if (isMiddle) {
-      const middleStories = [
-        `🚀 Du støder på en gådefuld ${adventureTitle.toLowerCase()}, som ser helt almindelig ud - men hold da op! Den gemmer på utrolige muligheder for at udforske ${subject} på en måde, du aldrig har prøvet før. Tør du tage udfordringen op?`,
-        `🕵️ En mærkelig opdagelse venter dig: ${adventureTitle} har brug for din hjælp! Med dine ${subject}-færdigheder som våben, kan du løse mysteriet og redde dagen. Hvad venter der på den anden side af eventyret?`,
-        `⚡ Forestil dig at ${adventureTitle.toLowerCase()} pludselig bliver dit ansvar. Du har chancen for at vise, hvad du kan med ${subject}, men der er både udfordringer og fantastiske overraskelser forude. Er du klar til at bevise dit værd?`
-      ];
-      return middleStories[Math.floor(Math.random() * middleStories.length)];
-    }
-
-    // Older students (9+)
-    const olderStories = [
-      `🎯 En uventet mulighed dukker op: du får chancen for at tage kontrol over ${adventureTitle} og bevise dine ${subject}-færdigheder i praksis. Det handler ikke bare om teori - det er din chance for at skabe noget betydningsfuldt og vise verden, hvad du kan!`,
-      `🌍 ${adventureTitle} står over for en kritisk udfordring, og der er brug for nogen med dine ${subject}-talenter til at finde løsningen. Dette er mere end bare en opgave - det er din mulighed for at gøre en reel forskel og lære utroligt meget undervejs.`,
-      `💡 Du opdager en fascinerende situation omkring ${adventureTitle}, der kræver kreativ problemløsning og solid ${subject}-viden. Dette projekt kan åbne døre til ny erkendelse og give dig færdigheder, du kan bruge resten af livet!`
-    ];
-    return olderStories[Math.floor(Math.random() * olderStories.length)];
   }
 
   /**
    * Convert UniversePack to AdventureUniverse format
    */
-  private static universePackToAdventure(pack: UniversePack, gradeLevel: string = "6-8"): AdventureUniverse {
+  private static async universePackToAdventure(pack: UniversePack, gradeLevel: string = "6-8", language: string = 'da'): Promise<AdventureUniverse> {
     // Convert grade level to integer for image system
     const gradeInt = gradeLevel === "K-2" ? 1 : 
                      gradeLevel === "3-5" ? 4 : 
                      gradeLevel === "6-8" ? 6 : 
                      gradeLevel === "9-10" ? 9 : 11;
     
-    // Generate magical backstory to hook the student
-    const magicalBackstory = this.generateMagicalBackstory(pack, gradeLevel);
+    // Get cached magical backstory to hook the student
+    const magicalBackstory = await this.getMagicalBackstory(pack, gradeLevel, language);
     
     return {
       id: pack.id,
@@ -185,8 +153,8 @@ export class AdventureService {
         selectedPack = filteredUniverses[Math.floor(Math.random() * filteredUniverses.length)];
       }
 
-      // Convert to AdventureUniverse format
-      const selectedUniverse = this.universePackToAdventure(selectedPack, criteria.gradeLevel || "6-8");
+      // Convert to AdventureUniverse format (now async due to backstory loading)
+      const selectedUniverse = await this.universePackToAdventure(selectedPack, criteria.gradeLevel || "6-8", 'da');
 
       // Generate content based on the universe pack
       const content: AdventureContent = {
