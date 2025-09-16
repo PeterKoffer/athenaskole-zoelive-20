@@ -11,7 +11,7 @@ const DASHBOARD_MAP: Partial<Record<UserRole, string>> = {
   school_leader: "/school-dashboard",
   school_staff: "/school-dashboard",
   teacher: "/teacher-dashboard",
-  student: "/daily-program",
+  student: "/adventure",
   parent: "/parent-dashboard"
 };
 

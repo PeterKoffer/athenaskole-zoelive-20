@@ -53,20 +53,20 @@ const StudentDashboard = () => {
 
   const handleQuickAction = (action: string) => {
     switch (action) {
-      case 'daily-program':
-        navigate('/daily-program');
+      case 'adventure':
+        navigate('/adventure');
         break;
       case 'assignments':
-        // For now, navigate to daily program as assignments aren't implemented yet
-        navigate('/daily-program');
+        // For now, navigate to adventure as assignments aren't implemented yet
+        navigate('/adventure');
         break;
       case 'practice':
         setShowPracticeModal(true);
         break;
       case 'help':
         // This could show the floating AI tutor or navigate to a help section
-        // For now, let's navigate to the daily program where Nelie is available
-        navigate('/daily-program');
+        // For now, let's navigate to the adventure where Nelie is available
+        navigate('/adventure');
         break;
       default:
         console.log('Unknown action:', action);
@@ -191,7 +191,7 @@ const StudentDashboard = () => {
             <CardContent className="space-y-3">
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700"
-                onClick={() => handleQuickAction('daily-program')}
+                onClick={() => handleQuickAction('adventure')}
               >
                 Start Daily Program
               </Button>

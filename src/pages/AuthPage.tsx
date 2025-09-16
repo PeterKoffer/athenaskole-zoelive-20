@@ -26,7 +26,7 @@ const AuthPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user && !loading) {
-      navigate('/daily-program');
+      navigate('/adventure');
     }
   }, [user, loading, navigate]);
 
@@ -41,7 +41,7 @@ const AuthPage = () => {
           title: "Welcome back!",
           description: "Successfully logged in.",
         });
-        navigate('/daily-program');
+        navigate('/adventure');
       } else {
         await signUp(formData.email, formData.password, {
           name: formData.name,
@@ -78,7 +78,7 @@ const AuthPage = () => {
         title: "Logged in!",
         description: `Logged in as ${email}`,
       });
-      navigate('/daily-program');
+      navigate('/adventure');
     } catch (error: any) {
       toast({
         title: "Login failed",

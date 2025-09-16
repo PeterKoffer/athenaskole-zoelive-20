@@ -47,11 +47,11 @@ const NavbarDesktopMenu = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-gray-800 border-gray-700" align="start">
           <DropdownMenuItem 
-            onClick={() => navigate('/daily-program')}
+            onClick={() => navigate('/adventure')}
             className="text-white hover:bg-gray-700 focus:bg-gray-700"
           >
             <BookOpen className="mr-2 h-4 w-4" />
-            Daily Program
+            Today's Adventure
           </DropdownMenuItem>
           <DropdownMenuItem 
             onClick={handleCurriculumSystem}

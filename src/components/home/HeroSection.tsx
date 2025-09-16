@@ -50,12 +50,12 @@ const HeroSection = ({ onGetStarted: _onGetStarted }: HeroSectionProps) => {
           </Button>
           
           <Button
-            onClick={() => navigate('/daily-program')}
+            onClick={() => navigate('/adventure')}
             variant="outline"
             size="lg"
             className="w-full sm:w-auto border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-gray-900 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
           >
-            View Daily Program
+            Start Today's Adventure
           </Button>
           
           <DropdownMenu>
@@ -74,7 +74,7 @@ const HeroSection = ({ onGetStarted: _onGetStarted }: HeroSectionProps) => {
                 <LogIn className="mr-2 h-4 w-4" />
                 Login
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/daily-program')} className="hover:bg-gray-700">
+              <DropdownMenuItem onClick={() => navigate('/adventure')} className="hover:bg-gray-700">
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
