@@ -32,19 +32,21 @@ const styleByAgeGroup = {
   },
 };
 
-function buildAgeGroupPrompt(universeTitle: string, scene: string, ageGroup: 'child' | 'teen' | 'adult'): AgeGroupPrompt {
+function buildAgeGroupPrompt(universeTitle: string, scene: string, ageGroup: 'child' | 'teen' | 'adult', description?: string): AgeGroupPrompt {
   const style = styleByAgeGroup[ageGroup];
   
   const prompt = [
-    `Illustrate: ${scene}`,
-    `Universe: ${universeTitle}`,
-    `Age group: ${ageGroup}`,
-    `Style: ${style.positive}`,
-  ].join(' — ');
+    `Create an engaging educational illustration that directly represents the adventure: ${universeTitle}`,
+    description ? `Story context: ${description}` : null,
+    `Visual scene: ${scene}`,
+    `Target audience: ${ageGroup} learners`,
+    `Art style: ${style.positive}`,
+    'The image should capture the essence and excitement of this specific learning adventure'
+  ].filter(Boolean).join(' — ');
 
   const negative = [
     style.negative,
-    'blurry, watermark, signature, text overlay, misspelled labels, extra fingers, deformed anatomy'
+    'generic stock photos, unrelated imagery, blurry, watermark, signature, text overlay, misspelled labels, extra fingers, deformed anatomy'
   ].join(', ');
 
   return {
@@ -167,7 +169,12 @@ serve(async (req) => {
           }
 
           try {
-            const promptSpec = buildAgeGroupPrompt(adventure.title, adventure.title, ageGroup as any);
+            const promptSpec = buildAgeGroupPrompt(
+              adventure.title, 
+              adventure.prompt || adventure.title, 
+              ageGroup as any,
+              adventure.description
+            );
             console.log(`Generating ${ageGroup} image for: ${adventure.title}`);
             
             const imageData = await generateImageWithOpenAI(promptSpec.prompt, promptSpec.size);

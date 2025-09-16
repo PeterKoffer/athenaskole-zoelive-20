@@ -175,6 +175,7 @@ export function buildAgeGroupImagePrompt(opts: {
   subject: string;
   scene: string;
   ageGroup: AgeGroup;
+  description?: string;
   extraStyle?: string;
 }): ImagePromptSpec {
   const sKey = resolveSubjectKey(opts.subject);
@@ -182,17 +183,19 @@ export function buildAgeGroupImagePrompt(opts: {
   const style = styleByAgeGroup[opts.ageGroup];
 
   const base = [
-    `Illustrate: ${opts.scene}`,
-    `Universe: ${opts.universeTitle}`,
-    `Subject cues: ${subjectCue}`,
-    `Age group: ${opts.ageGroup}`,
-    `Style: ${style.positive}`,
-    opts.extraStyle ? `Extra: ${opts.extraStyle}` : null
+    `Create an engaging educational illustration that directly represents the adventure: ${opts.universeTitle}`,
+    opts.description ? `Story context: ${opts.description}` : null,
+    `Subject area: ${subjectCue}`,
+    `Visual scene: ${opts.scene}`,
+    `Target audience: ${opts.ageGroup} learners`,
+    `Art style: ${style.positive}`,
+    opts.extraStyle ? `Additional style: ${opts.extraStyle}` : null,
+    'The image should capture the essence and excitement of this specific learning adventure'
   ].filter(Boolean).join(' — ');
 
   const negative = [
     style.negative,
-    'blurry, watermark, signature, text overlay, misspelled labels, extra fingers, deformed anatomy'
+    'generic stock photos, unrelated imagery, blurry, watermark, signature, text overlay, misspelled labels, extra fingers, deformed anatomy'
   ].join(', ');
 
   return {
