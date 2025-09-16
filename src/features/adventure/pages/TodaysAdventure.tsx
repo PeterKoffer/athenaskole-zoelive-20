@@ -7,6 +7,7 @@ import AdventureDisplay from "../components/AdventureDisplay";
 import { useAuth } from "@/hooks/useAuth";
 import type { AdventureUniverse } from "@/services/adventure/service";
 import adventureIllustration from "@/assets/adventure-illustration.jpg";
+import UniverseImage from "@/components/UniverseImage";
 
 export default function TodaysAdventure() {
   const { user } = useAuth();
@@ -107,11 +108,23 @@ export default function TodaysAdventure() {
               <div className="space-y-4">
                 {/* Adventure Illustration and Description */}
                 <div className="relative rounded-xl overflow-hidden">
-                  <img 
-                    src={data.universe?.imageUrl || adventureIllustration} 
-                    alt={`Today's Learning Adventure: ${data.universe?.title || 'Adventure'}`}
-                    className="w-full h-64 object-cover"
-                  />
+                  {data.universe?.metadata?.gradeInt ? (
+                    <UniverseImage
+                      universeId={data.universe.id}
+                      gradeInt={data.universe.metadata.gradeInt}
+                      title={data.universe.title}
+                      className="w-full h-64 object-cover"
+                      alt={`Today's Learning Adventure: ${data.universe.title}`}
+                      width={1024}
+                      height={576}
+                    />
+                  ) : (
+                    <img 
+                      src={adventureIllustration} 
+                      alt={`Today's Learning Adventure: ${data.universe?.title || 'Adventure'}`}
+                      className="w-full h-64 object-cover"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-xl font-bold text-white mb-2">

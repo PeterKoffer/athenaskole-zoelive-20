@@ -51,6 +51,12 @@ export class AdventureService {
    * Convert UniversePack to AdventureUniverse format
    */
   private static universePackToAdventure(pack: UniversePack, gradeLevel: string = "6-8"): AdventureUniverse {
+    // Convert grade level to integer for image system
+    const gradeInt = gradeLevel === "K-2" ? 1 : 
+                     gradeLevel === "3-5" ? 4 : 
+                     gradeLevel === "6-8" ? 6 : 
+                     gradeLevel === "9-10" ? 9 : 11;
+    
     return {
       id: pack.id,
       title: pack.title,
@@ -62,11 +68,14 @@ export class AdventureService {
         category: pack.category,
         tags: pack.tags,
         crossSubjects: pack.crossSubjects,
-        beats: pack.beats
+        beats: pack.beats,
+        gradeInt: gradeInt
       },
       slug: pack.id,
       category: pack.category,
-      imagePrompt: pack.imagePrompt
+      imagePrompt: pack.imagePrompt,
+      // Use the universe image system path format
+      image_url: `universe-images/${pack.id}/${gradeInt}/cover.webp`
     };
   }
 
