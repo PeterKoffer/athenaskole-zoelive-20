@@ -31,7 +31,10 @@ const CTASection = ({
                 Start Your Journey
               </Button>
               
-              <Button onClick={() => navigate("/adventure")} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 bg-neutral-50 text-slate-950">
+              <Button onClick={() => {
+                console.log('CTA: Navigating to adventure page');
+                navigate("/adventure");
+              }} variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 bg-neutral-50 text-slate-950">
                 Start Today's Adventure
               </Button>
             </div>

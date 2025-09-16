@@ -50,7 +50,10 @@ const HeroSection = ({ onGetStarted: _onGetStarted }: HeroSectionProps) => {
           </Button>
           
           <Button
-            onClick={() => navigate('/adventure')}
+            onClick={() => {
+              console.log('Navigating to adventure page');
+              navigate('/adventure');
+            }}
             variant="outline"
             size="lg"
             className="w-full sm:w-auto border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-gray-900 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
