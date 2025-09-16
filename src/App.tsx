@@ -14,9 +14,8 @@ import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 
 
-import DailyPage from "./pages/DailyPage";
 import TodaysAdventure from "./features/adventure/pages/TodaysAdventure";
-import ScenarioRunner from "./features/adventure/pages/ScenarioRunner";
+import AdventureRunner from "./features/adventure/pages/AdventureRunner";
 import TrainingGroundHome from "./features/training-ground/pages/TrainingGroundHome";
 
 function App() {
@@ -37,37 +36,13 @@ function App() {
            path="/training-ground-new"
            element={<ProtectedRoute><TrainingGroundHome /></ProtectedRoute>}
          />
-        <Route
-          path="/daily"
-          element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
-        />
-        <Route
-          path="/daily-program"
-          element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
-        />
-        <Route
-          path="/daily-session"
-          element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
-        />
-         <Route
-           path="/daily-universe-lesson"
-           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
-         />
-         <Route
-           path="/universe"
-           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
-         />
          <Route
            path="/adventure"
            element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
          />
          <Route
-           path="/scenario/:scenarioId"
-           element={<ProtectedRoute><ScenarioRunner /></ProtectedRoute>}
-         />
-         <Route
            path="/adventure/:adventureId"
-           element={<ProtectedRoute><ScenarioRunner /></ProtectedRoute>}
+           element={<ProtectedRoute><AdventureRunner /></ProtectedRoute>}
          />
         <Route
           path="/school-dashboard"
