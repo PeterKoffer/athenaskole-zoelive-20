@@ -15,6 +15,9 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 
 
 import DailyPage from "./pages/DailyPage";
+import UniverseLesson from "./features/daily-program/pages/UniverseLesson";
+import ScenarioRunner from "./features/daily-program/pages/ScenarioRunner";
+import TrainingGroundHome from "./features/training-ground/pages/TrainingGroundHome";
 
 function App() {
   return (
@@ -26,10 +29,14 @@ function App() {
         <Route path="/sitemap" element={<SiteMapPage />} />
 
         {/* protected */}
-        <Route
-          path="/training-ground"
-          element={<ProtectedRoute><TrainingGround /></ProtectedRoute>}
-        />
+         <Route
+           path="/training-ground"
+           element={<ProtectedRoute><TrainingGround /></ProtectedRoute>}
+         />
+         <Route
+           path="/training-ground-new"
+           element={<ProtectedRoute><TrainingGroundHome /></ProtectedRoute>}
+         />
         <Route
           path="/daily"
           element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
@@ -42,10 +49,18 @@ function App() {
           path="/daily-session"
           element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
         />
-        <Route
-          path="/daily-universe-lesson"
-          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
-        />
+         <Route
+           path="/daily-universe-lesson"
+           element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+         />
+         <Route
+           path="/universe"
+           element={<ProtectedRoute><UniverseLesson /></ProtectedRoute>}
+         />
+         <Route
+           path="/scenario/:scenarioId"
+           element={<ProtectedRoute><ScenarioRunner /></ProtectedRoute>}
+         />
         <Route
           path="/school-dashboard"
           element={<ProtectedRoute><SchoolDashboard /></ProtectedRoute>}
