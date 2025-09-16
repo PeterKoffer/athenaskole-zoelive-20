@@ -391,8 +391,20 @@ serve(async (req) => {
     const requestData = await req.json();
     logInfo('✅ Adventure metadata valid, generating lesson...');
 
+    // Extract data from the complex frontend structure and map to AdventureRequest
+    const adventureRequest: AdventureRequest = {
+      adventureTitle: requestData.adventure?.title || 'Epic Learning Adventure',
+      subject: requestData.adventure?.subject || 'General Learning',
+      gradeLevel: requestData.adventure?.gradeLevel || 7,
+      interests: requestData.studentProfile?.interests || ['adventure', 'mystery', 'technology'],
+      calendarKeywords: requestData.calendarContext?.keywords || ['interactive learning'],
+      lessonDuration: requestData.schoolSettings?.lessonDuration || 135
+    };
+
+    logInfo('📋 Mapped adventure request', adventureRequest);
+
     // Generate the epic adventure
-    const adventure = await generateEpicAdventure(requestData);
+    const adventure = await generateEpicAdventure(adventureRequest);
 
     // Return the adventure
     return new Response(JSON.stringify(adventure), {
