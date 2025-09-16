@@ -84,14 +84,15 @@
     "ts-morph": "^26.0.0",
     "uuid": "^11.1.0",
     "vaul": "^0.9.3",
+    "vite-tsconfig-paths": "^5.1.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@playwright/test": "^1.54.1",
     "@tailwindcss/typography": "^0.5.15",
-    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.19.11",

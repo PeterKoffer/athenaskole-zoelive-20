@@ -1,4 +1,4 @@
-import { logEvent } from "./logger.ts";
+import { logEvent } from "./logger";
 
 export type QAResult<T> =
   | { ok: true; data: T }

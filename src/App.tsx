@@ -14,8 +14,8 @@ import CalendarPage from "./pages/CalendarPage";
 import SubjectLearningPage from "./pages/SubjectLearningPage";
 import DailyLearningSessionPage from "./pages/DailyLearningSessionPage";
 
-import DailyProgramPage from "@features/daily-program/pages/DailyProgramPage";
-import DailyUniverseLessonPage from "@features/daily-program/pages/UniverseLesson";
+import DailyProgramPage from "./pages/DailyProgramPage";
+import DailyUniverseLessonPage from "./pages/DailyUniverseLessonPage";
 
 function App() {
   return (

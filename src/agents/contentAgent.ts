@@ -1,7 +1,7 @@
-import type { AgentInputs } from "./types.ts";
-import { logEvent } from "./logger.ts";
-import { boringButCorrectLesson } from "./fallbacks.ts";
-import { validateJson } from "./qaAgent.ts";
+import type { AgentInputs } from "./types";
+import { logEvent } from "./logger";
+import { boringButCorrectLesson } from "./fallbacks";
+import { validateJson } from "./qaAgent";
 
 export async function generateLesson(inputs: AgentInputs) {
   const sessionId = inputs.sessionId ?? cryptoRandom();
