@@ -19,7 +19,7 @@ const SiteMap = () => {
       pages: [
         { name: "Home", path: "/", description: "Welcome page and overview" },
         { name: "Training Ground", path: "/training-ground", description: "Subject-focused learning" },
-        { name: "Daily Program", path: "/daily-program", description: "Structured daily activities" },
+        { name: "Today's Adventure", path: "/adventure", description: "Your daily learning adventure" },
         { name: "Calendar", path: "/calendar", description: "School events and keyword schedules" },
       ]
     },

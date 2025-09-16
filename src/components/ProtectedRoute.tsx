@@ -57,10 +57,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       'school_staff': '/school-dashboard',
       'teacher': '/teacher-dashboard',
       'parent': '/parent-dashboard',
-      'student': '/daily-program'
+      'student': '/adventure'
     };
     
-    const targetPath = targetPaths[userRole] || '/daily-program';
+    const targetPath = targetPaths[userRole] || '/adventure';
     console.log('[ProtectedRoute] Redirecting to:', targetPath);
     return <Navigate to={targetPath} replace />;
   }

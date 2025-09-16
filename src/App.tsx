@@ -16,7 +16,7 @@ import SubjectLearningPage from "./pages/SubjectLearningPage";
 
 import DailyPage from "./pages/DailyPage";
 import TodaysAdventure from "./features/adventure/pages/TodaysAdventure";
-import ScenarioRunner from "./features/daily-program/pages/ScenarioRunner";
+import ScenarioRunner from "./features/adventure/pages/ScenarioRunner";
 import TrainingGroundHome from "./features/training-ground/pages/TrainingGroundHome";
 
 function App() {
@@ -39,19 +39,19 @@ function App() {
          />
         <Route
           path="/daily"
-          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+          element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
         />
         <Route
           path="/daily-program"
-          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+          element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
         />
         <Route
           path="/daily-session"
-          element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+          element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
         />
          <Route
            path="/daily-universe-lesson"
-           element={<ProtectedRoute><DailyPage /></ProtectedRoute>}
+           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
          />
          <Route
            path="/universe"
@@ -63,6 +63,10 @@ function App() {
          />
          <Route
            path="/scenario/:scenarioId"
+           element={<ProtectedRoute><ScenarioRunner /></ProtectedRoute>}
+         />
+         <Route
+           path="/adventure/:adventureId"
            element={<ProtectedRoute><ScenarioRunner /></ProtectedRoute>}
          />
         <Route

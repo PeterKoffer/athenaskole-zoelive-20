@@ -34,10 +34,10 @@ const RoleSwitcher = () => {
           'school_staff': '/school-dashboard',
           'teacher': '/teacher-dashboard',
           'parent': '/parent-dashboard',
-          'student': '/daily-program'
+          'student': '/adventure'
         };
         
-        const targetPath = targetPaths[selectedRole] || '/daily-program';
+        const targetPath = targetPaths[selectedRole] || '/adventure';
         window.location.href = targetPath; // Force full page navigation
       }, 1500);
     } catch (error) {
