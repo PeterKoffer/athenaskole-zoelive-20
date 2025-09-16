@@ -1,0 +1,282 @@
+[
+  {
+    "universeId": "food-truck-empire",
+    "gradeInt": 8,
+    "title": "Launch a Food Truck Empire",
+    "prompt": "Design a brand, create a menu, manage a budget, and compete in a city-wide food festival",
+    "description": "Start from scratch with your own food truck business. Learn about branding, menu pricing, supply chain management, and customer service while competing against other food trucks in the ultimate festival challenge.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "themed-cafe-manager",
+    "gradeInt": 7,
+    "title": "Open a Themed Cafe",
+    "prompt": "From a cat cafe to a board game cafe, manage inventory, design the space, and serve virtual customers",
+    "description": "Create the perfect themed cafe experience. Choose your theme, design the interior, manage inventory, hire staff, and keep customers happy while building a profitable business.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "sports-team-gm",
+    "gradeInt": 10,
+    "title": "Manage a Professional Sports Team",
+    "prompt": "Act as General Manager for a basketball, soccer, or esports team. Handle player trades, ticket pricing, and stadium upgrades",
+    "description": "Take control of a professional sports franchise. Make strategic decisions about player acquisitions, team chemistry, ticket pricing, marketing campaigns, and stadium management.",
+    "subject": "Physical Education"
+  },
+  {
+    "universeId": "record-label-boss",
+    "gradeInt": 9,
+    "title": "Run a Record Label",
+    "prompt": "Discover new AI-generated artists, manage their careers, design album art, and promote their music",
+    "description": "Build a music empire by discovering talent, producing albums, managing artist careers, and navigating the complex world of music promotion and distribution.",
+    "subject": "Music Discovery"
+  },
+  {
+    "universeId": "clothing-brand-startup",
+    "gradeInt": 8,
+    "title": "Start a Clothing Brand",
+    "prompt": "Design apparel, source virtual materials, set prices, and launch a marketing campaign",
+    "description": "From concept to runway, create your own fashion brand. Design unique clothing, understand textile sourcing, set competitive prices, and market to your target demographic.",
+    "subject": "Creative Arts"
+  },
+  {
+    "universeId": "game-studio-dev",
+    "gradeInt": 11,
+    "title": "Develop a Video Game Studio",
+    "prompt": "Create a game concept, manage a development team (with AI teammates), and market the final product",
+    "description": "Lead a video game development studio from concept to launch. Manage programming, art, sound, and marketing teams while balancing creative vision with commercial viability.",
+    "subject": "Computer and Technology"
+  },
+  {
+    "universeId": "pet-adoption-agency",
+    "gradeInt": 6,
+    "title": "Run a Pet Adoption Agency",
+    "prompt": "Care for virtual animals, manage the shelter's budget, and create adoption profiles to find them homes",
+    "description": "Operate a pet adoption center focused on finding loving homes for animals. Manage animal care, adoption processes, community outreach, and shelter operations.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "tech-startup-founder",
+    "gradeInt": 12,
+    "title": "Launch a Tech Startup",
+    "prompt": "Develop a new app idea, create a business plan, and pitch it to virtual venture capitalists",
+    "description": "Navigate the startup ecosystem from idea to funding. Develop your product, build a team, create financial projections, and perfect your pitch for investors.",
+    "subject": "Computer and Technology"
+  },
+  {
+    "universeId": "movie-theater-manager",
+    "gradeInt": 7,
+    "title": "Manage a Movie Theater",
+    "prompt": "Select films to show, set ticket and concession prices, and run promotions to maximize attendance",
+    "description": "Run a successful movie theater business. Choose which films to show, optimize pricing strategies, manage concessions, and create marketing campaigns to boost attendance.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "subscription-box-creator",
+    "gradeInt": 9,
+    "title": "Create a Subscription Box Service",
+    "prompt": "Curate monthly boxes for a specific hobby (e.g., art, science experiments, books) and manage logistics",
+    "description": "Build a subscription service that delivers curated experiences to customers' doors. Handle product sourcing, logistics, customer service, and retention strategies.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "mars-colony-mission",
+    "gradeInt": 10,
+    "title": "Mission to Mars Colony",
+    "prompt": "Design a habitat, plan resource management, and navigate the challenges of colonizing Mars",
+    "description": "Lead humanity's first permanent settlement on Mars. Solve complex problems of life support, resource extraction, habitat construction, and crew psychology in an alien environment.",
+    "subject": "Science"
+  },
+  {
+    "universeId": "deep-sea-explorer",
+    "gradeInt": 8,
+    "title": "Deep Sea Submarine Expedition",
+    "prompt": "Explore the Mariana Trench, discover new species, and study hydrothermal vents",
+    "description": "Command a deep-sea research vessel to explore Earth's final frontier. Discover new species, study unique ecosystems, and unlock the mysteries of the deep ocean.",
+    "subject": "Science"
+  },
+  {
+    "universeId": "dinosaur-park-designer",
+    "gradeInt": 7,
+    "title": "Dinosaur Safari Park",
+    "prompt": "Design and manage a park for dinosaurs, ensuring enclosures are safe and habitats are appropriate",
+    "description": "Create the ultimate dinosaur experience while ensuring visitor safety and animal welfare. Design exhibits, manage breeding programs, and handle emergencies.",
+    "subject": "Science"
+  },
+  {
+    "universeId": "volcano-response-team",
+    "gradeInt": 9,
+    "title": "Volcano Response Team",
+    "prompt": "Monitor volcanic activity around the world and create evacuation plans for nearby populations",
+    "description": "Lead an international volcano monitoring network. Predict eruptions, coordinate evacuations, and help communities prepare for and recover from volcanic disasters.",
+    "subject": "Geography"
+  },
+  {
+    "universeId": "lunar-base-commander",
+    "gradeInt": 11,
+    "title": "Build a Lunar Base",
+    "prompt": "Design a sustainable base on the moon, focusing on life support and energy systems",
+    "description": "Establish humanity's first permanent lunar outpost. Engineer life support systems, manage resources, and prepare for the challenges of long-term space habitation.",
+    "subject": "Science"
+  },
+  {
+    "universeId": "animated-film-director",
+    "gradeInt": 9,
+    "title": "Direct a Short Animated Film",
+    "prompt": "Write a script, design characters, create storyboards, and produce a 3-minute animated short",
+    "description": "Bring your story to life through animation. Develop characters, write compelling dialogue, plan visual sequences, and direct the production of your animated masterpiece.",
+    "subject": "Creative Arts"
+  },
+  {
+    "universeId": "podcast-producer",
+    "gradeInt": 8,
+    "title": "Produce a Podcast Series",
+    "prompt": "Choose a topic, research episodes, record and edit audio, and design cover art",
+    "description": "Create an engaging podcast from concept to distribution. Research compelling content, master audio production techniques, and build an audience.",
+    "subject": "Native Language"
+  },
+  {
+    "universeId": "comic-book-creator",
+    "gradeInt": 7,
+    "title": "Create a Comic Book",
+    "prompt": "Develop characters and a plot, then draw and letter a full 24-page comic",
+    "description": "Tell your story through sequential art. Create memorable characters, craft engaging plots, and master the visual language of comics.",
+    "subject": "Creative Arts"
+  },
+  {
+    "universeId": "virtual-band-manager",
+    "gradeInt": 8,
+    "title": "Launch a Virtual Band",
+    "prompt": "Write songs, design a band logo and look, play virtual concerts, and go on tour",
+    "description": "Build a music career from the ground up. Compose original music, develop a band identity, and navigate the music industry to achieve stardom.",
+    "subject": "Music Discovery"
+  },
+  {
+    "universeId": "game-level-designer",
+    "gradeInt": 10,
+    "title": "Design a Video Game Level",
+    "prompt": "Use a simplified 3D engine to design, build, and test a playable level for a platformer or adventure game",
+    "description": "Create an engaging game experience through level design. Balance challenge and fun while telling a story through environmental design.",
+    "subject": "Computer and Technology"
+  },
+  {
+    "universeId": "mayor-campaign",
+    "gradeInt": 10,
+    "title": "Run for Mayor",
+    "prompt": "Create a platform, give speeches, run a campaign, and, if elected, manage the city's budget and policies",
+    "description": "Experience democracy in action by running for mayor. Develop policy positions, campaign for votes, and govern a virtual city if elected.",
+    "subject": "History & Religion"
+  },
+  {
+    "universeId": "law-designer",
+    "gradeInt": 11,
+    "title": "Design a New Law",
+    "prompt": "Identify a community problem, research solutions, draft a legislative bill, and debate it in a simulated council",
+    "description": "Navigate the legislative process from identifying problems to passing solutions. Research issues, draft legislation, and engage in democratic debate.",
+    "subject": "History & Religion"
+  },
+  {
+    "universeId": "nonprofit-founder",
+    "gradeInt": 9,
+    "title": "Launch a Non-Profit Organization",
+    "prompt": "Write a mission statement, develop a fundraising plan, and run a program to address a social need",
+    "description": "Create positive change through nonprofit work. Identify social needs, build programs to address them, and manage the organization sustainably.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "community-organizer",
+    "gradeInt": 8,
+    "title": "Organize a Community Service Project",
+    "prompt": "Plan and execute a project like a park cleanup, a food drive, or a fundraiser for a local shelter",
+    "description": "Make a real difference in your community through organized service. Plan projects, recruit volunteers, and measure your impact.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "mock-trial-lawyer",
+    "gradeInt": 10,
+    "title": "The Mock Trial",
+    "prompt": "Take on the role of a lawyer, witness, or juror in a simulated court case",
+    "description": "Experience the justice system firsthand through realistic courtroom simulations. Build cases, examine witnesses, and seek justice.",
+    "subject": "History & Religion"
+  },
+  {
+    "universeId": "rollercoaster-engineer",
+    "gradeInt": 9,
+    "title": "Design and Build a Rollercoaster",
+    "prompt": "Use physics principles to design a thrilling but safe rollercoaster",
+    "description": "Engineer the perfect thrill ride using physics and mathematics. Balance excitement with safety while creating an unforgettable experience.",
+    "subject": "Mathematics"
+  },
+  {
+    "universeId": "rube-goldberg-master",
+    "gradeInt": 7,
+    "title": "The Rube Goldberg Machine Challenge",
+    "prompt": "Create a complex machine to perform a simple task",
+    "description": "Design elaborate chain reaction machines that accomplish simple tasks in the most complicated way possible. Learn about physics and engineering through playful creativity.",
+    "subject": "Science"
+  },
+  {
+    "universeId": "bridge-builder",
+    "gradeInt": 8,
+    "title": "The Bridge Builder",
+    "prompt": "Design and test bridges to withstand different loads and environmental conditions",
+    "description": "Engineer bridges that connect communities while withstanding the forces of nature. Learn structural engineering through hands-on design challenges.",
+    "subject": "Mathematics"
+  },
+  {
+    "universeId": "robotics-champion",
+    "gradeInt": 10,
+    "title": "Robotics Competition",
+    "prompt": "Build and code a virtual robot to complete a series of challenges in an arena",
+    "description": "Combine engineering and programming to create championship robots. Design, build, and program robots to excel in competitive challenges.",
+    "subject": "Computer and Technology"
+  },
+  {
+    "universeId": "skyscraper-architect",
+    "gradeInt": 11,
+    "title": "The Skyscraper Challenge",
+    "prompt": "Design a skyscraper that is both aesthetically pleasing and structurally sound enough to withstand wind and earthquakes",
+    "description": "Reach for the sky with architectural engineering. Design beautiful towers that can withstand natural disasters while serving urban communities.",
+    "subject": "Mathematics"
+  },
+  {
+    "universeId": "first-car-buyer",
+    "gradeInt": 12,
+    "title": "The First Car Purchase",
+    "prompt": "Research different cars, create a budget, secure a virtual loan, and negotiate a price",
+    "description": "Navigate one of life's major purchases with confidence. Learn about financing, insurance, depreciation, and negotiation in the car buying process.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "college-applicant",
+    "gradeInt": 12,
+    "title": "The College Application Journey",
+    "prompt": "Research colleges, write application essays, prepare for interviews, and fill out financial aid forms",
+    "description": "Successfully navigate the complex college application process. Research schools, craft compelling applications, and secure financial aid.",
+    "subject": "Life Essentials"
+  },
+  {
+    "universeId": "budget-master",
+    "gradeInt": 10,
+    "title": "The Personal Budget Challenge",
+    "prompt": "Manage a monthly budget for a year, making choices about spending, saving, and investing",
+    "description": "Master personal finance through practical budgeting experience. Learn to balance wants and needs while building long-term financial health.",
+    "subject": "Mathematics"
+  },
+  {
+    "universeId": "world-traveler",
+    "gradeInt": 9,
+    "title": "Plan a Trip Around the World",
+    "prompt": "Research destinations, book flights and hotels, and manage a travel budget and itinerary",
+    "description": "Explore the world through careful planning and budgeting. Research cultures, plan routes, and manage travel logistics for the adventure of a lifetime.",
+    "subject": "Geography"
+  },
+  {
+    "universeId": "wellness-guru",
+    "gradeInt": 8,
+    "title": "The Healthy Habits Challenge",
+    "prompt": "A 30-day challenge to track nutrition, exercise, and sleep to see their impact on virtual well-being",
+    "description": "Discover the science of wellness through personal experimentation. Track health metrics and learn how lifestyle choices impact physical and mental well-being.",
+    "subject": "Mental Wellness"
+  }
+]
