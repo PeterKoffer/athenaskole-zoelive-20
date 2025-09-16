@@ -5,47 +5,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Zap, RefreshCw } from "lucide-react";
-import { contentClient } from "../../../services/contentClient";
-import UniverseDisplay from "../components/UniverseDisplay";
+import { DailyUniverseService } from "@/services/universe/dailyUniverseService";
+import DailyUniverseDisplay from "../components/DailyUniverseDisplay";
 import { useAuth } from "@/hooks/useAuth";
+import type { Universe } from "@/services/universe/dailyUniverseService";
 
-// Type guard to access EdgeFunctionProvider methods
-const getEdgeProvider = () => {
-  return contentClient as any; // We know it's EdgeFunctionProvider
-};
+// Removed contentClient dependency - now using DailyUniverseService directly
 
 export default function UniverseLesson() {
   const { user } = useAuth();
-  const [grade, setGrade] = useState<number>(5);
-  const [subject, setSubject] = useState<string>("Mathematics");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [generationTime, setGenerationTime] = useState<number | null>(null);
 
-  const subjects = [
-    "Mathematics", "Science", "History", "Geography", 
-    "Language Arts", "Computer Science", "Creative Arts", 
-    "Music", "Physical Education"
-  ];
-
-  async function onGenerate() {
+  async function loadTodaysProgram() {
     setLoading(true); 
     setError(null);
     setGenerationTime(null);
     const startTime = Date.now();
     
     try {
-      const sanitizedContext = {
-        subject,
-        grade,
-        curriculum: "DK",
-        ability: "average",
-        learningStyle: "visual",
-        interests: ["technology", "games"],
-      };
+      // Load today's universe from your collection of 326+ universes
+      const result = await DailyUniverseService.getTodaysUniverse({
+        userId: user?.id,
+        gradeLevel: "6-12", // TODO: Get from user profile
+        preferences: {
+          curriculum: "DK",
+          difficulty: "average",
+          learningStyle: "visual",
+          interests: ["technology", "games"],
+        }
+      });
       
-      const result = await contentClient.generateContent(sanitizedContext);
       setData(result);
       setGenerationTime(Date.now() - startTime);
     } catch (e) {
@@ -57,18 +49,16 @@ export default function UniverseLesson() {
     }
   }
 
-  const handleStartJourney = () => {
+  const handleStartJourney = (universe: Universe) => {
     // TODO: Navigate to scenario runner or start the universe experience
-    console.log('🚀 Starting learning journey with universe:', data);
-    // navigate(`/scenario/${universeId}`, { state: { universe: data } });
+    console.log('🚀 Starting learning journey with universe:', universe);
+    // navigate(`/scenario/${universe.id}`, { state: { universe } });
   };
 
   const clearCache = () => {
-    const provider = getEdgeProvider();
-    if (provider.clearCache) {
-      provider.clearCache();
-      console.log('🧹 Cache cleared - next generation will be fresh');
-    }
+    // Clear the data to force a fresh universe selection
+    setData(null);
+    console.log('🧹 Cache cleared - next selection will be fresh');
   };
 
   return (
@@ -78,8 +68,8 @@ export default function UniverseLesson() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Daily Program — Universe Lesson</CardTitle>
-                <p className="text-muted-foreground">Generate personalized learning content using our clean architecture</p>
+                <CardTitle>Daily Program — Your Learning Universe</CardTitle>
+                <p className="text-muted-foreground">Complete school day experience across all subjects</p>
               </div>
               <Button 
                 variant="outline" 
@@ -92,55 +82,28 @@ export default function UniverseLesson() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="grade">Grade Level</Label>
-                <Input 
-                  id="grade"
-                  type="number" 
-                  value={grade} 
-                  onChange={(e) => setGrade(parseInt(e.target.value || "0", 10))}
-                  min="1"
-                  max="12"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <select 
-                  id="subject"
-                  value={subject} 
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  {subjects.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            
-            <div className="flex gap-2">
+            <div className="text-center">
               <Button 
-                onClick={onGenerate} 
+                onClick={loadTodaysProgram} 
                 disabled={loading} 
-                className="flex-1"
+                size="lg"
+                className="w-full max-w-md mx-auto"
               >
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Generating Universe Content...
+                    Loading Today's Learning Universe...
                   </>
                 ) : (
                   <>
                     <Zap className="w-4 h-4 mr-2" />
-                    Generate Universe Lesson
+                    View Daily Program
                   </>
                 )}
               </Button>
               
               {generationTime && (
-                <Badge variant="outline" className="px-3 py-2">
+                <Badge variant="outline" className="mt-3">
                   <Clock className="w-3 h-3 mr-1" />
                   {generationTime}ms
                 </Badge>
@@ -155,17 +118,21 @@ export default function UniverseLesson() {
             )}
             
             {!error && !data && !loading && (
-              <div className="p-4 border border-muted rounded-md">
+              <div className="p-4 border border-muted rounded-md text-center">
                 <p className="text-muted-foreground text-sm">
-                  Click "Generate Universe Lesson" to create personalized content
+                  Ready to start your learning journey? Click "View Daily Program" to discover today's universe.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Each day brings a new learning adventure from our collection of 326+ universes
                 </p>
               </div>
             )}
             
             
             {data && (
-              <UniverseDisplay 
-                data={data} 
+              <DailyUniverseDisplay 
+                universe={data.universe}
+                content={data.content}
                 onStartJourney={handleStartJourney}
               />
             )}
