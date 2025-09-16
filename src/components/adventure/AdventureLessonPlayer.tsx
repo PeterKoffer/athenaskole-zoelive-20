@@ -220,37 +220,48 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                       <h3 className="font-semibold text-white mb-3 text-lg">{activity.content.question}</h3>
                     </div>
                     
-                    <div className="grid gap-3">
-                      {activity.content.options?.map((option, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => handleAnswerSelect(index)}
-                          disabled={hasAnswered}
-                          variant="outline"
-                          className={`
-                            h-auto p-4 text-left justify-start border-2 transition-all duration-300 transform hover:scale-105
-                            ${hasAnswered 
-                              ? index === activity.content?.correctAnswer
-                                ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 border-green-400 text-green-100 shadow-green-400/20 shadow-lg'
-                                : selectedAnswer === index
-                                  ? 'bg-gradient-to-r from-red-500/30 to-pink-500/30 border-red-400 text-red-100 shadow-red-400/20 shadow-lg'
-                                  : 'bg-gray-500/10 border-gray-600 text-gray-300'
-                              : 'hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 border-white/30 text-white hover:border-purple-400'
-                            }
-                          `}
-                        >
-                          <span className="flex items-center gap-3 w-full">
-                            <span className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold bg-white/10">
-                              {String.fromCharCode(65 + index)}
-                            </span>
-                            <span className="flex-1">{option}</span>
-                            {hasAnswered && index === activity.content?.correctAnswer && (
-                              <CheckCircle className="w-6 h-6 text-green-400" />
-                            )}
-                          </span>
-                        </Button>
-                      ))}
-                    </div>
+                     <div className="grid gap-3">
+                       {activity.content.options?.map((option, index) => (
+                         <Button
+                           key={index}
+                           onClick={() => handleAnswerSelect(index)}
+                           disabled={hasAnswered}
+                           variant="outline"
+                           className={`
+                             h-auto p-4 text-left justify-start border-2 transition-all duration-300 transform hover:scale-105
+                             ${hasAnswered 
+                               ? index === activity.content?.correctAnswer
+                                 ? 'bg-gradient-to-r from-green-500/30 to-emerald-500/30 border-green-400 text-green-100 shadow-green-400/20 shadow-lg'
+                                 : selectedAnswer === index
+                                   ? 'bg-gradient-to-r from-red-500/30 to-pink-500/30 border-red-400 text-red-100 shadow-red-400/20 shadow-lg'
+                                   : 'bg-gray-500/10 border-gray-600 text-gray-300'
+                               : 'hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 border-white/30 text-white hover:border-purple-400'
+                             }
+                           `}
+                         >
+                           <span className="flex items-center gap-3 w-full">
+                             <span className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold bg-white/10 text-white">
+                               {String.fromCharCode(65 + index)}
+                             </span>
+                             <span className="flex-1 text-white font-medium">
+                               {option || `Option ${index + 1} (empty)`}
+                               {process.env.NODE_ENV === 'development' && (
+                                 <span className="text-xs text-red-300 ml-2">
+                                   ["{option}"]
+                                 </span>
+                               )}
+                             </span>
+                             {hasAnswered && index === activity.content?.correctAnswer && (
+                               <CheckCircle className="w-6 h-6 text-green-400" />
+                             )}
+                           </span>
+                         </Button>
+                       )) || (
+                         <div className="bg-red-500/20 p-4 rounded text-white">
+                           No options available - activity.content.options is: {JSON.stringify(activity.content.options)}
+                         </div>
+                       )}
+                     </div>
 
                     {showExplanation && activity.content.explanation && (
                       <div className={`
