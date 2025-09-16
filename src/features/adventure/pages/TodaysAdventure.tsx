@@ -106,41 +106,60 @@ export default function TodaysAdventure() {
             )}
 
             {data && (
-              <div className="space-y-4">
-                {/* Adventure Illustration and Description */}
-                <div className="relative rounded-xl overflow-hidden">
+              <div className="space-y-6">
+                {/* Adventure Title */}
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold text-white mb-2">
+                    {data.universe?.title || 'Learning Quest'}
+                  </h2>
+                  <div className="flex justify-center gap-2 mb-4">
+                    <span className="px-3 py-1 bg-cyan-400/20 text-cyan-300 rounded-full text-sm">
+                      {data.universe?.subject || 'Learning'}
+                    </span>
+                    <span className="px-3 py-1 bg-purple-400/20 text-purple-300 rounded-full text-sm">
+                      Grade {data.universe?.grade_level || '6-8'}
+                    </span>
+                    {data.isRecap && (
+                      <span className="px-3 py-1 bg-orange-400/20 text-orange-300 rounded-full text-sm">
+                        🔄 Recap
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Adventure Image */}
+                <div className="rounded-xl overflow-hidden">
                   {data.universe?.metadata?.gradeInt ? (
                     <UniverseImage
                       universeId={data.universe.id}
                       gradeInt={data.universe.metadata.gradeInt}
                       title={data.universe.title}
                       className="w-full h-64 object-cover"
-                      alt={`Today's Learning Adventure: ${data.universe.title}`}
+                      alt={`Learning Adventure: ${data.universe.title}`}
                       width={1024}
                       height={576}
                     />
                   ) : (
                     <img 
                       src={data.universe?.title?.includes('Digital Detox') ? digitalDetoxCover : adventureIllustration} 
-                      alt={`Today's Learning Adventure: ${data.universe?.title || 'Adventure'}`}
+                      alt={`Learning Adventure: ${data.universe?.title || 'Adventure'}`}
                       className="w-full h-64 object-cover"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      Today's Adventure: {data.universe?.title || 'Learning Quest'}
-                    </h3>
-                    <p className="text-white/90 text-sm">
-                      {data.universe?.description || 'Join us on an exciting learning journey!'}
-                    </p>
-                  </div>
+                </div>
+
+                {/* Adventure Backstory */}
+                <div className="bg-black/20 rounded-lg p-6 border border-white/10">
+                  <h3 className="text-lg font-semibold text-white mb-4">Your Adventure Begins...</h3>
+                  <p className="text-white/90 text-base leading-relaxed">
+                    {data.universe?.description || 'Join us on an exciting learning journey where you\'ll discover new concepts, solve interesting problems, and create something amazing!'}
+                  </p>
                 </div>
 
                 {/* Adventure Activities Preview */}
                 {data.content?.activities && (
                   <div className="bg-black/20 rounded-lg p-6 border border-white/10">
-                    <h4 className="text-lg font-semibold text-white mb-3">What Awaits You Today</h4>
+                    <h4 className="text-lg font-semibold text-white mb-4">What Awaits You Today</h4>
                     <div className="space-y-3 text-white/90">
                       {data.content.activities.slice(0, 3).map((activity: any, index: number) => (
                         <div key={index} className="flex items-start gap-3">
@@ -152,15 +171,15 @@ export default function TodaysAdventure() {
                   </div>
                 )}
 
-                {/* Action Button */}
-                <div className="flex justify-center">
+                {/* Start Button */}
+                <div className="flex justify-center pt-4">
                   <Button 
                     onClick={() => handleStartAdventure(data.universe, data.isRecap)}
                     size="lg"
-                    className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+                    className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Today's Adventure
+                    <Play className="w-5 h-5 mr-3" />
+                    {data.isRecap ? 'Continue Adventure' : 'Start Adventure'}
                   </Button>
                 </div>
               </div>
