@@ -142,7 +142,7 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
         <div className="grid gap-6">
           {/* Scenario (first stage only) */}
           {currentStage === 0 && lessonData.scenario && (
-            <Card className="bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 border-white/10 backdrop-blur-sm">
+            <Card className="bg-gradient-to-r from-indigo-900/80 via-purple-900/80 to-pink-900/80 border-white/10 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
@@ -152,11 +152,11 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-white/95 text-lg leading-relaxed font-medium">{lessonData.scenario}</p>
+                <p className="text-white text-lg leading-relaxed font-medium">{lessonData.scenario}</p>
                 {lessonData.learningObjectives && (
-                  <div className="mt-4 p-4 bg-white/10 rounded-lg">
+                  <div className="mt-4 p-4 bg-black/20 rounded-lg border border-white/20">
                     <h3 className="font-semibold text-white mb-2">🎯 Learning Objectives:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-white/90">
+                    <ul className="list-disc list-inside space-y-1 text-white">
                       {lessonData.learningObjectives.map((objective, index) => (
                         <li key={index}>{objective}</li>
                       ))}
@@ -169,7 +169,7 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
 
           {/* Story Section */}
           {stage?.storyText && (
-            <Card className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-cyan-300/30 backdrop-blur-sm">
+            <Card className="bg-gradient-to-r from-blue-900/80 to-cyan-900/80 border-cyan-400/30 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Zap className="w-5 h-5 text-cyan-400" />
@@ -177,14 +177,14 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-white/95 text-lg leading-relaxed font-medium">{stage.storyText}</p>
+                <p className="text-white text-lg leading-relaxed font-medium">{stage.storyText}</p>
               </CardContent>
             </Card>
           )}
 
           {/* Activity Section */}
           {activity && (
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+            <Card className="bg-black/40 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -198,9 +198,9 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                       {activity.instructions}
                     </CardDescription>
                   </div>
-                  <div className="flex items-center gap-2 bg-blue-500/20 px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-2 bg-blue-500/30 px-3 py-1 rounded-full border border-blue-400/50">
                     <Clock className="w-4 h-4 text-blue-200" />
-                    <span className="text-white/90 font-medium">{stage.duration} min</span>
+                    <span className="text-white font-medium">{stage.duration} min</span>
                   </div>
                 </div>
               </CardHeader>
@@ -216,7 +216,7 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 
                 {activity.type === 'multipleChoice' && activity.content && (
                   <>
-                    <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-lg border border-blue-400/30">
+                    <div className="bg-gradient-to-r from-blue-900/60 to-purple-900/60 p-6 rounded-lg border border-blue-400/50">
                       <h3 className="font-semibold text-white mb-3 text-lg">{activity.content.question}</h3>
                     </div>
                     
@@ -296,13 +296,13 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 )}
 
                 {activity.type === 'creativeTask' && (
-                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-6 rounded-lg text-center border border-purple-400/30">
+                  <div className="bg-gradient-to-r from-purple-900/70 to-pink-900/70 p-6 rounded-lg text-center border border-purple-400/50">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-center gap-2">
                       <Sparkles className="w-6 h-6 text-pink-400" />
                       {activity.title}
                     </h3>
-                    <p className="text-white/90 mb-6 font-medium leading-relaxed">{activity.instructions}</p>
-                    <div className="bg-white/10 p-6 rounded-lg border-2 border-dashed border-white/30 min-h-[200px] flex items-center justify-center">
+                    <p className="text-white mb-6 font-medium leading-relaxed">{activity.instructions}</p>
+                    <div className="bg-black/30 p-6 rounded-lg border-2 border-dashed border-white/30 min-h-[200px] flex items-center justify-center">
                       <div className="text-center">
                         <Sparkles className="w-12 h-12 text-purple-300 mx-auto mb-3" />
                         <p className="text-white font-semibold text-lg">🎨 Creative Workspace</p>
