@@ -96,7 +96,7 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
   const hasAnswered = selectedAnswer !== null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white overflow-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-foreground overflow-auto">
       {/* Animated Header */}
       <div className="bg-gradient-to-r from-purple-800/50 to-blue-800/50 backdrop-blur-sm border-b border-white/10 p-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -106,13 +106,13 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">{lessonData.title}</h1>
-              <p className="text-purple-200">{lessonData.subject} • Grade {lessonData.gradeLevel} • {lessonData.estimatedTime} min</p>
+              <p className="text-white/90 font-medium">{lessonData.subject} • Grade {lessonData.gradeLevel} • {lessonData.estimatedTime} min</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 px-4 py-2 rounded-full border border-yellow-400/30">
               <Star className="w-4 h-4 text-yellow-400" />
-              <span className="font-bold text-yellow-200">{score} pts</span>
+              <span className="font-bold text-yellow-100">{score} pts</span>
             </div>
             <Button onClick={onBack} variant="outline" className="border-white/20 text-white hover:bg-white/10">
               Back to Adventures
@@ -126,12 +126,12 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-purple-200">Adventure Progress</span>
-              <span className="text-sm text-purple-200">{Math.round(progress)}%</span>
+              <span className="text-sm text-white/90 font-medium">Adventure Progress</span>
+              <span className="text-sm text-white/90 font-medium">{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} className="h-3 bg-white/10" />
           </div>
-          <Badge variant="secondary" className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-200 border-purple-300/30">
+          <Badge variant="secondary" className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white/90 border-purple-300/30 font-medium">
             Stage {currentStage + 1} of {lessonData.stages.length}
           </Badge>
         </div>
@@ -152,11 +152,11 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-purple-100 text-lg leading-relaxed">{lessonData.scenario}</p>
+                <p className="text-white/95 text-lg leading-relaxed font-medium">{lessonData.scenario}</p>
                 {lessonData.learningObjectives && (
                   <div className="mt-4 p-4 bg-white/10 rounded-lg">
                     <h3 className="font-semibold text-white mb-2">🎯 Learning Objectives:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-purple-100">
+                    <ul className="list-disc list-inside space-y-1 text-white/90">
                       {lessonData.learningObjectives.map((objective, index) => (
                         <li key={index}>{objective}</li>
                       ))}
@@ -177,7 +177,7 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-cyan-100 text-lg leading-relaxed">{stage.storyText}</p>
+                <p className="text-white/95 text-lg leading-relaxed font-medium">{stage.storyText}</p>
               </CardContent>
             </Card>
           )}
@@ -194,13 +194,13 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                       </div>
                       {activity.title}
                     </CardTitle>
-                    <CardDescription className="text-purple-200">
+                    <CardDescription className="text-white/80 font-medium">
                       {activity.instructions}
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2 bg-blue-500/20 px-3 py-1 rounded-full">
-                    <Clock className="w-4 h-4 text-blue-300" />
-                    <span className="text-blue-200">{stage.duration} min</span>
+                    <Clock className="w-4 h-4 text-blue-200" />
+                    <span className="text-white/90 font-medium">{stage.duration} min</span>
                   </div>
                 </div>
               </CardHeader>
@@ -261,11 +261,11 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                             <p className="font-bold text-white mb-2 text-lg">
                               {isCorrectAnswer ? '🎉 Outstanding! You got it right!' : '💪 Great attempt! Keep learning!'}
                             </p>
-                            <p className="text-purple-100 mb-3">{activity.content.explanation}</p>
+                            <p className="text-white/95 mb-3 leading-relaxed">{activity.content.explanation}</p>
                             {isCorrectAnswer && activity.content.points && (
                               <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 px-4 py-2 rounded-full border border-yellow-400/30">
                                 <Star className="w-4 h-4 text-yellow-400" />
-                                <span className="text-yellow-300 font-bold">+{activity.content.points} points earned!</span>
+                                <span className="text-yellow-100 font-bold">+{activity.content.points} points earned!</span>
                               </div>
                             )}
                           </div>
@@ -281,12 +281,12 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                       <Sparkles className="w-6 h-6 text-pink-400" />
                       {activity.title}
                     </h3>
-                    <p className="text-purple-100 mb-6">{activity.instructions}</p>
+                    <p className="text-white/90 mb-6 font-medium leading-relaxed">{activity.instructions}</p>
                     <div className="bg-white/10 p-6 rounded-lg border-2 border-dashed border-white/30 min-h-[200px] flex items-center justify-center">
                       <div className="text-center">
                         <Sparkles className="w-12 h-12 text-purple-300 mx-auto mb-3" />
-                        <p className="text-purple-200 text-lg">🎨 Creative Workspace</p>
-                        <p className="text-purple-300 text-sm">Use your imagination and creativity!</p>
+                        <p className="text-white font-semibold text-lg">🎨 Creative Workspace</p>
+                        <p className="text-white/80 text-sm">Use your imagination and creativity!</p>
                       </div>
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                     )}
                   </div>
                   <div className="text-sm font-medium text-white">{s.title}</div>
-                  <div className="text-xs text-purple-200">{s.duration} min</div>
+                  <div className="text-xs text-white/70 font-medium">{s.duration} min</div>
                 </div>
               ))}
             </div>
