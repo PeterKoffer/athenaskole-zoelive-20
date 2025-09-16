@@ -34,11 +34,16 @@ export async function buildPrompt(req: LessonRequest) {
     ? Math.round(req.teacherPreferences.lessonDurations[req.gradeLevel.toString()] * 60) // convert hours to minutes
     : 150; // default: 2.5 hours
 
-  // Map grade level to band
-  const gradeBand = req.gradeLevel <= 2 ? "K-2" as const :
-                   req.gradeLevel <= 5 ? "3-5" as const :
-                   req.gradeLevel <= 8 ? "6-8" as const :
-                   req.gradeLevel <= 10 ? "9-10" as const : "11-12" as const;
+  // Map grade level to band - supports both US (K-12) and European (0-10 + high school) systems
+  const gradeBand = (() => {
+    // European system: 0-10 classes + high school
+    if (req.gradeLevel === 0) return "0-2" as const; // Early years
+    if (req.gradeLevel <= 2) return "0-2" as const;  // Early primary
+    if (req.gradeLevel <= 5) return "3-5" as const;  // Primary
+    if (req.gradeLevel <= 8) return "6-8" as const;  // Lower secondary
+    if (req.gradeLevel <= 10) return "9-10" as const; // Upper secondary
+    return "11-12" as const; // High school / Upper secondary
+  })();
 
   // Fetch dynamic calendar keywords
   const currentDate = new Date().toISOString().split('T')[0];
@@ -87,7 +92,7 @@ export async function buildPrompt(req: LessonRequest) {
 
   console.log('🎯 All parameters now active for lesson generation:', {
     '✅ Subject': normalizedSubject,
-    '✅ Grade Level': `Grade ${req.gradeLevel} (${gradeBand})`,
+    '✅ Grade Level': `Class ${req.gradeLevel} (${gradeBand}) - European: 0-10 classes + high school`,
     '✅ Curriculum': req.curriculum,
     '✅ Teaching Perspective': promptCtx.teachingPerspective,
     '✅ Lesson Duration': `${targetDuration} minutes`,

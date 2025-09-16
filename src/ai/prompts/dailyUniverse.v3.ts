@@ -18,7 +18,7 @@ export type AbilityProfile = {
 export type PromptCtx = {
   // Core lesson parameters
   subject: string;
-  gradeBand: "K-2"|"3-5"|"6-8"|"9-10"|"11-12";
+  gradeBand: "0-2"|"K-2"|"3-5"|"6-8"|"9-10"|"11-12"; // Support both European (0-2) and US (K-2) early grades
   plannerMinutes: number;
   timeScope: "day"|"season"|"year";
   studentInterests: string[];
