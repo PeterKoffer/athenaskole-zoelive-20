@@ -59,6 +59,48 @@ export type Database = {
         }
         Relationships: []
       }
+      adventures: {
+        Row: {
+          created_at: string
+          description: string | null
+          grade_int: number
+          id: string
+          image_generated: boolean | null
+          image_url: string | null
+          prompt: string | null
+          subject: string | null
+          title: string
+          universe_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          grade_int: number
+          id?: string
+          image_generated?: boolean | null
+          image_url?: string | null
+          prompt?: string | null
+          subject?: string | null
+          title: string
+          universe_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          grade_int?: number
+          id?: string
+          image_generated?: boolean | null
+          image_url?: string | null
+          prompt?: string | null
+          subject?: string | null
+          title?: string
+          universe_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_cache: {
         Row: {
           created_at: string
