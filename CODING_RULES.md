@@ -2,21 +2,33 @@
 
 ## 🚨 OBLIGATORISK: LÆS ALLE DOKUMENTER FØRST
 **INDEN du skriver en eneste linje kode, SKAL du læse:**
-- `docs/ASSISTANT_BRIEF.md` - Dagens fokus og prioriteter
-- `docs/PRODUCT_SPEC.md` - Produktspecifikation og krav
-- `docs/Rules.md` - Alle projektregler
-- `docs/NELIE_Foundational_Principles.md` - **KRITISK: NELIE's kerneprincipper**
-- `docs/ENHANCED_NELIE_README.md` - **KRITISK: NELIE lesson system**
-- `docs/TRAINING_GROUND_PROMPT_TEMPLATE.md` - Training Ground parametre
-- `docs/PARAMETER_DATA_SOURCES.md` - Data kilder og mapping
+
+### **🎯 KERNEDOKUMENTER (ALTID FØRST):**
+- `docs/PRODUCT_OVERVIEW.md` - **ZoeLive produktmål og globale parametre**
+- `docs/NELIE_SPEC.md` - **NELIE AI tutor specifikation**
+- `docs/NELIE_Foundational_Principles.md` - **NELIE's kerneprincipper**
+- `docs/Rules.md` - **Alle projektregler**
+
+### **📋 ARKITEKTUR & IMPLEMENTATION:**
 - `docs/ARCHITECTURE.md` - App arkitektur og struktur
 - `docs/ENGINEERING_GUIDE.md` - Praktisk implementerings guide
-- `docs/CURRICULUM_COVERAGE.md` - Pensum dækning
-- `docs/GAME_INTEGRATION_GUIDE.md` - Spil integration og tracking
-- `docs/UNIFIED_QUESTION_GENERATION.md` - Spørgsmål generering system
-- Alle andre relevante dokumenter i `docs/` folderen
+- `docs/ENHANCED_NELIE_README.md` - NELIE lesson system
+- `docs/SIMULATION_PLATFORM.md` - Universe simulation engine
+- `docs/TRAINING_GROUND_PROMPT_TEMPLATE.md` - Training Ground parametre
 
-**INGEN kode må skrives uden at have gennemlæst disse regler og parametre!**
+### **🔧 SYSTEMER & INTEGRATION:**
+- `docs/PARAMETER_DATA_SOURCES.md` - Data kilder og mapping
+- `docs/CURRICULUM_INDEX.md` - Pensum normalisering schema
+- `docs/GAME_INTEGRATION_GUIDE.md` - Spil integration og tracking
+- `docs/UNIFIED_QUESTION_GENERATION.md` - Spørgsmål generering
+- `docs/COST_CONTROL.md` - AI omkostnings kontrol
+- `docs/I18N_STRATEGY.md` - Flersproget strategi
+
+### **📊 DÆKNING & PLANLÆGNING:**
+- `docs/CURRICULUM_COVERAGE.md` - Pensum dækning
+- `docs/ASSISTANT_BRIEF.md` - Dagens fokus og prioriteter
+
+**🚨 INGEN kode må skrives uden at have gennemlæst disse regler og specifikationer!**
 
 ## CORE APP KONCEPT
 Dette er en **AI-drevet skole app** med fokus på personaliseret læring for hver enkelt elev.
