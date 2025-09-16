@@ -53,10 +53,17 @@ export class AdventureService {
    */
   private static async getMagicalBackstory(pack: UniversePack, gradeLevel: string, language: string = 'en'): Promise<string> {
     try {
-      return await BackstoryService.getOrGenerateBackstory(pack, gradeLevel, language);
+      console.log(`[Adventure] Generating backstory for: ${pack.title} (${gradeLevel}, ${language})`);
+      
+      // For now, always generate directly to avoid cache issues
+      // TODO: Re-enable cache once backstories are pre-generated
+      const backstory = BackstoryService.generateMagicalBackstory(pack, gradeLevel, language);
+      console.log(`[Adventure] Generated backstory length: ${backstory.length}`);
+      
+      return backstory;
     } catch (error) {
-      console.error('Error getting backstory, using fallback:', error);
-      return BackstoryService.generateMagicalBackstory(pack, gradeLevel, language);
+      console.error('Error getting backstory, using simple fallback:', error);
+      return `🚀 Welcome to ${pack.title}! Get ready for an exciting ${pack.subjectHint} adventure that will challenge and inspire you!`;
     }
   }
 

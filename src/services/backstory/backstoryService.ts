@@ -68,6 +68,35 @@ export class BackstoryService {
     const adventureTitle = pack.title;
     const subject = pack.subjectHint;
     
+    if (language === 'en') {
+      // English backstories  
+      if (isYoung) {
+        const youngStories = [
+          `🌟 One day you walk past an old, forgotten ${adventureTitle.toLowerCase()}, and suddenly it begins to shine magically! You discover it holds fantastic secrets that can help you learn about ${subject}. What will happen if you take on the challenge?`,
+          `✨ In your backyard you find a mysterious book about ${adventureTitle}. When you open it, the words jump off the pages and invite you on the most exciting adventure! Are you ready to dive into the world of ${subject}?`,
+          `🎪 The old circus wagon on the corner has always been empty - until today! Suddenly it's buzzing with activity around ${adventureTitle}, and you get the chance to become today's hero by mastering ${subject} in a whole new way!`
+        ];
+        return youngStories[Math.floor(Math.random() * youngStories.length)];
+      }
+
+      if (isMiddle) {
+        const middleStories = [
+          `🚀 You stumble upon a mysterious ${adventureTitle.toLowerCase()} that looks completely ordinary - but wow! It holds incredible opportunities to explore ${subject} in ways you've never tried before. Do you dare take on the challenge?`,
+          `🕵️ A strange discovery awaits you: ${adventureTitle} needs your help! With your ${subject} skills as weapons, you can solve the mystery and save the day. What awaits on the other side of the adventure?`,
+          `⚡ Imagine that ${adventureTitle.toLowerCase()} suddenly becomes your responsibility. You have the chance to show what you can do with ${subject}, but there are both challenges and fantastic surprises ahead. Are you ready to prove your worth?`
+        ];
+        return middleStories[Math.floor(Math.random() * middleStories.length)];
+      }
+
+      // Older students (9+)
+      const olderStories = [
+        `🎯 An unexpected opportunity arises: you get the chance to take control of ${adventureTitle} and prove your ${subject} skills in practice. This isn't just about theory - it's your chance to create something meaningful and show the world what you can do!`,
+        `🌍 ${adventureTitle} faces a critical challenge, and someone with your ${subject} talents is needed to find the solution. This is more than just a task - it's your opportunity to make a real difference and learn incredibly much along the way.`,
+        `💡 You discover a fascinating situation around ${adventureTitle} that requires creative problem-solving and solid ${subject} knowledge. This project can open doors to new insights and give you skills you can use for the rest of your life!`
+      ];
+      return olderStories[Math.floor(Math.random() * olderStories.length)];
+    }
+
     if (language === 'da') {
       // Danish backstories
       if (isYoung) {
@@ -97,16 +126,8 @@ export class BackstoryService {
       return olderStories[Math.floor(Math.random() * olderStories.length)];
     }
 
-    // English fallback
-    if (isYoung) {
-      return `🌟 One day you walk past an old, forgotten ${adventureTitle.toLowerCase()}, and suddenly it begins to shine magically! You discover it holds fantastic secrets that can help you learn about ${subject}. What will happen if you take on the challenge?`;
-    }
-    
-    if (isMiddle) {
-      return `🚀 You stumble upon a mysterious ${adventureTitle.toLowerCase()} that looks completely ordinary - but wow! It holds incredible opportunities to explore ${subject} in ways you've never tried before. Do you dare take on the challenge?`;
-    }
-
-    return `🎯 An unexpected opportunity arises: you get the chance to take control of ${adventureTitle} and prove your ${subject} skills in practice. This isn't just about theory - it's your chance to create something meaningful and show the world what you can do!`;
+    // Ultimate fallback
+    return `🌟 Welcome to ${adventureTitle}! Get ready for an exciting ${subject} adventure that will challenge and inspire you!`;
   }
 
   /**
