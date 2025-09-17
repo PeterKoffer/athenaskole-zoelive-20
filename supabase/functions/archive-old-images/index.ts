@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,66 +18,61 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('Starting to archive old generic adventure images...');
+    console.log('Starting archive process...');
 
-    // Step 1: Move old images to archive folder in storage
+    // Create archive folder name with timestamp
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const archiveFolder = `archive-${timestamp}`;
+    
+    let archivedImages = 0;
+
+    // List all files in universe-images bucket
     const { data: files, error: listError } = await supabaseClient.storage
       .from('universe-images')
-      .list('', { limit: 1000, sortBy: { column: 'name', order: 'asc' } });
+      .list('', {
+        limit: 1000,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
 
     if (listError) {
+      console.error('Error listing files:', listError);
       throw listError;
     }
 
-    let movedCount = 0;
-    const archiveFolder = `archive-${Date.now()}`;
+    console.log(`Found ${files?.length || 0} files to potentially archive`);
 
-    if (files) {
-      for (const file of files) {
-        try {
-          // Download the file
-          const { data: fileData, error: downloadError } = await supabaseClient.storage
-            .from('universe-images')
-            .download(file.name);
+    // Filter out files that don't match adventure pattern or are already in archive folders
+    const filesToArchive = files?.filter(file => 
+      file.name && 
+      !file.name.startsWith('archive-') &&
+      file.name.includes('/') &&
+      (file.name.endsWith('.webp') || file.name.endsWith('.png') || file.name.endsWith('.jpg'))
+    ) || [];
 
-          if (downloadError) {
-            console.warn(`Could not download ${file.name}:`, downloadError);
-            continue;
-          }
+    console.log(`Will archive ${filesToArchive.length} files`);
 
-          // Upload to archive folder
-          const { error: archiveError } = await supabaseClient.storage
-            .from('universe-images')
-            .upload(`${archiveFolder}/${file.name}`, fileData, {
-              contentType: file.metadata?.mimetype || 'image/webp',
-              upsert: true
-            });
+    // Move files to archive folder in batches
+    for (const file of filesToArchive) {
+      try {
+        const newPath = `${archiveFolder}/${file.name}`;
+        
+        // Move the file
+        const { error: moveError } = await supabaseClient.storage
+          .from('universe-images')
+          .move(file.name, newPath);
 
-          if (archiveError) {
-            console.warn(`Could not archive ${file.name}:`, archiveError);
-            continue;
-          }
-
-          // Delete original file
-          const { error: deleteError } = await supabaseClient.storage
-            .from('universe-images')
-            .remove([file.name]);
-
-          if (deleteError) {
-            console.warn(`Could not delete original ${file.name}:`, deleteError);
-            continue;
-          }
-
-          movedCount++;
-          console.log(`Archived: ${file.name} -> ${archiveFolder}/${file.name}`);
-
-        } catch (error) {
-          console.error(`Error processing ${file.name}:`, error);
+        if (moveError) {
+          console.error(`Failed to move ${file.name}:`, moveError);
+        } else {
+          archivedImages++;
+          console.log(`Moved ${file.name} to ${newPath}`);
         }
+      } catch (error) {
+        console.error(`Error moving file ${file.name}:`, error);
       }
     }
 
-    // Step 2: Reset adventure image generation flags
+    // Reset generation flags in adventures table
     const { error: resetError } = await supabaseClient
       .from('adventures')
       .update({
@@ -87,30 +83,34 @@ serve(async (req) => {
         image_url_teen: null,
         image_url_adult: null
       })
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Update all records
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Update all rows
 
     if (resetError) {
-      console.error('Error resetting adventure flags:', resetError);
-      throw resetError;
+      console.error('Error resetting generation flags:', resetError);
+    } else {
+      console.log('Reset all generation flags and URLs');
     }
 
-    console.log(`Archive completed: ${movedCount} images moved to ${archiveFolder}`);
+    const result = {
+      archivedImages,
+      archiveFolder,
+      message: `Successfully archived ${archivedImages} images to ${archiveFolder} and reset generation flags`
+    };
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        archivedImages: movedCount,
-        archiveFolder,
-        message: 'All old images archived and adventure flags reset. Ready for new cinematic generation!'
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.log('Archive complete:', result);
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
-    console.error('Error in archive-old-images function:', error);
+    console.error('Archive failed:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: error.message }), 
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     );
   }
 });

@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,88 +13,87 @@ serve(async (req) => {
   }
 
   try {
+    const { adventures } = await req.json();
+    
+    if (!adventures || !Array.isArray(adventures)) {
+      throw new Error('Invalid adventures data');
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { adventures } = await req.json();
+    console.log(`Starting import of ${adventures.length} adventures...`);
 
-    if (!Array.isArray(adventures)) {
-      return new Response(
-        JSON.stringify({ error: 'Adventures must be an array' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log(`Starting import of ${adventures.length} adventures`);
-    
     let imported = 0;
     let skipped = 0;
     let errors = 0;
 
-    // Process in batches of 10 to avoid overwhelming the database
-    for (let i = 0; i < adventures.length; i += 10) {
-      const batch = adventures.slice(i, i + 10);
-      
-      for (const adventure of batch) {
-        try {
-          const { universeId, gradeInt, title, prompt, description, subject } = adventure;
-          
-          if (!universeId || !gradeInt || !title) {
-            console.warn('Skipping adventure with missing required fields:', adventure);
-            skipped++;
-            continue;
-          }
+    for (const adventure of adventures) {
+      try {
+        // Check if adventure already exists
+        const { data: existing } = await supabaseClient
+          .from('adventures')
+          .select('id')
+          .eq('universe_id', adventure.universeId)
+          .single();
 
-          // Use upsert to handle duplicates gracefully
-          const { error } = await supabaseClient
-            .from('adventures')
-            .upsert({
-              universe_id: universeId,
-              grade_int: gradeInt,
-              title,
-              prompt: prompt || null,
-              description: description || null,
-              subject: subject || null,
-            }, {
-              onConflict: 'universe_id,grade_int'
-            });
-
-          if (error) {
-            console.error('Error inserting adventure:', error);
-            errors++;
-          } else {
-            imported++;
-          }
-        } catch (err) {
-          console.error('Error processing adventure:', err);
-          errors++;
+        if (existing) {
+          console.log(`Adventure ${adventure.universeId} already exists, skipping`);
+          skipped++;
+          continue;
         }
+
+        // Insert new adventure
+        const { error: insertError } = await supabaseClient
+          .from('adventures')
+          .insert({
+            universe_id: adventure.universeId,
+            grade_int: adventure.gradeInt,
+            title: adventure.title,
+            description: adventure.description || adventure.prompt,
+            subject: adventure.subject,
+            image_prompt: adventure.prompt,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+
+        if (insertError) {
+          console.error(`Failed to insert ${adventure.universeId}:`, insertError);
+          errors++;
+        } else {
+          console.log(`Successfully imported ${adventure.universeId}`);
+          imported++;
+        }
+
+      } catch (error) {
+        console.error(`Error processing adventure ${adventure.universeId}:`, error);
+        errors++;
       }
-      
-      // Small delay between batches
-      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
-    console.log(`Import completed: ${imported} imported, ${skipped} skipped, ${errors} errors`);
+    const result = {
+      total: adventures.length,
+      imported,
+      skipped,
+      errors
+    };
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        imported,
-        skipped,
-        errors,
-        total: adventures.length
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.log('Import complete:', result);
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
-    console.error('Error in import-adventures function:', error);
+    console.error('Import failed:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: error.message }), 
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     );
   }
 });
