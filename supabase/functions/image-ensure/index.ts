@@ -5,7 +5,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 // Prompt building system - NO CLASSROOMS!
 const STYLE_PACK = "cinematic hybrid photoreal + pixar-like, high dynamic range, volumetric light, shallow depth of field, ultra-detailed, filmic color grade, no text overlay, no watermark, no logos";
-const NEGATIVE = "NO classroom, NO school interior, NO desks, NO chalkboard, NO whiteboard, NO children, NO teacher, NO clipart, NO flat icon style, NO 3D word art, NO school supplies, NO academic setting";
+const NEGATIVE = "NO classroom, NO school interior, NO desks, NO chalkboard, NO whiteboard, NO children, NO teacher, NO clipart, NO flat icon style, NO 3D word art, NO school supplies, NO academic setting, NO students, NO educational posters, NO school building, NO learning materials, NEVER educational environment";
 
 type Scene = { scene: string; props: string };
 const SCENE_MAP: Record<string, Scene> = {
@@ -17,6 +17,18 @@ const SCENE_MAP: Record<string, Scene> = {
     scene: "prehistoric safari outpost, jungle foliage, electric fence vista, paleontology field station",
     props: "field kits, binoculars, bone casts, muddy tracks, research tent",
   },
+  "antarctic-lab": {
+    scene: "antarctic research station, ice core drilling rig, scientific equipment in snowy landscape",
+    props: "ice core samples, drilling machinery, weather monitoring equipment, research tents",
+  },
+  "marine-lab": {
+    scene: "marine research facility, underwater observation tanks, sonar equipment",
+    props: "diving gear, marine specimens, underwater cameras, research vessels",
+  },
+  "space-lab": {
+    scene: "space mission control center, satellite tracking screens, astronaut training facility",
+    props: "mission control consoles, space suits, rocket launch pads, orbital tracking displays",
+  },
   "sports-team": {
     scene: "professional sports management office, team tactics board, performance analytics screens",
     props: "team jerseys, strategy charts, fitness data, stadium model",
@@ -25,9 +37,17 @@ const SCENE_MAP: Record<string, Scene> = {
     scene: "acoustics lab with anechoic wedges, microphones and SPL meters",
     props: "signal generator screen with waveforms, tripod stands, sound equipment",
   },
+  "construction-site": {
+    scene: "active construction site, tower cranes, scaffolding, engineering office",
+    props: "blueprints, hard hats, construction vehicles, surveying equipment",
+  },
+  "medical-lab": {
+    scene: "modern medical research laboratory, diagnostic equipment, clean room environment",
+    props: "microscopes, medical devices, test tubes, research computers",
+  },
   "generic-professional": {
-    scene: "real-world professional environment relevant to the topic",
-    props: "authentic tools and materials, subtle depth haze, natural light",
+    scene: "professional research facility, modern laboratory environment, scientific workstation",
+    props: "research equipment, computer monitors, technical instruments, professional workspace",
   },
 };
 
@@ -35,8 +55,13 @@ function inferKey(title: string): string {
   const t = title.toLowerCase();
   if (/(graphic|design|branding|logo|agency)/.test(t)) return "graphic-agency";
   if (/(dinosaur|safari|paleo|jurassic|prehistoric)/.test(t)) return "dinosaur-park";
+  if (/(antarctic|ice core|polar|glacier|arctic)/.test(t)) return "antarctic-lab";
+  if (/(marine|ocean|underwater|aquatic|submarine)/.test(t)) return "marine-lab";
+  if (/(space|satellite|astronaut|rocket|mission control)/.test(t)) return "space-lab";
   if (/(sports|team|manage|professional sports)/.test(t)) return "sports-team";
   if (/(soundproof|acoustic|anechoic|audio lab)/.test(t)) return "soundproof-room";
+  if (/(construction|building|architect|engineering)/.test(t)) return "construction-site";
+  if (/(medical|health|clinic|hospital|diagnostic)/.test(t)) return "medical-lab";
   return "generic-professional";
 }
 
