@@ -64,13 +64,15 @@ function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: Promp
     "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
   const COLOR_MOOD =
     "rich but natural palette; inspiring, capable, modern";
+  const DIVERSITY =
+    "diverse group of children and teenagers (ages 8-17) from various ethnic backgrounds, races, and nationalities working together";
 
   // negative rules (pro mode forbids classrooms)
   const NEG_PRO =
-    "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, teachers or students";
+    "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, adult teachers, adult professionals; NO adults over 18 years old";
 
   const NEG_CLASSROOM =
-    "no boardrooms, no factories, no hospitals, no construction sites";
+    "no boardrooms, no factories, no hospitals, no construction sites, no adults over 18";
 
   const t = title.toLowerCase();
   let scene = "professional real-world environment relevant to the adventure";
@@ -83,11 +85,11 @@ function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: Promp
     // server should already gate this by allowlist
     const CLASSROOM_SCENE =
       "bright, modern classroom; collaborative tables; learning posters; natural daylight; friendly atmosphere";
-    return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — Adventure: ${title}. ${subjectHint}${tagHint}${CLASSROOM_SCENE} — ${NEG_CLASSROOM}`;
+    return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — ${DIVERSITY} — Adventure: ${title}. ${subjectHint}${tagHint}${CLASSROOM_SCENE} — ${NEG_CLASSROOM}`;
   }
 
   // pro (default) — adventure-specific, classroom-proof
-  return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — Adventure: ${title}. ${subjectHint}${tagHint}${scene} — ${NEG_PRO}`;
+  return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — ${DIVERSITY} — Adventure: ${title}. ${subjectHint}${tagHint}${scene} — ${NEG_PRO}`;
 }
 
 

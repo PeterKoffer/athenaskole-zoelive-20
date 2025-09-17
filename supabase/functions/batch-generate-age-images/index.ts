@@ -60,21 +60,21 @@ type AgeGroup = 'child' | 'teen' | 'adult';
 
 const ageEnhancements = {
   child: {
-    visual: "bright colors, rounded shapes, thick outlines, flat shading, minimal background",
+    visual: "bright colors, rounded shapes, thick outlines, flat shading, minimal background, younger children ages 8-12",
     mood: "joyful, playful, wonder-filled",
-    negative: "no realism, no text, no clutter, no scary elements, no violence, no dark themes",
+    negative: "no realism, no text, no clutter, no scary elements, no violence, no dark themes, no adults over 18",
     size: "1536x1024" // 16:9 ratio supported by OpenAI
   },
   teen: {
-    visual: "vibrant stylized illustration, soft shading, playful but neat composition",
+    visual: "vibrant stylized illustration, soft shading, playful but neat composition, teenagers ages 13-17",
     mood: "confident, curious, collaborative", 
-    negative: "no babyish style, no overly childish cartoon style",
+    negative: "no babyish style, no overly childish cartoon style, no adults over 18",
     size: "1536x1024" // 16:9 ratio supported by OpenAI
   },
   adult: {
-    visual: "realistic to photorealistic, professional tone, technical overlays ok",
+    visual: "realistic to photorealistic, professional tone, teenagers ages 16-17 in advanced learning scenarios",
     mood: "focused, sophisticated, achievement-oriented",
-    negative: "no childish/kawaii style, no cartoon aesthetics",
+    negative: "no childish/kawaii style, no cartoon aesthetics, no adults over 18",
     size: "1536x1024" // 16:9 ratio supported by OpenAI
   }
 };
@@ -85,6 +85,7 @@ function buildUnifiedAdventurePrompt(title: string, ageGroup: AgeGroup): string 
   const COMPOSITION = "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
   const SAFE_MARGINS = "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
   const COLOR_MOOD = "rich but natural palette; inspiring, capable, modern";
+  const DIVERSITY = "diverse group of children and teenagers from various ethnic backgrounds, races, and nationalities working together";
 
   // Get adventure-specific scene
   const t = title.toLowerCase();
@@ -94,10 +95,10 @@ function buildUnifiedAdventurePrompt(title: string, ageGroup: AgeGroup): string 
   // Age-specific enhancements
   const ageConfig = ageEnhancements[ageGroup];
   
-  // NO CLASSROOM EVER
-  const NEG_PRO = "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, teachers or students";
+  // NO CLASSROOM EVER, NO ADULTS
+  const NEG_PRO = "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, adult teachers, adult professionals; NO adults over 18 years old";
 
-  return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — Adventure: ${title}. Age group: ${ageGroup} learners. Visual style: ${ageConfig.visual}. Mood: ${ageConfig.mood}. Scene: ${scene} — ${NEG_PRO}, ${ageConfig.negative}`;
+  return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — ${DIVERSITY} — Adventure: ${title}. Age group: ${ageGroup} learners. Visual style: ${ageConfig.visual}. Mood: ${ageConfig.mood}. Scene: ${scene} — ${NEG_PRO}, ${ageConfig.negative}`;
 }
 
 async function buildCinematicAgeGroupPrompt(
