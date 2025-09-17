@@ -282,7 +282,7 @@ function defaultTags(title: string, category: UniverseCategory): string[] {
 }
 
 function imagePromptFor(title: string, category: UniverseCategory) {
-  return `Child-safe, text-free illustration for "${title}" in category ${category}. Bright, educational, tangible props, realistic daily-life setting.`;
+  return `Professional environment illustration for "${title}" in category ${category}. Modern workplace setting, realistic props, cinematic lighting, no classrooms.`;
 }
 
 // minutes per beat by grade (we'll auto-scale to fit lesson duration later)
