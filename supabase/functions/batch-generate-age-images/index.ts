@@ -63,19 +63,19 @@ const ageEnhancements = {
     visual: "bright colors, rounded shapes, thick outlines, flat shading, minimal background",
     mood: "joyful, playful, wonder-filled",
     negative: "no realism, no text, no clutter, no scary elements, no violence, no dark themes",
-    size: "1024x576" // 16:9 ratio like main adventures
+    size: "1536x1024" // 16:9 ratio supported by OpenAI
   },
   teen: {
     visual: "vibrant stylized illustration, soft shading, playful but neat composition",
     mood: "confident, curious, collaborative", 
     negative: "no babyish style, no overly childish cartoon style",
-    size: "1024x576" // 16:9 ratio like main adventures
+    size: "1536x1024" // 16:9 ratio supported by OpenAI
   },
   adult: {
     visual: "realistic to photorealistic, professional tone, technical overlays ok",
     mood: "focused, sophisticated, achievement-oriented",
     negative: "no childish/kawaii style, no cartoon aesthetics",
-    size: "1024x576" // 16:9 ratio like main adventures
+    size: "1536x1024" // 16:9 ratio supported by OpenAI
   }
 };
 
@@ -195,8 +195,8 @@ async function uploadImageToStorage(
         alt_text: `${adventure.title} - ${ageGroup} age group`,
         subjects: [adventure.subject || 'General'],
         tags: [ageGroup, 'adventure-cover', 'generated', '16:9'],
-        width: 1024,
-        height: 576,
+        width: 1536,
+        height: 1024,
         bytes: bytes.length,
         mime: 'image/webp',
         provider: 'openai',

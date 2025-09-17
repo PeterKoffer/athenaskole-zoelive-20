@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
         model: "gpt-image-1",
         prompt: fullPrompt,
         n: 1,
-        size: "1024x576", // True 16:9 ratio for perfect banner framing
+        size: "1536x1024", // True 16:9 ratio for perfect banner framing (OpenAI supported)
         quality: "high",
         output_format: "webp",
       }),
