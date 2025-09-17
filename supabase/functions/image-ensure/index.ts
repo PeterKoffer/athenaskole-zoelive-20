@@ -134,6 +134,11 @@ Deno.serve(async (req) => {
       environment = 'high-tech control room with screens showing orbital paths and communications';
       keyElements = 'satellite dishes, orbital displays, communication arrays, mission control screens';
       props = 'control panels, satellite models, orbital maps, communication equipment, radar dishes';
+    } else if (titleLower.includes('skyscraper') || titleLower.includes('construction') || titleLower.includes('building') || titleLower.includes('architecture')) {
+      setting = 'a skyscraper construction site and architectural planning office';
+      environment = 'construction site with cranes and scaffolding, or architectural firm with building models';
+      keyElements = 'construction cranes, building blueprints, hard hats, scaffolding, architectural models';
+      props = 'construction equipment, blueprints, hard hats, measuring tools, building models, cranes';
     } else if (titleLower.includes('water rocket') || titleLower.includes('rocket') || titleLower.includes('rube goldberg')) {
       setting = 'a rocket launch competition area or engineering workshop';
       environment = 'outdoor launch field with safety equipment and measuring tools, or indoor workshop with engineering materials';
@@ -233,6 +238,25 @@ Deno.serve(async (req) => {
       environment = 'eco-friendly facility with renewable energy and natural elements';
       keyElements = 'solar panels, wind turbines, green plants, recycling systems, natural lighting';
       props = 'solar panels, plants, recycling bins, environmental charts, renewable energy displays';
+    
+    // Transportation & Logistics  
+    } else if (titleLower.includes('transport') || titleLower.includes('logistics') || titleLower.includes('delivery')) {
+      setting = 'a modern logistics center or transportation hub';
+      environment = 'warehouse with automated systems and delivery trucks';
+      keyElements = 'conveyor belts, delivery trucks, shipping containers, tracking systems';
+      props = 'packages, trucks, conveyor systems, shipping labels, logistics screens';
+    } else if (titleLower.includes('aviation') || titleLower.includes('airport') || titleLower.includes('flight')) {
+      setting = 'an airport or aviation facility';
+      environment = 'modern airport with aircraft and control systems';
+      keyElements = 'airplanes, control towers, runways, flight displays, aviation equipment';
+      props = 'aircraft, flight schedules, aviation instruments, airport equipment, control panels';
+    
+    // Gaming & Interactive
+    } else if (titleLower.includes('game') || titleLower.includes('gaming') || titleLower.includes('interactive')) {
+      setting = 'a game development studio';
+      environment = 'creative workspace with multiple monitors and gaming setups';
+      keyElements = 'gaming computers, development tools, game art, testing stations';
+      props = 'gaming monitors, keyboards, game controllers, development software, concept art';
     }
     
     if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
@@ -298,7 +322,7 @@ Deno.serve(async (req) => {
 
   try {
     // ---- 3) Check if image exists in storage first (with version check)
-    const promptVersion = 'v2'; // Increment when prompt logic changes
+    const promptVersion = 'v3'; // Increment when prompt logic changes
     const expectedPath = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
     
     console.log("[image-ensure] Checking for existing image at:", expectedPath);
@@ -382,7 +406,7 @@ Deno.serve(async (req) => {
     // ---- 4) Upload to Storage
     // Use the expected path format: universeId/gradeInt/cover.webp
     // Add version suffix to force regeneration when prompts change
-    const promptVersion = 'v2'; // Increment when prompt logic changes
+    const promptVersion = 'v3'; // Increment when prompt logic changes
     const path = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
     const up = await supa.storage.from(bucket).upload(path, bytes, {
       contentType: "image/webp", // Always save as webp for consistency
