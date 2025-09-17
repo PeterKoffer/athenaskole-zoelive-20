@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.generate-adventure-lesson]
 verify_jwt = false
+
+[functions.generate-adventure-multipart]
+verify_jwt = false
