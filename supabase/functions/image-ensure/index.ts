@@ -97,6 +97,11 @@ Deno.serve(async (req) => {
       environment = 'indoor hydroponic tower garden with LED grow lights';
       keyElements = 'stacked growing towers, LED panels, nutrient systems, fresh vegetables';
       props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
+    } else if (titleLower.includes('farm') || titleLower.includes('ranch') || idLower.includes('farm') || idLower.includes('ranch')) {
+      setting = 'a traditional farm or ranch operation';
+      environment = 'pastoral countryside with farmhouse, barns, fields, and livestock areas';
+      keyElements = 'red barn, farmhouse, tractors, crops, farm animals, pastures, fence lines';
+      props = 'wooden barn, farm equipment, hay bales, farm animals, crops in fields, rustic fencing';
     } else if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
       setting = 'a business negotiation workshop';
       environment = 'professional meeting room or classroom setup';
