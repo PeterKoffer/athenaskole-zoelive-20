@@ -322,10 +322,11 @@ Deno.serve(async (req) => {
 
   try {
     // ---- 3) Check if image exists in storage first (with version check)
-    const promptVersion = 'v3'; // Increment when prompt logic changes
+    const promptVersion = 'v4'; // Increment when prompt logic changes - FORCE REGENERATION
     const expectedPath = `${universeId}/${gradeInt}/cover.webp`;
     
     console.log("[image-ensure] Checking for existing image at:", expectedPath);
+    console.log("[image-ensure] Looking for prompt version:", promptVersion);
     
     // Check if we have a version marker in metadata to know if regeneration is needed
     const { data: existingFile } = await supa.storage.from(bucket).list(`${universeId}/${gradeInt}`, {
@@ -336,6 +337,8 @@ Deno.serve(async (req) => {
       const file = existingFile[0];
       // Check if file is large enough AND was generated with current prompt version
       const hasCurrentVersion = file.metadata?.promptVersion === promptVersion;
+      console.log("[image-ensure] Found existing file with version:", file.metadata?.promptVersion, "need version:", promptVersion);
+      
       if (file.metadata?.size && file.metadata.size >= minBytes && hasCurrentVersion) {
         console.log("[image-ensure] Found existing image with correct version, returning:", expectedPath);
         const { data: publicUrl } = supa.storage.from(bucket).getPublicUrl(expectedPath);
@@ -350,6 +353,8 @@ Deno.serve(async (req) => {
       } else {
         console.log("[image-ensure] Existing image outdated or too small, regenerating...");
       }
+    } else {
+      console.log("[image-ensure] No existing cover.webp found, will generate new one");
     }
 
     console.log("[image-ensure] No suitable existing image found, generating new one...");
@@ -421,16 +426,6 @@ Deno.serve(async (req) => {
         generatedAt: new Date().toISOString(),
         adventureSpecific: true
       }
-    });
-    const up = await supa.storage.from(bucket).upload(path, bytes, {
-      contentType: "image/webp", // Always save as webp for consistency
-      upsert: true,
-      metadata: {
-        promptVersion: promptVersion, // Track version for cache invalidation
-        generatedAt: new Date().toISOString(),
-        adventureSpecific: true
-      }
-    });
     });
     if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
 
