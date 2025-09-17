@@ -1,23 +1,151 @@
+// Structured Adventure Blueprint Generation
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Legacy interface for compatibility with frontend
 interface AdventureRequest {
   adventureTitle: string;
   subject: string;
   gradeLevel: number;
-  interests?: string[];
-  calendarKeywords?: string[];
-  lessonDuration?: number;
+  interests: string[];
+  calendarKeywords: string[];
+  lessonDuration: number;
 }
 
-// Create epic adventure prompt that generates truly exciting educational content
-function createEpicAdventurePrompt(request: AdventureRequest): string {
+// Comprehensive Blueprint Types
+type AdaptiveLevel = "remedial" | "core" | "stretch";
+
+interface AdventureBlueprint {
+  version: "nelie.adventure.v1";
+  adventure: {
+    id: string;
+    title: string;
+    forhistory_hook: {
+      text: string;
+      image_prompt: string;
+    };
+    learning_goals: Array<{
+      subject: string;
+      curriculum_ref: string;
+      goal: string;
+    }>;
+    parameters: {
+      grade: number;
+      curriculum: string;
+      school_philosophy: string;
+      teacher_weights: Record<string, number>;
+      lesson_duration_minutes: number;
+      student_ability: string;
+      learning_style: string[];
+      interests: string[];
+      calendar: {
+        keywords: string[];
+        day_minutes: number;
+      };
+    };
+    timebox_policy: {
+      total_minutes: number;
+      phase_budgeting: string;
+      checkpoint_every_minutes: number;
+      grace_period_minutes: number;
+      fallback_rule: string;
+    };
+    global_pacing_controls: {
+      adaptive_levels: AdaptiveLevel[];
+      difficulty_band: {
+        min: number;
+        target: number;
+        max: number;
+      };
+      mastery_gate_policy: string;
+      branching_mode: string;
+    };
+    phases: Array<{
+      id: string;
+      name: string;
+      target_minutes: {
+        core: number;
+        min: number;
+        max: number;
+      };
+      objective: string;
+      narrative: string;
+      activities: Array<{
+        type: string;
+        subject: string;
+        estimated_minutes: number;
+        adaptive?: {
+          level_map: Record<AdaptiveLevel, string>;
+        };
+        input_spec?: Record<string, unknown>;
+        scoring?: {
+          auto: boolean;
+          partial_credit?: boolean;
+        };
+        hints?: number;
+        success_criteria?: string;
+        remediation?: {
+          offer: boolean;
+          max_minutes: number;
+          content: string;
+        };
+        enrichment?: {
+          offer: boolean;
+          max_minutes: number;
+          content: string;
+        };
+        decisions?: number;
+        feedback_mode?: string;
+        items?: Array<{
+          format: string;
+          prompt: string;
+        }>;
+        rubric?: Array<{
+          dimension: string;
+          scale: string;
+        }>;
+        next_step_rules?: Array<{
+          if: string;
+          then: string;
+        }>;
+      }>;
+      assets?: {
+        images?: Array<{
+          role: string;
+          prompt: string;
+        }>;
+      };
+      checkpoints?: Array<{
+        minute: number;
+        ensure: string;
+        on_miss: string;
+      }>;
+    }>;
+    assessment_summary: {
+      auto_scored: string[];
+      teacher_review: string[];
+      mastery_gate_results: Record<string, string>;
+    };
+    time_adaptation_runtime_rules: Array<{
+      if: string;
+      then: string[];
+    }>;
+    validation: {
+      age_fit: boolean;
+      curriculum_coverage_ok: boolean;
+      token_budget_ok: boolean;
+      notes?: string;
+    };
+  };
+}
+
+// Create structured blueprint prompt for comprehensive educational adventures
+function createStructuredAdventurePrompt(request: AdventureRequest): string {
   const {
     adventureTitle,
     subject,
@@ -30,157 +158,192 @@ function createEpicAdventurePrompt(request: AdventureRequest): string {
   const interestText = interests.join(', ');
   const contextText = calendarKeywords.join(', ');
 
-  return `🎬 CREATE AN EPIC EDUCATIONAL ADVENTURE! 🎬
+  return `Du er en uddannelsesarkitekt der genererer strukturerede læringseventyr som JSON-blueprints. 
 
-Title: "${adventureTitle}"
-Subject: ${subject} | Grade: ${gradeLevel} | Duration: ${lessonDuration} min
-Student Interests: ${interestText}
+Du skal skabe spændende, sammenhængende undervisning der:
+- Integrerer faglige mål naturligt i en adventure-historie
+- Sikrer alle elever samme tidsramme men med tilpasset sværhedsgrad
+- Kombinerer multiple fag i samme adventure
+- Inkluderer checkpoints for at holde klassen synkron
+- Har adaptive aktiviteter der tilpasser sig elevens niveau
 
-🔥 MAKE THIS FEEL LIKE A BLOCKBUSTER MOVIE OR VIDEO GAME!
+ADVENTURE: "${adventureTitle}"
+HOVEDFAG: ${subject}
+KLASSETRIN: ${gradeLevel}  
+ELEVINTERESSER: ${interestText}
+KALENDER: ${contextText}
+TOTAL MINUTTER: ${lessonDuration}
 
-This should be:
-- A thrilling story with high stakes and dramatic tension
-- An immersive world where students are the heroes
-- A quest where ${subject} knowledge is their superpower
-- An adventure with plot twists, mysteries, and epic moments
-
-🎯 STORY FORMULA:
-1. HOOK: Dramatic opening crisis that demands immediate action
-2. QUEST: Epic journey with escalating challenges and discoveries  
-3. CLIMAX: Final showdown where everything depends on their knowledge
-4. VICTORY: Triumphant resolution with celebration of learning
-
-📚 EDUCATIONAL INTEGRATION:
-- ${subject} concepts must be essential to survival/success in the story
-- Knowledge unlocks new abilities or solves critical problems
-- Learning feels like gaining superpowers or secret knowledge
-- Grade ${gradeLevel} appropriate complexity woven into adventure
-
-🎮 ACTIVITY TYPES:
-- "Decode the Ancient Message" (multiple choice with story consequences)
-- "Hack the Enemy System" (problem-solving under pressure)
-- "Navigate the Dangerous Territory" (apply knowledge to survive)
-- "Build Your Escape Device" (creative engineering challenge)
-- "Negotiate with Aliens" (use concepts to communicate)
-
-⚡ EXCITEMENT ELEMENTS:
-- Countdown timers and urgent deadlines
-- Plot twists that shock and surprise
-- Characters in danger who need rescuing
-- Discoveries that change everything
-- Epic battles between good and evil
-- Mysterious powers to unlock
-
-Return ONLY this JSON structure with THRILLING content:
+Returner præcis dette JSON-skema:
 
 {
-  "title": "${adventureTitle}",
-  "subject": "${subject}",
-  "gradeLevel": ${gradeLevel},
-  "scenario": "You are [heroic role] when [shocking crisis] threatens [people/world/mission]. Only your ${subject} skills can [save the day/unlock the mystery/defeat the enemy]. Time is running out...",
-  "learningObjectives": [
-    "Master ${subject} through life-or-death challenges",
-    "Use knowledge as your superpower to overcome impossible odds",
-    "Apply learning in high-stakes situations that matter"
-  ],
-  "stages": [
-    {
-      "id": "crisis-strikes",
-      "title": "Crisis Strikes!",
-      "description": "Something terrible happens - heroes needed immediately!",
-      "duration": ${Math.round(lessonDuration * 0.3)},
-      "storyText": "🚨 EMERGENCY ALERT! [Dramatic crisis] has just occurred! You're the only one who can [heroic mission] using ${subject}. The countdown has begun...",
-      "activities": [
-        {
-          "type": "multipleChoice",
-          "title": "Emergency Response",
-          "instructions": "Lives are at stake! Make the right choice or face disaster!",
-          "content": {
-            "question": "Critical ${subject} challenge where wrong answer = catastrophe in the story",
-            "options": [
-              "Heroic action that saves lives",
-              "Clever solution that outwits danger", 
-              "Dangerous choice that risks everything",
-              "Safe option that might be too slow"
-            ],
-            "correctAnswer": 1,
-            "explanation": "🎉 BRILLIANT! Your ${subject} knowledge just saved everyone! Here's how this works and why it was the perfect choice...",
-            "points": 50
-          }
-        }
-      ]
+  "version": "nelie.adventure.v1",
+  "adventure": {
+    "id": "adventure-${Date.now()}",
+    "title": "${adventureTitle}",
+    "forhistory_hook": {
+      "text": "2-3 dramatiske sætninger der starter eventyret. Du er hovedpersonen i en spændende historie hvor din viden bliver din superkraft...",
+      "image_prompt": "Epic adventure scene with students as heroes"
     },
-    {
-      "id": "epic-quest",
-      "title": "The Epic Quest",
-      "description": "Journey into danger with your newfound powers",
-      "duration": ${Math.round(lessonDuration * 0.4)},
-      "storyText": "🗡️ PLOT TWIST! You discover [shocking revelation] that changes everything! Now you must [epic challenge] while [dramatic obstacle]. Your ${subject} abilities are evolving...",
-      "activities": [
-        {
-          "type": "multipleChoice",
-          "title": "The Ultimate Test",
-          "instructions": "Everything depends on this moment! Choose your destiny!",
-          "content": {
-            "question": "Advanced ${subject} puzzle that unlocks the path to victory",
-            "options": [
-              "Unleash your full power",
-              "Use stealth and cunning",
-              "Rally allies to your cause", 
-              "Sacrifice yourself for others"
-            ],
-            "correctAnswer": 0,
-            "explanation": "⚡ INCREDIBLE! You've unlocked your true potential! This ${subject} mastery reveals the secret to [story resolution]...",
-            "points": 75
-          }
-        },
-        {
-          "type": "creativeTask",
-          "title": "Build Your Legendary Tool",
-          "instructions": "Design the ultimate device/plan/solution using your ${subject} mastery to overcome the final challenge!"
-        }
-      ]
+    "learning_goals": [
+      {"subject": "${subject}", "curriculum_ref": "DK/${subject}/${gradeLevel}.1", "goal": "Anvende ${subject} i spændende problemløsning"},
+      {"subject": "Tværfagligt", "curriculum_ref": "DK/Mixed/${gradeLevel}.1", "goal": "Integrere viden på tværs af fag"}
+    ],
+    "parameters": {
+      "grade": ${gradeLevel},
+      "curriculum": "DK-Common", 
+      "school_philosophy": "Adventure-based epic learning",
+      "teacher_weights": {"${subject}": 0.5, "Other": 0.5},
+      "lesson_duration_minutes": ${lessonDuration},
+      "student_ability": "mixed",
+      "learning_style": ["visual", "kinesthetic", "narrative"],
+      "interests": ${JSON.stringify(interests)},
+      "calendar": {"keywords": ${JSON.stringify(calendarKeywords)}, "day_minutes": ${lessonDuration}}
     },
-    {
-      "id": "final-showdown",
-      "title": "Final Showdown",
-      "description": "The epic climax - save the world!",
-      "duration": ${Math.round(lessonDuration * 0.3)},
-      "storyText": "🏆 THE FINAL BATTLE! Face-to-face with [ultimate villain/challenge]. Everything you've learned has led to this moment. The fate of [world/universe/people] rests in your hands. 3... 2... 1... FIGHT!",
-      "activities": [
-        {
-          "type": "multipleChoice",
-          "title": "Victory or Defeat",
-          "instructions": "This is it! One final test to prove you're the ultimate ${subject} hero!",
-          "content": {
-            "question": "Master-level ${subject} challenge that brings together everything from your journey",
-            "options": [
-              "Channel all your knowledge into one devastating attack",
-              "Use wisdom and strategy to outmaneuver the enemy",
-              "Inspire others with your incredible understanding",
-              "Transform the enemy through the power of education"
-            ],
-            "correctAnswer": 3,
-            "explanation": "🎆 LEGENDARY VICTORY! You didn't just win - you transformed everything! Your ${subject} mastery has created a better world. You are truly a hero!",
-            "points": 100
+    "timebox_policy": {
+      "total_minutes": ${lessonDuration},
+      "phase_budgeting": "fixed_core+elastic_enrichment",
+      "checkpoint_every_minutes": 15,
+      "grace_period_minutes": 5,
+      "fallback_rule": "prefer_core_completion_over_enrichment"
+    },
+    "global_pacing_controls": {
+      "adaptive_levels": ["remedial", "core", "stretch"],
+      "difficulty_band": {"min": 0.8, "target": 1.0, "max": 1.2},
+      "mastery_gate_policy": "soft-gate-with-recap",
+      "branching_mode": "linear-core-with-optional-sidequests"
+    },
+    "phases": [
+      {
+        "id": "phase-1",
+        "name": "Eventyret Begynder",
+        "target_minutes": {"core": ${Math.round(lessonDuration * 0.25)}, "min": ${Math.round(lessonDuration * 0.2)}, "max": ${Math.round(lessonDuration * 0.3)}},
+        "objective": "Introducer adventure-verdenen og diagnosticer elevniveau",
+        "narrative": "🚨 KRISEALARMEN LYDER! Du befinder dig pludselig i en situation hvor kun din ${subject}-viden kan redde dagen. Hvad gør du først?",
+        "activities": [
+          {
+            "type": "diagnostic_adventure_start",
+            "subject": "${subject}",
+            "estimated_minutes": ${Math.round(lessonDuration * 0.15)},
+            "adaptive": {
+              "level_map": {
+                "remedial": "3 guidede opgaver med ekstra hjælp",
+                "core": "5 standardopgaver i adventure-kontekst", 
+                "stretch": "7 udfordrende opgaver med bonus elementer"
+              }
+            },
+            "success_criteria": ">= 70% korrekte for at fortsætte adventure",
+            "next_step_rules": [
+              {"if": "score < 0.7", "then": "unlock_remedial_adventure_training"},
+              {"if": "score >= 0.9", "then": "offer_hero_mode_challenges"}
+            ]
           }
-        }
-      ]
+        ],
+        "assets": {"images": [{"role": "scene", "prompt": "Student hero starting epic ${subject} adventure"}]},
+        "checkpoints": [{"minute": ${Math.round(lessonDuration * 0.2)}, "ensure": "adventure started and diagnostic done", "on_miss": "skip optional story elements"}]
+      },
+      {
+        "id": "phase-2", 
+        "name": "Heltens Rejse",
+        "target_minutes": {"core": ${Math.round(lessonDuration * 0.4)}, "min": ${Math.round(lessonDuration * 0.35)}, "max": ${Math.round(lessonDuration * 0.45)}},
+        "objective": "Mestre ${subject} gennem spændende udfordringer",
+        "narrative": "⚡ DIT FØRSTE STORE TEST! Adventure-verdenen præsenterer dig for komplekse udfordringer. Din ${subject}-viden vokser og bliver stærkere for hver opgave du løser...",
+        "activities": [
+          {
+            "type": "epic_problem_solving",
+            "subject": "${subject}",
+            "estimated_minutes": ${Math.round(lessonDuration * 0.25)},
+            "adaptive": {
+              "level_map": {
+                "remedial": "Trinvis guidning + 4 opgaver med støtte",
+                "core": "6 progressivt sværere adventure-opgaver",
+                "stretch": "8 komplekse multi-step challenges + bonus quests"
+              }
+            },
+            "scoring": {"auto": true, "partial_credit": true},
+            "hints": 2,
+            "success_criteria": ">= 75% eller fuldført med hjælp",
+            "remediation": {"offer": true, "max_minutes": 8, "content": "${subject} adventure boot camp"},
+            "enrichment": {"offer": true, "max_minutes": 12, "content": "Hero-level ${subject} mastery challenges"}
+          },
+          {
+            "type": "creative_adventure_task",
+            "subject": "Tværfagligt", 
+            "estimated_minutes": ${Math.round(lessonDuration * 0.1)},
+            "adaptive": {
+              "level_map": {
+                "remedial": "Guidet kreativitet med skabeloner",
+                "core": "Fri kreativ opgave med ${subject} fokus",
+                "stretch": "Avanceret kreativ projekt med multiple løsninger"
+              }
+            }
+          }
+        ],
+        "checkpoints": [{"minute": ${Math.round(lessonDuration * 0.6)}, "ensure": "main challenges completed", "on_miss": "skip enrichment, go to wrap-up"}]
+      },
+      {
+        "id": "phase-3",
+        "name": "Den Ultimative Test", 
+        "target_minutes": {"core": ${Math.round(lessonDuration * 0.35)}, "min": ${Math.round(lessonDuration * 0.25)}, "max": ${Math.round(lessonDuration * 0.4)}},
+        "objective": "Anvende al læring i episk finale og reflektere",
+        "narrative": "🏆 DEN STORE FINALE! Alt hvad du har lært gennem adventure skal nu bruges i det ultimative opgør. Kan du blive den helt verden har brug for?",
+        "activities": [
+          {
+            "type": "master_challenge",
+            "subject": "${subject}",
+            "estimated_minutes": ${Math.round(lessonDuration * 0.2)},
+            "adaptive": {
+              "level_map": {
+                "remedial": "Trinvist master-challenge med støtte",
+                "core": "Komplet ${subject} integration challenge",
+                "stretch": "Multi-layered master quest med innovation"
+              }
+            },
+            "decisions": 3,
+            "feedback_mode": "immediate",
+            "success_criteria": "Succesfuld anvendelse af ${subject} i finale"
+          },
+          {
+            "type": "hero_reflection",
+            "subject": "Tværfagligt",
+            "estimated_minutes": ${Math.round(lessonDuration * 0.1)},
+            "items": [
+              {"format": "adventure_reflection", "prompt": "Hvordan føltes det at være helt? Hvad var din superkraft?"},
+              {"format": "learning_celebration", "prompt": "Hvilken ${subject}-viden reddede dagen?"},
+              {"format": "hero_rating", "prompt": "Rate din helt-performance (1-5 stjerner)"}
+            ]
+          }
+        ]
+      }
+    ],
+    "assessment_summary": {
+      "auto_scored": ["phase-1.diagnostic_adventure_start", "phase-2.epic_problem_solving", "phase-3.master_challenge"],
+      "teacher_review": ["phase-2.creative_adventure_task", "phase-3.hero_reflection"],
+      "mastery_gate_results": {"${subject}": "adventure_complete"}
+    },
+    "time_adaptation_runtime_rules": [
+      {"if": "behind_schedule", "then": ["trim:enrichment", "reduce:creative_time", "focus:core_objectives"]},
+      {"if": "ahead_of_schedule", "then": ["unlock:stretch", "add:bonus_sidequests<=15m", "enhance:storytelling"]}
+    ],
+    "validation": {
+      "age_fit": true,
+      "curriculum_coverage_ok": true, 
+      "token_budget_ok": true,
+      "notes": "Epic adventure blueprint with ${lessonDuration}min structure and adaptive difficulty"
     }
-  ],
-  "estimatedTime": ${lessonDuration}
+  }
 }
 
-CRITICAL REQUIREMENTS:
-- Every word must EXCITE and INSPIRE students
-- Use action words: "unleash", "discover", "battle", "triumph"
-- Students are HEROES, not just learners
-- ${subject} knowledge is their SUPERPOWER
-- Every choice has DRAMATIC story consequences
-- Make them feel like they're IN a movie/game
-- Victory should feel EPIC and well-earned
+KRAV:
+- Skab spændende narrativ der gør ${subject} til en superkraft
+- Brug elevinteresser: ${interestText} aktivt i story og karakterer  
+- Integrer kalender kontekst: ${contextText}
+- Tilpas til klassetrin ${gradeLevel} sprog og kompleksitet
+- Sikr total tid på ${lessonDuration} minutter fordelt intelligent
+- Alle aktiviteter skal føles som naturlige dele af adventure
+- Elever er HELTE, ikke bare studerende
 
-Return ONLY the JSON - no explanations, no markdown, just pure adventure!`;
+Returner KUN valid JSON.`;
 }
 
 // Enhanced logging for better debugging
@@ -302,9 +465,9 @@ async function callOpenAI(prompt: string) {
   return content;
 }
 
-// Enhanced JSON parsing with better error handling
-function parseAdventureJSON(content: string) {
-  logInfo('🔍 Parsing JSON response...');
+// Enhanced JSON parsing for adventure blueprints
+function parseAdventureBlueprintJSON(content: string): AdventureBlueprint {
+  logInfo('🔍 Parsing adventure blueprint JSON response...');
   
   // Clean the content - remove any markdown or extra text
   let jsonString = content.trim();
@@ -321,45 +484,50 @@ function parseAdventureJSON(content: string) {
 
   try {
     const parsed = JSON.parse(jsonString);
-    logSuccess('✅ Successfully parsed JSON');
+    logSuccess('✅ Successfully parsed adventure blueprint JSON');
     
-    // Validate the adventure structure
-    if (!parsed.title || !parsed.subject || !parsed.stages || !Array.isArray(parsed.stages)) {
-      logError('❌ Invalid adventure structure - missing required fields');
-      throw new Error('Invalid adventure structure');
+    // Validate the adventure blueprint structure
+    if (!parsed.version || parsed.version !== "nelie.adventure.v1") {
+      logError('❌ Invalid adventure blueprint version');
+      throw new Error('Invalid adventure blueprint version');
     }
 
-    if (parsed.stages.length === 0) {
-      logError('❌ Adventure has no stages');
-      throw new Error('Adventure must have at least one stage');
+    if (!parsed.adventure || !parsed.adventure.title || !parsed.adventure.phases) {
+      logError('❌ Invalid adventure blueprint structure - missing required fields');
+      throw new Error('Invalid adventure blueprint structure');
     }
 
-    logInfo('📚 Parsed lesson preview', {
-      title: parsed.title,
-      subject: parsed.subject,
-      gradeLevel: parsed.gradeLevel,
-      stagesCount: parsed.stages.length,
-      scenario: parsed.scenario?.substring(0, 100) + '...'
+    if (!Array.isArray(parsed.adventure.phases) || parsed.adventure.phases.length === 0) {
+      logError('❌ Adventure blueprint has no phases');
+      throw new Error('Adventure blueprint must have at least one phase');
+    }
+
+    logInfo('📚 Parsed adventure blueprint preview', {
+      version: parsed.version,
+      title: parsed.adventure.title,
+      totalMinutes: parsed.adventure.timebox_policy?.total_minutes,
+      phasesCount: parsed.adventure.phases.length,
+      learningGoals: parsed.adventure.learning_goals?.length || 0
     });
 
-    logSuccess('✅ Adventure validation passed');
-    return parsed;
+    logSuccess('✅ Adventure blueprint validation passed');
+    return parsed as AdventureBlueprint;
     
   } catch (error) {
-    logError('❌ JSON parsing failed', error);
+    logError('❌ Adventure blueprint JSON parsing failed', error);
     logError('📄 Failed content', jsonString.substring(0, 500));
-    throw new Error(`Failed to parse adventure JSON: ${error.message}`);
+    throw new Error(`Failed to parse adventure blueprint JSON: ${error.message}`);
   }
 }
 
-// Main adventure generation function
-async function generateEpicAdventure(request: AdventureRequest) {
-  logInfo('🚀 Starting epic adventure generation for', request.adventureTitle);
+// Main structured adventure generation function
+async function generateStructuredAdventure(request: AdventureRequest): Promise<AdventureBlueprint> {
+  logInfo('🚀 Starting structured adventure blueprint generation for', request.adventureTitle);
   logInfo('📨 Received request for adventure', request.adventureTitle);
 
-  // Build the epic adventure prompt
-  const prompt = createEpicAdventurePrompt(request);
-  logInfo('📋 Built epic adventure context', {
+  // Build the structured adventure prompt
+  const prompt = createStructuredAdventurePrompt(request);
+  logInfo('📋 Built structured adventure context', {
     subject: request.subject,
     gradeLevel: request.gradeLevel,
     lessonDuration: request.lessonDuration,
@@ -370,9 +538,9 @@ async function generateEpicAdventure(request: AdventureRequest) {
   const content = await callOpenAI(prompt);
   logInfo('📥 Received OpenAI response');
 
-  // Parse and validate the adventure
-  const adventure = parseAdventureJSON(content);
-  logSuccess(`✅ Successfully generated epic adventure with ${adventure.stages.length} stages`);
+  // Parse and validate the adventure blueprint
+  const adventure = parseAdventureBlueprintJSON(content);
+  logSuccess(`✅ Successfully generated structured adventure with ${adventure.adventure.phases.length} phases`);
 
   return adventure;
 }
@@ -403,10 +571,10 @@ serve(async (req) => {
 
     logInfo('📋 Mapped adventure request', adventureRequest);
 
-    // Generate the epic adventure
-    const adventure = await generateEpicAdventure(adventureRequest);
+    // Generate the structured adventure blueprint
+    const adventure = await generateStructuredAdventure(adventureRequest);
 
-    // Return the adventure
+    // Return the adventure blueprint
     return new Response(JSON.stringify(adventure), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
