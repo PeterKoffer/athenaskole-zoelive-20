@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabaseClient';
-import { invokeFn } from '@/supabase/functionsClient';
+import { supabase } from '@/integrations/supabase/client';
+import { buildCinematicPrompt } from './images/promptBuilder';
 
 export const BUCKET = 'universe-images';
 export const MIN_BYTES = 1024;
@@ -27,13 +27,16 @@ export async function getUniverseImageSignedUrl(
   }
 
   // 2) Invoke edge function to ensure image exists
-  const { prompt } = opts;
-  await invokeFn('image-service', { 
-    prompt: prompt || 'Universe cover',
-    universeId: universeId,
-    gradeInt: Number(grade),
-    width: 1024,
-    height: 576
+  const title = opts.prompt || path.split('/')[0] || 'cover';
+  await supabase.functions.invoke('image-ensure', {
+    body: {
+      universeId: universeId,
+      gradeInt: Number(grade),
+      title: title,
+      minBytes: MIN_BYTES,
+      width: 1024,
+      height: 576
+    }
   }).catch(() => {});
 
   // 3) Deterministic wait for the file to appear (webp or png)
