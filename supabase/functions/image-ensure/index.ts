@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
         prompt: fullPrompt,
         n: 1,
         size: "1024x1024",
-        quality: "hd",
+        quality: "high",
         output_format: "webp",
       }),
     });
