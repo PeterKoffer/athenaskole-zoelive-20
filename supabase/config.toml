@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.generate-adventure-multipart]
 verify_jwt = false
+
+[functions.realtime-chat]
+verify_jwt = false
