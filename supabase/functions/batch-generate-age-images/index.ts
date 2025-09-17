@@ -56,11 +56,11 @@ function buildCinematicPrompt(adventureId: string, title: string, ageGroup: stri
   const titleLower = title.toLowerCase();
   const idLower = adventureId.toLowerCase();
   
-  // Adventure-specific contexts
-  let setting = 'a learning adventure focused on ' + title;
-  let environment = 'modern educational classroom or learning space';
-  let keyElements = 'educational materials, learning tools, collaborative workspace';
-  let props = 'learning materials, books, tools, presentation boards';
+  // Adventure-specific contexts - NO CLASSROOMS
+  let setting = 'a professional adventure focused on ' + title;
+  let environment = 'modern professional workspace or research facility';
+  let keyElements = 'professional equipment, research tools, collaborative workspace';
+  let props = 'professional materials, equipment, tools, displays';
   
   if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
     setting = 'a modern vertical farming facility';
@@ -69,7 +69,7 @@ function buildCinematicPrompt(adventureId: string, title: string, ageGroup: stri
     props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
   } else if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
     setting = 'a business negotiation workshop';
-    environment = 'professional meeting room or classroom setup';
+    environment = 'professional meeting room or conference center';
     keyElements = 'meeting tables, presentation boards, handshake moments, business materials';
     props = 'meeting tables, chairs, notebooks, presentation materials, name tags';
   } else if (titleLower.includes('toy line') || idLower.includes('toy') || titleLower.includes('design')) {

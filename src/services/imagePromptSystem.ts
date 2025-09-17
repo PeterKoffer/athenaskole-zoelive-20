@@ -1,8 +1,13 @@
-// ONE CENTRALIZED IMAGE PROMPT SYSTEM
+// ====== SINGLE IMAGE PROMPT SYSTEM - NO OTHER PROMPTS ALLOWED ======
+// All image generation MUST go through the image-ensure edge function
+// This file exists only for backward compatibility and forwards to the edge function
+
 export function buildAdventureImagePrompt(title: string, gradeLevel?: number): string {
-  return `Professional modern environment for "${title}" adventure. Cinematic lighting, realistic props, inspiring atmosphere, no text overlay, no classroom elements.`;
+  // This function is deprecated - all prompts now handled by image-ensure edge function
+  return title; // Just return title, the edge function handles the actual prompt
 }
 
 export function buildCoverImagePrompt(universeId: string): string {
-  return `Professional environment cover image for adventure "${universeId}". Modern workspace, cinematic lighting, realistic props, inspiring mood, no classroom setting.`;
+  // This function is deprecated - all prompts now handled by image-ensure edge function
+  return universeId; // Just return ID, the edge function handles the actual prompt
 }

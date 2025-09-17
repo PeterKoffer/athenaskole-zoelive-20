@@ -29,29 +29,26 @@ async function withGate<T>(fn: () => Promise<T>) {
 export async function generateActivityImage(prompt?: string, phaseType: "cover" | "math" | "language" | "science" | "exit" = "cover"): Promise<string | null> {
   if (!prompt) return null;
   
-  // Professional environment prompt - NO CLASSROOM
-  const enhancedPrompt = `Professional modern environment for "${prompt}". Cinematic lighting, realistic props, inspiring atmosphere, no text overlay, no classroom elements.`;
-  
-  const key = hashKey(`${PROMPT_VERSION}:${enhancedPrompt}`);
+  // ALL PROMPTS NOW GO THROUGH THE SINGLE IMAGE-ENSURE SYSTEM
+  const key = hashKey(`${PROMPT_VERSION}:${prompt}`);
   if (imageCache.has(key)) return imageCache.get(key)!;
 
   const p = withGate(async () => {
     try {
-      const base = (import.meta as any)?.env?.VITE_IMAGE_EDGE_URL;
-      if (!base) return null;
+      const supabaseUrl = 'https://yphkfkpfdpdmllotpqua.supabase.co';
+      const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwaGtma3BmZHBkbWxsb3RwcXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MTcxNTksImV4cCI6MjA2Mzk5MzE1OX0.hqyZ2nk3dqMx8rX9tdM1H4XF9wZ9gvaRor-6i5AyCy8';
       
-      const seed = seedFromId(key);
-      
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/image-ensure`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/image-ensure`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${anonKey}`,
         },
         body: JSON.stringify({
           universeId: 'activity-image',
           gradeInt: 6,
-          title: enhancedPrompt,
+          title: prompt, // Let the edge function handle the prompt building
+          mode: 'professional' // NEVER classroom unless explicitly requested
         }),
       });
       const data = await res.json().catch(() => ({}));

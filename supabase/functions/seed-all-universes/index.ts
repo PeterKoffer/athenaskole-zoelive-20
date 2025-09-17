@@ -22,21 +22,21 @@ function generatePrompt(universe: any): string {
   const title = universe.title || 'learning';
   
   const subjectPrompts: Record<string, string> = {
-    mathematics: "bright kid-friendly math classroom with numbers and shapes, simple colorful design",
-    science: "bright kid-friendly science lab with beakers and atoms, simple shapes, high-contrast",
-    geography: "bright kid-friendly world map with continents, simple colorful design",
-    "computer-science": "bright kid-friendly computer lab with circuits, simple tech icons",
-    music: "bright kid-friendly music room with instruments, simple colorful notes",
-    "creative-arts": "bright kid-friendly art studio with paintbrushes and colors, simple design",
-    "body-lab": "bright kid-friendly gym with sports equipment, simple active design",
-    "life-essentials": "bright kid-friendly life skills classroom, simple everyday objects",
-    "history-religion": "bright kid-friendly history classroom with books and scrolls, simple design",
-    languages: "bright kid-friendly language classroom with letters and words, simple design",
-    "mental-wellness": "bright kid-friendly peaceful classroom with calm colors, simple soothing design"
+    mathematics: "bright modern math research center with equations and data displays, professional colorful design",
+    science: "bright modern science lab with advanced equipment and displays, professional high-contrast",
+    geography: "bright modern geographic research center with digital maps, professional colorful design",
+    "computer-science": "bright modern tech innovation lab with computers and screens, professional design",
+    music: "bright modern recording studio with professional instruments, professional colorful design",
+    "creative-arts": "bright modern design studio with digital displays and tools, professional design",
+    "body-lab": "bright modern fitness research center with advanced equipment, professional design",
+    "life-essentials": "bright modern life skills training center, professional everyday objects",
+    "history-religion": "bright modern research library with digital archives, professional design",
+    languages: "bright modern language center with digital displays, professional design",
+    "mental-wellness": "bright modern wellness center with calming professional design"
   };
 
-  const basePrompt = subjectPrompts[subject] || "bright kid-friendly educational classroom, simple shapes, high-contrast";
-  return `${basePrompt}, educational illustration for ${title}`;
+  const basePrompt = subjectPrompts[subject] || "bright modern professional workspace, professional design";
+  return `${basePrompt}, professional illustration for ${title}`;
 }
 
 async function seedUniverse(u: { id: string, title?: string, subject?: string }) {

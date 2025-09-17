@@ -1,75 +1,65 @@
 // @ts-nocheck
-// supabase/functions/image-ensure/index.ts - Fixed quality param + forced professional environments
+// supabase/functions/image-ensure/index.ts - SINGLE SOURCE OF TRUTH FOR ALL IMAGES
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
-// Prompt building system - NO CLASSROOMS!
-const STYLE_PACK = "cinematic hybrid photoreal + pixar-like, high dynamic range, volumetric light, shallow depth of field, ultra-detailed, filmic color grade, no text overlay, no watermark, no logos";
-const NEGATIVE = "NO classroom, NO school interior, NO desks, NO chalkboard, NO whiteboard, NO children, NO teacher, NO clipart, NO flat icon style, NO 3D word art, NO school supplies, NO academic setting, NO students, NO educational posters, NO school building, NO learning materials, NEVER educational environment";
+// ====== WHITELIST: ONLY THESE TITLES CAN HAVE CLASSROOM IMAGES ======
+const CLASSROOM_ALLOWED = [
+  /training ground/i,
+  /teacher training/i,
+  /classroom management/i,
+  /education practice/i,
+  /pedagogy/i
+];
 
-type Scene = { scene: string; props: string };
-const SCENE_MAP: Record<string, Scene> = {
-  "graphic-agency": {
-    scene: "modern graphic design studio, large monitors with design software, drawing tablets, moodboards, color swatch walls",
-    props: "sketchpads, pens, logo drafts, light from big windows, indoor plants",
-  },
-  "dinosaur-park": {
-    scene: "prehistoric safari outpost, jungle foliage, electric fence vista, paleontology field station",
-    props: "field kits, binoculars, bone casts, muddy tracks, research tent",
-  },
-  "antarctic-lab": {
-    scene: "antarctic research station, ice core drilling rig, scientific equipment in snowy landscape",
-    props: "ice core samples, drilling machinery, weather monitoring equipment, research tents",
-  },
-  "marine-lab": {
-    scene: "marine research facility, underwater observation tanks, sonar equipment",
-    props: "diving gear, marine specimens, underwater cameras, research vessels",
-  },
-  "space-lab": {
-    scene: "space mission control center, satellite tracking screens, astronaut training facility",
-    props: "mission control consoles, space suits, rocket launch pads, orbital tracking displays",
-  },
-  "sports-team": {
-    scene: "professional sports management office, team tactics board, performance analytics screens",
-    props: "team jerseys, strategy charts, fitness data, stadium model",
-  },
-  "soundproof-room": {
-    scene: "acoustics lab with anechoic wedges, microphones and SPL meters",
-    props: "signal generator screen with waveforms, tripod stands, sound equipment",
-  },
-  "construction-site": {
-    scene: "active construction site, tower cranes, scaffolding, engineering office",
-    props: "blueprints, hard hats, construction vehicles, surveying equipment",
-  },
-  "medical-lab": {
-    scene: "modern medical research laboratory, diagnostic equipment, clean room environment",
-    props: "microscopes, medical devices, test tubes, research computers",
-  },
-  "generic-professional": {
-    scene: "professional research facility, modern laboratory environment, scientific workstation",
-    props: "research equipment, computer monitors, technical instruments, professional workspace",
-  },
-};
+function isClassroomAllowed(title: string): boolean {
+  return CLASSROOM_ALLOWED.some(pattern => pattern.test(title));
+}
 
-function inferKey(title: string): string {
+// ====== THE ONLY PROMPT BUILDER IN THE ENTIRE SYSTEM ======
+function buildSinglePrompt(title: string, mode: "professional" | "classroom" = "professional"): string {
+  const STYLE = "cinematic hybrid photoreal + subtle Pixar warmth, HDR, volumetric light, shallow DOF, filmic color grade, no text/watermarks, no logos";
+  
+  // Force professional mode if classroom not allowed
+  if (mode === "classroom" && !isClassroomAllowed(title)) {
+    mode = "professional";
+  }
+
+  if (mode === "classroom") {
+    return `${STYLE} — bright modern classroom with collaborative learning setup, natural daylight, educational posters, students working together, inspiring atmosphere — NO corporate settings, NO boardrooms`;
+  }
+
+  // Professional environments based on adventure title
   const t = title.toLowerCase();
-  if (/(graphic|design|branding|logo|agency)/.test(t)) return "graphic-agency";
-  if (/(dinosaur|safari|paleo|jurassic|prehistoric)/.test(t)) return "dinosaur-park";
-  if (/(antarctic|ice core|polar|glacier|arctic)/.test(t)) return "antarctic-lab";
-  if (/(marine|ocean|underwater|aquatic|submarine)/.test(t)) return "marine-lab";
-  if (/(space|satellite|astronaut|rocket|mission control)/.test(t)) return "space-lab";
-  if (/(sports|team|manage|professional sports)/.test(t)) return "sports-team";
-  if (/(soundproof|acoustic|anechoic|audio lab)/.test(t)) return "soundproof-room";
-  if (/(construction|building|architect|engineering)/.test(t)) return "construction-site";
-  if (/(medical|health|clinic|hospital|diagnostic)/.test(t)) return "medical-lab";
-  return "generic-professional";
+  let scene = "professional modern workspace";
+  
+  if (/(record label|music|studio|audio)/.test(t)) {
+    scene = "modern recording studio with mixing console, sound equipment, acoustic panels";
+  } else if (/(graphic|design|agency|branding)/.test(t)) {
+    scene = "creative design studio with large monitors, drawing tablets, mood boards";
+  } else if (/(robot|ai|tech|programming)/.test(t)) {
+    scene = "modern tech lab with computers, robotic equipment, innovation workspace";
+  } else if (/(dinosaur|paleo|fossil|expedition)/.test(t)) {
+    scene = "paleontology field station with excavation tools, fossil displays, research tent";
+  } else if (/(antarctic|ice|polar|climate)/.test(t)) {
+    scene = "arctic research station with ice core samples, scientific equipment, snowy landscape";
+  } else if (/(marine|ocean|underwater|aquatic)/.test(t)) {
+    scene = "marine research facility with aquariums, diving gear, underwater cameras";
+  } else if (/(space|satellite|mission|astronaut)/.test(t)) {
+    scene = "space mission control center with monitoring screens, satellite displays";
+  } else if (/(construction|building|architect)/.test(t)) {
+    scene = "construction site office with blueprints, hard hats, building equipment";
+  } else if (/(medical|health|clinic|hospital)/.test(t)) {
+    scene = "modern medical facility with diagnostic equipment, clean environment";
+  } else if (/(sports|team|athletics|fitness)/.test(t)) {
+    scene = "professional sports facility with training equipment, performance analytics";
+  }
+
+  const ANTI_CLASSROOM = "ABSOLUTELY NO classroom, school desks, chalkboards, whiteboards, lockers, teachers, students, school supplies, educational posters, academic settings";
+  
+  return `${STYLE} — ${scene} — inspiring professional atmosphere — ${ANTI_CLASSROOM}`;
 }
 
-function buildCinematicPrompt(title: string): string {
-  const key = inferKey(title);
-  const scene = SCENE_MAP[key] ?? SCENE_MAP["generic-professional"];
-  return `${STYLE_PACK} — ${scene.scene} — ${scene.props} — mood: adventurous, inspiring — ${NEGATIVE}`;
-}
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -126,15 +116,11 @@ Deno.serve(async (req) => {
       ? Number(body.gradeInt ?? query.gradeInt) 
       : 6;
     const titleIn = String(body.title ?? query.title ?? "cover");
+    const requestedMode = String(body.mode ?? query.mode ?? "professional");
 
-    console.log("[image-ensure] Looking for prompt version: v4");
-    console.log("[image-ensure] Checking for existing image at:", `${universeId}/${gradeInt}/cover.webp`);
-    console.log("[image-ensure] Adventure details:", {
-      universeId,
-      titleIn,
-      titleLower: titleIn.toLowerCase(),
-      idLower: universeId.toLowerCase()
-    });
+    console.log("[image-ensure] SINGLE PROMPT SYSTEM - Looking for:", `${universeId}/${gradeInt}/cover.webp`);
+    console.log("[image-ensure] Title:", titleIn, "| Mode requested:", requestedMode);
+    console.log("[image-ensure] Classroom allowed:", isClassroomAllowed(titleIn));
 
     const objectPath = `${universeId}/${gradeInt}/cover.webp`;
 
@@ -159,10 +145,12 @@ Deno.serve(async (req) => {
 
     console.log("[image-ensure] No suitable existing image found, generating new one...");
 
-    // Build the prompt using our classroom-free system
-    const fullPrompt = buildCinematicPrompt(titleIn);
+    // THE ONLY PROMPT BUILDER - NO OTHER PROMPTS ALLOWED
+    const finalMode = (requestedMode === "classroom" && isClassroomAllowed(titleIn)) ? "classroom" : "professional";
+    const fullPrompt = buildSinglePrompt(titleIn, finalMode);
     
-    console.log("[image-ensure] Full prompt being sent:", fullPrompt);
+    console.log("[image-ensure] FINAL MODE:", finalMode);
+    console.log("[image-ensure] SINGLE PROMPT:", fullPrompt);
 
     // Generate image with OpenAI
     const openaiResponse = await fetch("https://api.openai.com/v1/images/generations", {

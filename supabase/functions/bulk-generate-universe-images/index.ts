@@ -112,7 +112,7 @@ async function generateOne(u: any, size = "1024x1024") {
     console.log(`🎨 Generating image for universe: ${u.id}`)
     
     const prompt = u.image_prompt || 
-      `Cinematic key art for "${u.title || u.id}" classroom adventure, child-friendly, vibrant, high detail, no text. Educational theme with books, science elements, discovery and adventure. Perfect for students aged 8-16.`
+      `Cinematic key art for "${u.title || u.id}" professional adventure, inspiring, vibrant, high detail, no text. Professional theme with modern equipment, discovery and innovation. Perfect for adventurous learning.`
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
     
