@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
         model: "gpt-image-1",
         prompt: fullPrompt,
         n: 1,
-        size: "1792x1024", // 16:9 banner format for adventure covers
+        size: "1536x1024", // 16:9-ish banner format, OpenAI supported size
         quality: "high",
         output_format: "webp",
       }),
