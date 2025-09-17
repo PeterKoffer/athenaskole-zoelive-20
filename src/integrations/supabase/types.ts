@@ -59,6 +59,33 @@ export type Database = {
         }
         Relationships: []
       }
+      adventure_settings: {
+        Row: {
+          adventure_id: string
+          class_id: string
+          id: string
+          settings: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          adventure_id: string
+          class_id: string
+          id?: string
+          settings: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          adventure_id?: string
+          class_id?: string
+          id?: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       adventures: {
         Row: {
           created_at: string
@@ -606,6 +633,107 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      image_assets: {
+        Row: {
+          adventure_id: string | null
+          ahash: string
+          alt_text: string | null
+          attribution_required: boolean | null
+          bytes: number
+          consistency_tag: string | null
+          created_at: string | null
+          created_by: string | null
+          height: number
+          id: string
+          mime: string
+          model: string | null
+          moderation: Json | null
+          negative_prompt: string | null
+          palette: Json | null
+          phase_id: string | null
+          prompt: string | null
+          provider: string | null
+          provider_terms_url: string | null
+          reusable: boolean | null
+          seed: string | null
+          storage_path: string
+          style_pack: string | null
+          subjects: string[] | null
+          tags: string[] | null
+          usage_count: number | null
+          variant_of: string | null
+          width: number
+        }
+        Insert: {
+          adventure_id?: string | null
+          ahash: string
+          alt_text?: string | null
+          attribution_required?: boolean | null
+          bytes: number
+          consistency_tag?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          height: number
+          id?: string
+          mime: string
+          model?: string | null
+          moderation?: Json | null
+          negative_prompt?: string | null
+          palette?: Json | null
+          phase_id?: string | null
+          prompt?: string | null
+          provider?: string | null
+          provider_terms_url?: string | null
+          reusable?: boolean | null
+          seed?: string | null
+          storage_path: string
+          style_pack?: string | null
+          subjects?: string[] | null
+          tags?: string[] | null
+          usage_count?: number | null
+          variant_of?: string | null
+          width: number
+        }
+        Update: {
+          adventure_id?: string | null
+          ahash?: string
+          alt_text?: string | null
+          attribution_required?: boolean | null
+          bytes?: number
+          consistency_tag?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          height?: number
+          id?: string
+          mime?: string
+          model?: string | null
+          moderation?: Json | null
+          negative_prompt?: string | null
+          palette?: Json | null
+          phase_id?: string | null
+          prompt?: string | null
+          provider?: string | null
+          provider_terms_url?: string | null
+          reusable?: boolean | null
+          seed?: string | null
+          storage_path?: string
+          style_pack?: string | null
+          subjects?: string[] | null
+          tags?: string[] | null
+          usage_count?: number | null
+          variant_of?: string | null
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "image_assets_variant_of_fkey"
+            columns: ["variant_of"]
+            isOneToOne: false
+            referencedRelation: "image_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       knowledge_component_mastery: {
         Row: {
@@ -1674,6 +1802,46 @@ export type Database = {
       purge_old_events: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      search_images: {
+        Args: {
+          p_consistency?: string
+          p_limit?: number
+          p_style?: string
+          p_subject?: string
+          p_tag?: string
+          q?: string
+        }
+        Returns: {
+          adventure_id: string | null
+          ahash: string
+          alt_text: string | null
+          attribution_required: boolean | null
+          bytes: number
+          consistency_tag: string | null
+          created_at: string | null
+          created_by: string | null
+          height: number
+          id: string
+          mime: string
+          model: string | null
+          moderation: Json | null
+          negative_prompt: string | null
+          palette: Json | null
+          phase_id: string | null
+          prompt: string | null
+          provider: string | null
+          provider_terms_url: string | null
+          reusable: boolean | null
+          seed: string | null
+          storage_path: string
+          style_pack: string | null
+          subjects: string[] | null
+          tags: string[] | null
+          usage_count: number | null
+          variant_of: string | null
+          width: number
+        }[]
       }
       submit_score: {
         Args: { p_game_id: string; p_meta?: Json; p_score: number }

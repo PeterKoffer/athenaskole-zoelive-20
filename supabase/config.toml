@@ -1,5 +1,8 @@
 project_id = "yphkfkpfdpdmllotpqua"
 
+[functions.adventure-settings]
+verify_jwt = true
+
 [functions.cover-generator]
 verify_jwt = false
 
