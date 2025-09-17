@@ -184,6 +184,13 @@ Deno.serve(async (req) => {
       keyElements = 'world maps, cultural artifacts, international flags, language materials';
       props = 'world globes, cultural items, language books, international flags, communication devices';
     
+    // Gaming & Entertainment  
+    } else if (titleLower.includes('escape room') || idLower.includes('escape-room')) {
+      setting = 'a mysterious escape room puzzle chamber';
+      environment = 'immersive themed room with locks, puzzles, and hidden compartments';
+      keyElements = 'combination locks, puzzle boxes, hidden keys, mysterious symbols, cryptic clues';
+      props = 'locked boxes, padlocks, puzzle pieces, magnifying glasses, cipher wheels, hidden compartments';
+    
     // Arts & Media
     } else if (titleLower.includes('music') || titleLower.includes('sound') || titleLower.includes('audio')) {
       setting = 'a music production studio';
