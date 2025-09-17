@@ -104,6 +104,18 @@ Deno.serve(async (req) => {
       keyElements = 'design mockups, color swatches, typography samples, brand identity materials';
       props = 'design tablets, color wheels, font samples, logo sketches, brand boards';
     
+    // Automotive & AI
+    } else if (titleLower.includes('self-driving') || titleLower.includes('autonomous') || titleLower.includes('car ai') || titleLower.includes('vehicle ai')) {
+      setting = 'an autonomous vehicle testing facility and AI development center';
+      environment = 'high-tech automotive lab with self-driving cars and computer vision displays';
+      keyElements = 'autonomous vehicles, AI computer screens, sensor arrays, camera systems, radar displays';
+      props = 'self-driving cars, computer monitors with AI code, LIDAR sensors, cameras, automotive equipment';
+    } else if (titleLower.includes('robot') || titleLower.includes('automation') || titleLower.includes('ai')) {
+      setting = 'a robotics laboratory or automation facility';
+      environment = 'modern tech lab with robotic equipment and programming stations';
+      keyElements = 'robotic arms, circuit boards, programming interfaces, mechanical components';
+      props = 'robots, circuit boards, computers, sensors, mechanical parts, programming displays';
+    
     // Agriculture & Farming
     } else if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
       setting = 'a modern vertical farming facility';
@@ -275,9 +287,47 @@ Deno.serve(async (req) => {
   };
   
   const prompt = buildCinematicPrompt(universeId, titleIn);
+  
+  // DEBUG: Log what we're generating for
+  console.log("[image-ensure] Adventure details:", { 
+    universeId, 
+    titleIn, 
+    titleLower: titleIn.toLowerCase(),
+    idLower: universeId.toLowerCase()
+  });
 
-  try {
-    console.log("[image-ensure] Starting OpenAI image generation...", { prompt, openaiSize });
+    // ---- 3) Check if image exists in storage first (with version check)
+    const promptVersion = 'v2'; // Increment when prompt logic changes
+    const expectedPath = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
+    
+    console.log("[image-ensure] Checking for existing image at:", expectedPath);
+    const { data: existingFile } = await supa.storage.from(bucket).list(`${universeId}/${gradeInt}`, {
+      search: `cover-${promptVersion}.webp`
+    });
+
+    if (existingFile && existingFile.length > 0) {
+      const file = existingFile[0];
+      if (file.metadata?.size && file.metadata.size >= minBytes) {
+        console.log("[image-ensure] Found existing image with correct version, returning:", expectedPath);
+        const { data: publicUrl } = supa.storage.from(bucket).getPublicUrl(expectedPath);
+        return good({
+          impl: "storage-existing",
+          width: width,
+          height: height, 
+          bucket,
+          path: expectedPath,
+          publicUrl: publicUrl.publicUrl
+        });
+      }
+    }
+
+    console.log("[image-ensure] No suitable existing image found, generating new one...");
+    console.log("[image-ensure] Full prompt being sent:", prompt);
+    
+    // Check if this looks like a generic prompt (debugging)
+    if (prompt.includes('learning adventure focused on') && !prompt.includes('autonomous') && !prompt.includes('animation') && !prompt.includes('farm')) {
+      console.log("[image-ensure] WARNING: Using generic fallback prompt! This shouldn't happen for specific adventures.");
+    }
     
     // ---- 1) Generate via OpenAI
     const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
@@ -330,7 +380,9 @@ Deno.serve(async (req) => {
 
     // ---- 4) Upload to Storage
     // Use the expected path format: universeId/gradeInt/cover.webp
-    const path = `${universeId}/${gradeInt}/cover.webp`;
+    // Add version suffix to force regeneration when prompts change
+    const promptVersion = 'v2'; // Increment when prompt logic changes
+    const path = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
     const up = await supa.storage.from(bucket).upload(path, bytes, {
       contentType: "image/webp", // Always save as webp for consistency
       upsert: true,
