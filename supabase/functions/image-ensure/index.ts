@@ -323,16 +323,20 @@ Deno.serve(async (req) => {
   try {
     // ---- 3) Check if image exists in storage first (with version check)
     const promptVersion = 'v3'; // Increment when prompt logic changes
-    const expectedPath = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
+    const expectedPath = `${universeId}/${gradeInt}/cover.webp`;
     
     console.log("[image-ensure] Checking for existing image at:", expectedPath);
+    
+    // Check if we have a version marker in metadata to know if regeneration is needed
     const { data: existingFile } = await supa.storage.from(bucket).list(`${universeId}/${gradeInt}`, {
-      search: `cover-${promptVersion}.webp`
+      search: `cover.webp`
     });
 
     if (existingFile && existingFile.length > 0) {
       const file = existingFile[0];
-      if (file.metadata?.size && file.metadata.size >= minBytes) {
+      // Check if file is large enough AND was generated with current prompt version
+      const hasCurrentVersion = file.metadata?.promptVersion === promptVersion;
+      if (file.metadata?.size && file.metadata.size >= minBytes && hasCurrentVersion) {
         console.log("[image-ensure] Found existing image with correct version, returning:", expectedPath);
         const { data: publicUrl } = supa.storage.from(bucket).getPublicUrl(expectedPath);
         return good({
@@ -343,6 +347,8 @@ Deno.serve(async (req) => {
           path: expectedPath,
           publicUrl: publicUrl.publicUrl
         });
+      } else {
+        console.log("[image-ensure] Existing image outdated or too small, regenerating...");
       }
     }
 
@@ -405,11 +411,26 @@ Deno.serve(async (req) => {
 
     // ---- 4) Upload to Storage
     // Use the expected path format: universeId/gradeInt/cover.webp
-    // Add version suffix to force regeneration when prompts change
-    const path = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
+    // Add version metadata to track when images need regeneration
+    const path = `${universeId}/${gradeInt}/cover.webp`;
     const up = await supa.storage.from(bucket).upload(path, bytes, {
       contentType: "image/webp", // Always save as webp for consistency
       upsert: true,
+      metadata: {
+        promptVersion: promptVersion, // Track version for cache invalidation
+        generatedAt: new Date().toISOString(),
+        adventureSpecific: true
+      }
+    });
+    const up = await supa.storage.from(bucket).upload(path, bytes, {
+      contentType: "image/webp", // Always save as webp for consistency
+      upsert: true,
+      metadata: {
+        promptVersion: promptVersion, // Track version for cache invalidation
+        generatedAt: new Date().toISOString(),
+        adventureSpecific: true
+      }
+    });
     });
     if (up.error) return bad(`Storage upload failed: ${up.error.message}`, 502);
 
