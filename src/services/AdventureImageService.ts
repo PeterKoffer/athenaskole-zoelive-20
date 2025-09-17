@@ -4,6 +4,49 @@ import { AgeGroup, gradeToAgeGroup } from '@/lib/imageProfiles';
 export class AdventureImageService {
   
   /**
+   * Archive old generic images and reset generation flags
+   */
+  static async archiveOldImages(): Promise<{
+    archivedImages: number;
+    archiveFolder: string;
+    message: string;
+  }> {
+    const { data, error } = await supabase.functions.invoke('archive-old-images');
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
+   * Regenerate ALL adventure images with new cinematic system
+   */
+  static async regenerateAllImages(options: {
+    batchSize?: number;
+    ageGroups?: AgeGroup[];
+    forceRegenerate?: boolean;
+  } = {}): Promise<{
+    processed: number;
+    successful: number;
+    failed: number;
+    ageGroups: AgeGroup[];
+  }> {
+    // First archive old images if requested
+    if (options.forceRegenerate) {
+      console.log('Archiving old images before regeneration...');
+      await this.archiveOldImages();
+    }
+
+    // Then generate new ones
+    return this.generateAgeImages({
+      batchSize: options.batchSize || 10,
+      ageGroups: options.ageGroups || ['child', 'teen', 'adult']
+    });
+  }
+  
+  /**
    * Import adventures from JSON data
    */
   static async importAdventures(adventures: any[]): Promise<{
