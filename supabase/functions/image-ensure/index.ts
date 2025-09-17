@@ -1,5 +1,5 @@
 // @ts-nocheck
-// supabase/functions/image-ensure/index.ts
+// supabase/functions/image-ensure/index.ts - Fixed quality param for gpt-image-1
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
