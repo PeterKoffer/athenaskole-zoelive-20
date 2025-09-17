@@ -42,14 +42,16 @@ const MAP: Array<[RegExp, string]> = [
     "active construction site with tower cranes, scaffolding, and blueprints on a table"],
   [/news|journalis|podcast|broadcast/i,
     "newsroom / podcast studio with cameras, boom mics, light panels, editing bays"],
-  [/hospital|clinic|medical|er|wellness/i,
-    "modern diagnostics room with ultrasound/ECG equipment, clinicians conferring"],
   [/kitchen|culinary|restaurant|food truck/i,
     "professional kitchen line with stainless counters and the pass"],
   [/earthquake|seismic|tremor|geological/i,
     "seismology research lab with earthquake monitoring equipment, seismographs, geological rock samples"],
   [/national park|park manager|conservation/i,
     "park ranger station with trail maps, wildlife monitoring equipment, conservation research center"],
+  [/anti.?bullying|campaign|advocacy|social.?change/i,
+    "community outreach center with campaign materials, advocacy posters, meeting space with presentation boards"],
+  [/budget|financial|accounting|economics/i,
+    "modern financial planning office with charts, calculators, budget spreadsheets on monitors"],
 ];
 
 function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: PromptInput): string {
@@ -209,7 +211,7 @@ Deno.serve(async (req) => {
         model: "gpt-image-1",
         prompt: fullPrompt,
         n: 1,
-        size: "1536x1024", // 16:9-ish banner format, OpenAI supported size
+        size: "1024x576", // True 16:9 ratio for perfect banner framing
         quality: "high",
         output_format: "webp",
       }),
