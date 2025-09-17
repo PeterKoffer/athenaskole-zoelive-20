@@ -648,8 +648,6 @@ Deno.serve(async (req) => {
     ].join(" — ");
   }
   
-  const prompt = buildCinematicPrompt(universeId, titleIn);
-  
   // DEBUG: Log what we're generating for
   console.log("[image-ensure] Adventure details:", { 
     universeId, 
@@ -695,6 +693,8 @@ Deno.serve(async (req) => {
       console.log("[image-ensure] No existing cover.webp found, will generate new one");
     }
 
+    const prompt = buildCinematicPrompt(universeId, titleIn);
+    
     console.log("[image-ensure] No suitable existing image found, generating new one...");
     console.log("[image-ensure] Full prompt being sent:", prompt);
     
