@@ -58,7 +58,7 @@ export default function TodaysAdventure() {
       setLoading(true);
       
       // Call our new edge function to generate the lesson
-      const { data: lessonData, error } = await supabase.functions.invoke('generate-adventure-lesson', {
+      const { data: lessonData, error } = await supabase.functions.invoke('generate-adventure-multipart', {
         body: {
           adventure: {
             id: universe.id,
