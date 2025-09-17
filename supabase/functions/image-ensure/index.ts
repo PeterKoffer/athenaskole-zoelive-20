@@ -149,8 +149,15 @@ Deno.serve(async (req) => {
     const finalMode = (requestedMode === "classroom" && isClassroomAllowed(titleIn)) ? "classroom" : "professional";
     const fullPrompt = buildSinglePrompt(titleIn, finalMode);
     
-    console.log("[image-ensure] FINAL MODE:", finalMode);
-    console.log("[image-ensure] SINGLE PROMPT:", fullPrompt);
+    console.log("[image-ensure] ===== PROMPT DETAILS =====");
+    console.log("[image-ensure] Title:", titleIn);
+    console.log("[image-ensure] Universe ID:", universeId);
+    console.log("[image-ensure] Requested Mode:", requestedMode);
+    console.log("[image-ensure] Final Mode:", finalMode);
+    console.log("[image-ensure] Classroom Allowed:", isClassroomAllowed(titleIn));
+    console.log("[image-ensure] ===== FULL PROMPT BEING SENT TO OPENAI =====");
+    console.log("[image-ensure] PROMPT:", fullPrompt);
+    console.log("[image-ensure] ===== END PROMPT =====");
 
     // Generate image with OpenAI
     const openaiResponse = await fetch("https://api.openai.com/v1/images/generations", {
