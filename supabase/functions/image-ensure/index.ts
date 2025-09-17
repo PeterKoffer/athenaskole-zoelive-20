@@ -46,6 +46,10 @@ const MAP: Array<[RegExp, string]> = [
     "modern diagnostics room with ultrasound/ECG equipment, clinicians conferring"],
   [/kitchen|culinary|restaurant|food truck/i,
     "professional kitchen line with stainless counters and the pass"],
+  [/earthquake|seismic|tremor|geological/i,
+    "seismology research lab with earthquake monitoring equipment, seismographs, geological rock samples"],
+  [/national park|park manager|conservation/i,
+    "park ranger station with trail maps, wildlife monitoring equipment, conservation research center"],
 ];
 
 function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: PromptInput): string {
@@ -171,8 +175,14 @@ Deno.serve(async (req) => {
 
     // THE ONLY PROMPT BUILDER - NO OTHER PROMPTS ALLOWED
     const finalMode = (requestedMode === "classroom" && isClassroomAllowed(titleIn)) ? "classroom" : "pro";
+    
+    // Convert universe ID to proper title for adventure-specific prompts
+    const adventureTitle = titleIn === "cover" ? 
+      universeId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 
+      titleIn;
+    
     const fullPrompt = buildAdventurePrompt({
-      title: titleIn,
+      title: adventureTitle,
       subject: body.subject ?? query.subject,
       tags: body.tags ?? query.tags ?? [],
       mode: finalMode
