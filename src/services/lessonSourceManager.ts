@@ -264,7 +264,7 @@ export class LessonSourceManager {
         gradeRange: gradeBand,
         durationMinutes: 150,
         summary: "An engaging exploration of scientific concepts through hands-on activities and discovery.",
-        imagePrompt: "Educational science laboratory scene with colorful experiments, students engaged in discovery, modern classroom setting, bright and inspiring atmosphere",
+        imagePrompt: "Professional science laboratory scene with advanced equipment, research facility environment, cinematic lighting, no classrooms",
         hero: {
           title: "Science Discovery Lab",
           subtitle: "Explore, experiment, and discover the wonders of science",

@@ -33,7 +33,7 @@ export async function generateActivityImage(prompt?: string, phaseType: "cover" 
   const enhancedPrompt = buildImagePrompt({
     style: "kidbook-gouache",
     subject: prompt,
-    setting: "educational classroom or school environment, age-appropriate props and materials",
+    setting: "professional research environment, modern laboratory, scientific workspace, no classrooms",
     consistency: `NELIE-activity-v2-${phaseType}`
   });
   
