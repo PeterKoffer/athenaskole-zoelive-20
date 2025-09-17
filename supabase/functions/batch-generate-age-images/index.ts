@@ -32,17 +32,92 @@ const styleByAgeGroup = {
   },
 };
 
-// Import the new cinematic prompt engine
-async function importPromptEngine() {
-  try {
-    // Dynamic import of the prompt engine modules
-    const { buildImagePrompts } = await import('../../../src/services/imagePromptEngine.ts');
-    const { getDomainFromTitle } = await import('../../../src/config/propsBanks.ts');
-    return { buildImagePrompts, getDomainFromTitle };
-  } catch (error) {
-    console.warn('Could not load new prompt engine, falling back to legacy:', error);
-    return null;
+// Embedded domain detection and prompt generation for edge function
+function getDomainFromTitle(title: string): string {
+  const titleLower = title.toLowerCase();
+  
+  if (titleLower.includes('food') || titleLower.includes('truck') || titleLower.includes('restaurant'))
+    return 'food-truck';
+  if (titleLower.includes('vertical') || titleLower.includes('farm') || titleLower.includes('hydroponic'))
+    return 'vertical-farm';
+  if (titleLower.includes('negotiation') || titleLower.includes('deal') || titleLower.includes('business'))
+    return 'negotiation';
+  if (titleLower.includes('rocket') || titleLower.includes('water') || titleLower.includes('launch'))
+    return 'water-rocket';
+  if (titleLower.includes('toy') || titleLower.includes('design') || titleLower.includes('prototype'))
+    return 'toy-design';
+  if (titleLower.includes('constitution') || titleLower.includes('founding') || titleLower.includes('democracy'))
+    return 'constitution';
+  
+  return 'vertical-farm'; // Default fallback
+}
+
+function buildCinematicPrompt(adventureId: string, title: string, ageGroup: string): string {
+  const titleLower = title.toLowerCase();
+  const idLower = adventureId.toLowerCase();
+  
+  // Adventure-specific contexts
+  let setting = 'a learning adventure focused on ' + title;
+  let environment = 'modern educational classroom or learning space';
+  let keyElements = 'educational materials, learning tools, collaborative workspace';
+  let props = 'learning materials, books, tools, presentation boards';
+  
+  if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
+    setting = 'a modern vertical farming facility';
+    environment = 'indoor hydroponic tower garden with LED grow lights';
+    keyElements = 'stacked growing towers, LED panels, nutrient systems, fresh vegetables';
+    props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
+  } else if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
+    setting = 'a business negotiation workshop';
+    environment = 'professional meeting room or classroom setup';
+    keyElements = 'meeting tables, presentation boards, handshake moments, business materials';
+    props = 'meeting tables, chairs, notebooks, presentation materials, name tags';
+  } else if (titleLower.includes('toy line') || idLower.includes('toy') || titleLower.includes('design')) {
+    setting = 'a toy design and manufacturing workshop';
+    environment = 'creative design studio with prototyping materials';
+    keyElements = 'toy prototypes, design sketches, colorful materials, craft supplies';
+    props = 'craft materials, design tools, toy prototypes, sketch pads, markers';
+  } else if (titleLower.includes('water rocket') || idLower.includes('rocket') || titleLower.includes('rube goldberg')) {
+    setting = 'a rocket launch competition area or engineering workshop';
+    environment = 'outdoor launch field with safety equipment and measuring tools, or indoor workshop with engineering materials';
+    keyElements = 'rockets, launch pads, trajectory paths, measuring equipment, engineering contraptions';
+    props = 'rockets, launch pads, safety goggles, measuring tapes, engineering materials, pulleys, ramps';
+  } else if (titleLower.includes('constitutional') || idLower.includes('constitution')) {
+    setting = 'a historical constitutional convention';
+    environment = 'colonial-style meeting hall with period furniture';
+    keyElements = 'colonial architecture, founding documents, quill pens, historical furniture';
+    props = 'wooden desks, quill pens, parchment, candles, colonial chairs';
   }
+  
+  // Age-appropriate subject prefixes
+  const ageConfig = cinematicStylesByAgeGroup[ageGroup] || cinematicStylesByAgeGroup.teen;
+  const subjectPrefix = ageConfig.subjectPrefix;
+  
+  const consistency = `NELIE-cin-real-01 ${adventureId.replace(/[^a-z0-9]/gi, '-')}`;
+  
+  return [
+    "cinematic stylized realism",
+    "high-end animation film aesthetic", 
+    "soft PBR materials",
+    "depth-of-field bokeh",
+    `cinematic establishing shot of ${setting}, showing ${keyElements}`,
+    `${subjectPrefix} ${environment}, ${props}`,
+    "wide establishing, 35mm anamorphic, eye-level, gentle parallax",
+    "golden hour backlight, soft rim, warm bounce",
+    ageConfig.colorOverride || "teal & warm amber cinematic grade",
+    ageConfig.moodOverride || "hopeful, inviting, educational",
+    "age-appropriate, wholesome",
+    "no text overlay, no brand logos",
+    `CONSISTENCY_TAG: ${consistency}`
+  ].join(" — ");
+}
+
+async function importPromptEngine() {
+  // Return embedded functions instead of trying to import
+  return {
+    buildImagePrompts: null, // We'll use buildCinematicPrompt instead
+    getDomainFromTitle
+  };
 }
 
 // Age group specific cinematic styles
@@ -78,46 +153,21 @@ async function buildCinematicAgeGroupPrompt(
 ): Promise<AgeGroupPrompt> {
   const promptEngine = await importPromptEngine();
   
-  if (promptEngine) {
-    try {
-      const { buildImagePrompts, getDomainFromTitle } = promptEngine;
-      const domain = getDomainFromTitle(universeTitle);
-      const style = cinematicStylesByAgeGroup[ageGroup];
-      
-      // Create age-specific subject line
-      const subjectLine = `${style.subjectPrefix} ${universeTitle} adventure, ${description || 'hands-on learning experience'}`;
-      
-      const prompts = buildImagePrompts("cover", {
-        adventureId: universeId,
-        domain,
-        title: universeTitle,
-        subjectLine,
-        stylePackId: style.stylePackId,
-        realismBlend: style.realismBlend,
-        consistencyTag: `NELIE-${ageGroup}-${domain}`,
-        avoid: ["classroom", "readable text", "grade signs", "brand logos", "generic education"],
-        variantSalt: ageGroup === 'child' ? 1 : ageGroup === 'teen' ? 2 : 3
-      });
-      
-      // Override mood and color for age group
-      let finalPrompt = prompts[0].prompt;
-      if (style.moodOverride) {
-        finalPrompt = finalPrompt.replace(/hopeful, inviting, educational|curious, hands-on, focused|energetic, festival-like, welcoming|calm, precise, craftsmanlike/g, style.moodOverride);
-      }
-      if (style.colorOverride) {
-        finalPrompt = finalPrompt.replace(/teal & warm amber cinematic grade|butter yellow, forest green, sky blue|coral, seafoam, lilac accents|terracotta, sage, powder blue|deep navy, saffron, mint highlights/g, style.colorOverride);
-      }
-      
-      return {
-        prompt: finalPrompt,
-        negative_prompt: prompts[0].negative,
-        size: ageGroup === 'child' ? '1024x1024' : '1280x720',
-        aspect_ratio: ageGroup === 'child' ? '1:1' : '16:9'
-      };
-    } catch (error) {
-      console.warn('Error using new prompt engine, falling back:', error);
-    }
-  }
+  // Use embedded cinematic prompt generation
+  const { getDomainFromTitle } = promptEngine;
+  const style = cinematicStylesByAgeGroup[ageGroup];
+  
+  // Generate the cinematic prompt directly
+  const finalPrompt = buildCinematicPrompt(universeId, universeTitle, ageGroup);
+  
+  const baseNegativePrompt = "text, watermark, logo, low-res, blurry, extra fingers, deformed hands, gore, hyperreal skin, sexualized, noisy background, posterized, oversaturated";
+  
+  return {
+    prompt: finalPrompt,
+    negative_prompt: baseNegativePrompt + ', uncanny valley, waxy skin, readable text, grade signs, brand logos',
+    size: ageGroup === 'child' ? '1024x1024' : '1280x720',
+    aspect_ratio: ageGroup === 'child' ? '1:1' : '16:9'
+  };
   
   // Fallback to enhanced legacy system with cinematic elements
   const legacyStyle = styleByAgeGroup[ageGroup];
