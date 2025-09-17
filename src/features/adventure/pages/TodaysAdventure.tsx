@@ -203,14 +203,14 @@ export default function TodaysAdventure() {
                   </div>
                 </div>
 
-                {/* Adventure Image */}
+                {/* Adventure Image - Full size for perfect framing */}
                 <div className="rounded-xl overflow-hidden">
                   {data.universe?.metadata?.gradeInt ? (
                     <UniverseImage
                       universeId={data.universe.id}
                       gradeInt={data.universe.metadata.gradeInt}
                       title={data.universe.title}
-                      className="w-full h-64 object-cover"
+                      className="w-full aspect-video object-cover"
                       alt={`Learning Adventure: ${data.universe.title}`}
                       width={1024}
                       height={576}
@@ -219,7 +219,7 @@ export default function TodaysAdventure() {
                     <img 
                       src={data.universe?.title?.includes('Digital Detox') ? digitalDetoxCover : adventureIllustration} 
                       alt={`Learning Adventure: ${data.universe?.title || 'Adventure'}`}
-                      className="w-full h-64 object-cover"
+                      className="w-full aspect-video object-cover"
                     />
                   )}
                 </div>
@@ -232,20 +232,6 @@ export default function TodaysAdventure() {
                   </p>
                 </div>
 
-                {/* Adventure Activities Preview */}
-                {data.content?.activities && (
-                  <div className="bg-black/20 rounded-lg p-6 border border-white/10">
-                    <h4 className="text-lg font-semibold text-white mb-4">What Awaits You Today</h4>
-                    <div className="space-y-3 text-white/90">
-                      {data.content.activities.slice(0, 3).map((activity: any, index: number) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <div className={`w-2 h-2 ${index % 2 === 0 ? 'bg-cyan-400' : 'bg-purple-400'} rounded-full mt-2 flex-shrink-0`}></div>
-                          <p className="text-sm">{activity.instructions || activity.title}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {/* Start Button */}
                 <div className="flex justify-center pt-4">
