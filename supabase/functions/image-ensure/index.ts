@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
         model: "gpt-image-1",
         prompt: fullPrompt,
         n: 1,
-        size: "1024x1024",
+        size: "1792x1024", // 16:9 aspect ratio for video containers
         quality: "high",
         output_format: "webp",
       }),
