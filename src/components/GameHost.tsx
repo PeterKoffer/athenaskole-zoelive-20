@@ -31,7 +31,7 @@ export function GameHost({
       if (!game) { root.innerText = `Game not found: ${gameId}`; return; }
 
       if (!allowStart) {
-        root.innerHTML = `<div class="p-4 text-sm">Afslut kerneopgaven for at låse op for spillet.</div>`;
+        root.innerHTML = `<div class="p-4 text-sm">Complete the core task to unlock the game.</div>`;
         return;
       }
 

@@ -1,0 +1,5 @@
+Adventure: {{title}} ({{grade}}. klasse)
+Tema: {{theme}}
+Stil: børnevenlig, filmisk, konkrete sanser (lys, lyde, lugte)
+Fokus: spor om {{subject_hints}}
+Elev: {{student_name}}, interesser: {{interests}}

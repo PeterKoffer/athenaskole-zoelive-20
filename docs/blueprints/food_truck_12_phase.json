@@ -1,0 +1,186 @@
+{
+  "version": "nelie.adventure.v1",
+  "adventure": {
+    "id": "food-truck-van",
+    "title": "Food Truck Mission (12-phase day)",
+    "forhistory_hook": {
+      "text": "Du finder en gammel varevogn ved skolens hegn med en gulnet seddel: \"Bevis din vision inden solnedgang, så er vognen din.\" I dag forvandler du den til en food truck.",
+      "image_prompt": "children's storybook gouache — student converting an old van into a cozy food truck, schoolyard bunting, warm golden hour — age-appropriate — no text overlay — CONSISTENCY_TAG: NELIE-kidbook-gouache-01 food-truck"
+    },
+    "learning_goals": [
+      { "subject": "Mathematics", "curriculum_ref": "DK/Mat/5.N1.2", "goal": "Brøker/procenter, budget, break-even og dækningsbidrag." },
+      { "subject": "Language Lab", "curriculum_ref": "DK/Eng/5.CC1", "goal": "Slogan, pitch og flersprogede menutekster (EN + ES/IT)." },
+      { "subject": "Science", "curriculum_ref": "DK/Nat/5.FS2.1", "goal": "Fødevaresikkerhed, temperaturer og kølekæde." },
+      { "subject": "Creative Arts", "curriculum_ref": "DK/Krea/5.D1", "goal": "Logo, farvepalet og menu-layout." },
+      { "subject": "Entrepreneurship", "curriculum_ref": "DK/Erh/5.E1", "goal": "Plan, KPI'er, kunderejse og pitch." }
+    ],
+    "parameters": {
+      "grade": 5,
+      "curriculum": "DK-Common",
+      "lesson_duration_minutes": 180,
+      "student_ability": "mixed",
+      "learning_style": ["visual","kinesthetic"]
+    },
+    "timebox_policy": {
+      "total_minutes": 180,
+      "phase_budgeting": "fixed_core+elastic_enrichment",
+      "checkpoint_every_minutes": 15,
+      "grace_period_minutes": 5,
+      "fallback_rule": "prefer_core_completion_over_enrichment"
+    },
+    "global_pacing_controls": {
+      "adaptive_levels": ["remedial","core","stretch"],
+      "mastery_gate_policy": "soft-gate-with-recap",
+      "branching_mode": "linear-core-with-optional-sidequests"
+    },
+    "phases": [
+      { "id": "p1", "name": "Hook + Diagnostic", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Aktivere motivation og tjekke matematisk forforståelse.",
+        "activities": [
+          { "type": "diagnostic_quickcheck", "subject": "Mathematics", "estimated_minutes": 8,
+            "adaptive": { "level_map": { "remedial": "3", "core": "5", "stretch": "7" } },
+            "success_criteria": ">= 70% korrekte"
+          },
+          { "type": "planning_note", "subject": "Entrepreneurship", "estimated_minutes": 5,
+            "input_spec": { "format": "short-note", "prompt": "Hvad vil gøre din truck unik i dag?" } }
+        ]
+      },
+      { "id": "p2", "name": "Math Core I: Procenter & Brøker", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Anvende procenter/brøker i pris og rabat.",
+        "activities": [
+          { "type": "applied_problem_set", "subject": "Mathematics", "estimated_minutes": 13,
+            "hints": 2, "scoring": { "auto": true, "partial_credit": true },
+            "generated": { "quiz_set": { "version": "quiz_set.v1",
+              "items": [
+                { "id": "m1", "type": "numeric", "stem": "Hvad er 3/4 af 20?", "answer": 15,
+                  "explanation": "20*3/4=15", "hints": ["1/4=5","Gange med 3"], "difficulty": "core" },
+                { "id": "m2", "type": "word-problem", "stem": "Rabat 25% på 120 kr. Ny pris?",
+                  "answer": 90, "explanation": "25% af 120=30; 120-30=90",
+                  "hints": ["25%=1/4","Træk fra"], "difficulty": "core" }
+              ],
+              "worked_examples": [{ "title": "Procentrabat", "steps": ["120 kr.","25% = 30 kr.","Ny pris 90 kr."] }]
+            } } }
+        ] },
+      { "id": "p3", "name": "Branding: Logo & Slogan", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Udvikle visuelt udtryk og slogan.",
+        "activities": [
+          { "type": "creative_asset", "subject": "Creative Arts", "estimated_minutes": 9,
+            "input_spec": { "format": "logo+palette", "tools": ["Canva","paper"] } },
+          { "type": "writing_prompt", "subject": "Language Lab", "estimated_minutes": 6,
+            "rubric": [
+              {"dimension":"klarhed","scale":"1-4"},
+              {"dimension":"målgruppe","scale":"1-4"},
+              {"dimension":"kreativitet","scale":"1-4"} ],
+            "generated": { "writing_task": { "version": "writing_task.v1",
+              "prompt": "Skriv 1 slogan + 1 sætning på spansk eller italiensk til en gæst.",
+              "rubric": [
+                {"dimension":"klarhed","scale":"1-4"},
+                {"dimension":"målgruppe","scale":"1-4"},
+                {"dimension":"kreativitet","scale":"1-4"} ],
+              "revision_prompts": ["Gør budskabet mere konkret"],
+              "model_answer": "Crunch & Glow — ¡Bienvenidos!" } } }
+        ] },
+      { "id": "p4", "name": "Supply & Budget Plan", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Planlæg indkøb, råvarer og budget.",
+        "activities": [
+          { "type": "applied_problem_set", "subject": "Mathematics", "estimated_minutes": 12,
+            "generated": { "quiz_set": { "version": "quiz_set.v1",
+              "items": [
+                { "id": "m3", "type": "word-problem", "stem": "Du køber 2×38 kr. og 3×19 kr. Totalsum?",
+                  "answer": 133, "explanation": "76+57=133", "hints": ["Gange først","Plus bagefter"],
+                  "difficulty": "remedial" } ] } } },
+          { "type": "planning_note", "subject": "Entrepreneurship", "estimated_minutes": 3,
+            "input_spec": { "format": "checklist", "items": ["Indkøbsliste A","Indkøbsliste B"] } }
+        ] },
+      { "id": "p5", "name": "Food Safety Scenarios", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Træffe sikre valg om opbevaring og temperatur.",
+        "activities": [
+          { "type": "scenario_decision", "subject": "Science", "estimated_minutes": 13,
+            "generated": { "scenario_set": { "version": "scenario_set.v1",
+              "feedback_mode": "immediate",
+              "cases": [
+                { "id": "s1", "situation": "Kylling har stået 3 timer uden køl.",
+                  "choices": [
+                    {"text":"Sælg","is_correct":false,"feedback":"Usikkert"},
+                    {"text":"Smid ud","is_correct":true,"feedback":"Korrekt"},
+                    {"text":"Genopvarm hårdt","is_correct":false,"feedback":"Stadig usikkert"} ] },
+                { "id": "s2", "situation": "Mayo står i 32°C sol.",
+                  "choices": [
+                    {"text":"Lad stå","is_correct":false,"feedback":"Risiko"},
+                    {"text":"Flyt til 4°C køl","is_correct":true,"feedback":"Sikkert"},
+                    {"text":"Skygge uden køl","is_correct":false,"feedback":"Utilstrækkeligt"} ] }
+              ] } } }
+        ] },
+      { "id": "p6", "name": "Language Lab: Bilingual Menu", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Formulere menulinjer på EN + ES/IT.",
+        "activities": [
+          { "type": "language_lab", "subject": "Language Lab", "estimated_minutes": 12,
+            "input_spec": { "format": "menu lines", "languages": ["EN","ES|IT"], "count": 2 },
+            "success_criteria": "Korrekt og appetitlig formulering" }
+        ] },
+      { "id": "p7", "name": "Finance: Break-even & Løn", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Beregne break-even pr. måned inkl. løn.",
+        "activities": [
+          { "type": "applied_problem_set", "subject": "Mathematics", "estimated_minutes": 13,
+            "generated": { "quiz_set": { "version": "quiz_set.v1",
+              "items": [
+                { "id": "m4", "type": "word-problem",
+                  "stem": "Faste omk. 3.500 kr./md + løn 12.000 kr./md. DB 28 kr./menu. Hvor mange menuer?",
+                  "answer": 553, "explanation": "(3500+12000)/28≈553.6 → 553",
+                  "hints": ["Læg faste omk.","Divider med DB"], "difficulty": "core" } ] } } }
+        ] },
+      { "id": "p8", "name": "Simulation I: Åbning", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Starte første salgsloop og overvåge KPI'er.",
+        "activities": [
+          { "type": "simulation_loop", "subject": "Cross", "estimated_minutes": 14,
+            "input_spec": { "loop": 1, "kpis": ["revenue","waste","customer_satisfaction"], "events": ["supplier_delay"] },
+            "success_criteria": "Positiv kundetilfredshed" }
+        ] },
+      { "id": "p9", "name": "Simulation II: Rush Hour", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Håndtere travlhed og justere priser/menu.",
+        "activities": [
+          { "type": "simulation_loop", "subject": "Cross", "estimated_minutes": 14,
+            "input_spec": { "loop": 2, "kpis": ["revenue","waste","customer_satisfaction"], "events": ["flat_tire","road_closure"] },
+            "success_criteria": "Stabil omsætning og lavt spild" }
+        ] },
+      { "id": "p10", "name": "Customer Service & Barrierer", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Løse sprogbarriere og service-situationer.",
+        "activities": [
+          { "type": "scenario_decision", "subject": "Language Lab", "estimated_minutes": 12,
+            "generated": { "scenario_set": { "version": "scenario_set.v1", "feedback_mode": "immediate",
+              "cases": [ { "id": "l1", "situation": "Kunde spørger på spansk om allergener.",
+                "choices": [
+                  {"text":"Ignorér","is_correct":false,"feedback":"Uhensigtsmæssigt"},
+                  {"text":"Svar på spansk med kort sikker info","is_correct":true,"feedback":"God service"},
+                  {"text":"Peg uden forklaring","is_correct":false,"feedback":"Uklar info"} ] } ] } } }
+        ] },
+      { "id": "p11", "name": "Pitch Rehearsal & Q&A", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Øve 60 sek pitch og svare på spørgsmål.",
+        "activities": [
+          { "type": "pitch_rehearsal", "subject": "Language Lab", "estimated_minutes": 9,
+            "input_spec": { "format": "oral", "notes": "slogan + 2 salgsargumenter" },
+            "success_criteria": "Tydelig struktur ≤ 60 sek" },
+          { "type": "qna_scenario", "subject": "Entrepreneurship", "estimated_minutes": 6,
+            "input_spec": { "questions": ["Hvordan håndterer du spidsbelastning?","Hvad gør du ved spild?"] } }
+        ] },
+      { "id": "p12", "name": "Exit Ticket & Mastery", "target_minutes": { "core": 15, "min": 10, "max": 20 },
+        "objective": "Refleksion og opsummering pr. fag.",
+        "activities": [
+          { "type": "exit_ticket", "subject": "Cross", "estimated_minutes": 10,
+            "generated": { "exit_ticket": { "version": "exit_ticket.v1",
+              "items": [
+                { "format": "short-reflection", "prompt": "Hvad kan du nu, som du ikke kunne før?" },
+                { "format": "self-rating", "prompt": "Hvor sikker føler du dig på dagens emner? (1–5)" } ],
+              "mastery_summary": true } } }
+        ] }
+    ],
+    "assessment_summary": {
+      "auto_scored": ["p2.applied_problem_set","p4.applied_problem_set","p5.scenario_decision","p8.simulation_loop","p9.simulation_loop","p10.scenario_decision"],
+      "teacher_review": ["p3.writing_prompt","p11.pitch_rehearsal"]
+    },
+    "time_adaptation_runtime_rules": [
+      { "if": "behind_schedule", "then": ["trim:enrichment","reduce:hints_by_1"] },
+      { "if": "ahead_of_schedule", "then": ["unlock:stretch","add:bonus_sidequest<=10m"] }
+    ]
+  }
+}
