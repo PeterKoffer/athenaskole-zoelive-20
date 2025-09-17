@@ -81,11 +81,64 @@ Deno.serve(async (req) => {
 
   const titleIn = String(body.title ?? query.title ?? "Today's Program");
   
-  // Import the new cinematic prompt engine
-  const { buildAdventurePrompt } = await import('../../../src/services/imagePromptEngine.ts');
+  // Cinematic prompt generation (embedded for edge function)
+  const buildCinematicPrompt = (universeId: string, title: string): string => {
+    const titleLower = title.toLowerCase();
+    const idLower = universeId.toLowerCase();
+    
+    // Adventure-specific contexts
+    let setting = 'a learning adventure focused on ' + title;
+    let environment = 'modern educational classroom or learning space';
+    let keyElements = 'educational materials, learning tools, collaborative workspace';
+    let props = 'learning materials, books, tools, presentation boards';
+    
+    if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
+      setting = 'a modern vertical farming facility';
+      environment = 'indoor hydroponic tower garden with LED grow lights';
+      keyElements = 'stacked growing towers, LED panels, nutrient systems, fresh vegetables';
+      props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
+    } else if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
+      setting = 'a business negotiation workshop';
+      environment = 'professional meeting room or classroom setup';
+      keyElements = 'meeting tables, presentation boards, handshake moments, business materials';
+      props = 'meeting tables, chairs, notebooks, presentation materials, name tags';
+    } else if (titleLower.includes('toy line') || idLower.includes('toy') || titleLower.includes('design')) {
+      setting = 'a toy design and manufacturing workshop';
+      environment = 'creative design studio with prototyping materials';
+      keyElements = 'toy prototypes, design sketches, colorful materials, craft supplies';
+      props = 'craft materials, design tools, toy prototypes, sketch pads, markers';
+    } else if (titleLower.includes('water rocket') || idLower.includes('rocket') || titleLower.includes('rube goldberg')) {
+      setting = 'a rocket launch competition area or engineering workshop';
+      environment = 'outdoor launch field with safety equipment and measuring tools, or indoor workshop with engineering materials';
+      keyElements = 'rockets, launch pads, trajectory paths, measuring equipment, engineering contraptions';
+      props = 'rockets, launch pads, safety goggles, measuring tapes, engineering materials, pulleys, ramps';
+    } else if (titleLower.includes('constitutional') || idLower.includes('constitution')) {
+      setting = 'a historical constitutional convention';
+      environment = 'colonial-style meeting hall with period furniture';
+      keyElements = 'colonial architecture, founding documents, quill pens, historical furniture';
+      props = 'wooden desks, quill pens, parchment, candles, colonial chairs';
+    }
+    
+    const consistency = `NELIE-cin-real-01 ${universeId.replace(/[^a-z0-9]/gi, '-')}`;
+    
+    return [
+      "cinematic stylized realism",
+      "high-end animation film aesthetic", 
+      "soft PBR materials",
+      "depth-of-field bokeh",
+      `cinematic establishing shot of ${setting}, showing ${keyElements}`,
+      `${environment}, ${props}`,
+      "wide establishing, 35mm anamorphic, eye-level, gentle parallax",
+      "golden hour backlight, soft rim, warm bounce",
+      "teal & warm amber cinematic grade",
+      "hopeful, inviting, educational",
+      "age-appropriate, wholesome",
+      "no text overlay, no brand logos",
+      `CONSISTENCY_TAG: ${consistency}`
+    ].join(" — ");
+  };
   
-  // Build cinematic adventure-specific prompt
-  const prompt = buildAdventurePrompt(universeId, titleIn, "cover");
+  const prompt = buildCinematicPrompt(universeId, titleIn);
 
   try {
     console.log("[image-ensure] Starting OpenAI image generation...", { prompt, openaiSize });
