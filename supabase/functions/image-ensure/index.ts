@@ -81,16 +81,347 @@ Deno.serve(async (req) => {
 
   const titleIn = String(body.title ?? query.title ?? "Today's Program");
   
-  // Cinematic prompt generation (embedded for edge function)
+  // Cinematic prompt generation - COMPREHENSIVE MAPPING FOR ALL ADVENTURES
   const buildCinematicPrompt = (universeId: string, title: string): string => {
     const titleLower = title.toLowerCase();
     const idLower = universeId.toLowerCase();
     
-    // Adventure-specific contexts
+    // Adventure-specific contexts - NO MORE CLASSROOM IMAGES!
     let setting = 'a learning adventure focused on ' + title;
-    let environment = 'modern educational classroom or learning space';
+    let environment = 'modern educational workspace';
     let keyElements = 'educational materials, learning tools, collaborative workspace';
-    let props = 'learning materials, books, tools, presentation boards';
+    let props = 'learning materials, tools, equipment';
+    
+    // === BUSINESS & ENTREPRENEURSHIP ===
+    if (titleLower.includes('food truck') || titleLower.includes('restaurant') || titleLower.includes('cafe') || titleLower.includes('kitchen') || titleLower.includes('culinary')) {
+      setting = 'a bustling food truck operation and commercial kitchen';
+      environment = 'vibrant street food scene with cooking equipment and serving areas';
+      keyElements = 'food truck, commercial kitchen, fresh ingredients, cooking equipment, happy customers';
+      props = 'food truck, grills, fresh vegetables, cooking utensils, menu boards, cash register';
+    } else if (titleLower.includes('record label') || titleLower.includes('music studio') || titleLower.includes('band') || titleLower.includes('audio') || titleLower.includes('sound')) {
+      setting = 'a professional music recording studio';
+      environment = 'state-of-the-art recording facility with mixing boards and sound equipment';
+      keyElements = 'recording booth, mixing console, microphones, musical instruments, sound waves';
+      props = 'recording equipment, microphones, headphones, musical instruments, vinyl records';
+    } else if (titleLower.includes('clothing') || titleLower.includes('fashion') || titleLower.includes('textile') || idLower.includes('clothing')) {
+      setting = 'a fashion design studio and manufacturing facility';
+      environment = 'creative workspace with mannequins, fabric samples, and sewing equipment';
+      keyElements = 'design sketches, fabric swatches, sewing machines, mannequins, clothing displays';
+      props = 'mannequins, fabric samples, sewing machines, measuring tape, fashion sketches';
+    } else if (titleLower.includes('pet adoption') || titleLower.includes('animal shelter') || titleLower.includes('veterinary') || titleLower.includes('animal care')) {
+      setting = 'a modern animal shelter and veterinary facility';
+      environment = 'caring environment with kennels, play areas, and medical equipment';
+      keyElements = 'animal kennels, happy pets, medical equipment, adoption forms, play areas';
+      props = 'dog kennels, pet toys, medical supplies, adoption paperwork, pet carriers';
+    } else if (titleLower.includes('movie theater') || titleLower.includes('cinema') || titleLower.includes('film') || titleLower.includes('theater management')) {
+      setting = 'a modern movie theater complex';
+      environment = 'entertainment venue with screening rooms and concession areas';
+      keyElements = 'movie screens, projection equipment, theater seats, film reels, popcorn stands';
+      props = 'projectors, film reels, theater seats, popcorn machines, movie posters';
+    } else if (titleLower.includes('sports team') || titleLower.includes('athletic') || titleLower.includes('stadium') || titleLower.includes('sports management')) {
+      setting = 'a professional sports stadium and training facility';
+      environment = 'athletic complex with playing fields, training equipment, and team areas';
+      keyElements = 'sports field, stadium seating, training equipment, team jerseys, scoreboards';
+      props = 'sports equipment, uniforms, training gear, scoreboards, athletic fields';
+    } else if (titleLower.includes('startup') || titleLower.includes('tech company') || titleLower.includes('entrepreneur') || titleLower.includes('business incubator')) {
+      setting = 'a modern startup incubator and co-working space';
+      environment = 'collaborative workspace with whiteboards, computers, and presentation areas';
+      keyElements = 'startup office, brainstorming sessions, pitch presentations, computer workstations';
+      props = 'whiteboards, laptops, presentation screens, sticky notes, business charts';
+    } else if (titleLower.includes('subscription box') || titleLower.includes('e-commerce') || titleLower.includes('online business')) {
+      setting = 'an e-commerce fulfillment center and subscription service facility';
+      environment = 'modern warehouse with packaging stations and shipping areas';
+      keyElements = 'subscription boxes, packaging stations, inventory shelves, shipping equipment';
+      props = 'cardboard boxes, packing materials, shipping labels, warehouse equipment';
+    } else if (titleLower.includes('eco-tourism') || titleLower.includes('tourism agency') || titleLower.includes('travel business')) {
+      setting = 'an eco-tourism center in a natural setting';
+      environment = 'outdoor adventure base with conservation displays and tour equipment';
+      keyElements = 'nature trails, tour equipment, conservation displays, outdoor gear';
+      props = 'hiking equipment, nature guides, conservation materials, outdoor gear';
+    
+    // === SCIENCE & TECHNOLOGY ===
+    } else if (titleLower.includes('mars') || titleLower.includes('space') || titleLower.includes('lunar') || titleLower.includes('colony') || titleLower.includes('satellite')) {
+      setting = 'a space mission control center and astronaut training facility';
+      environment = 'futuristic space facility with control panels and space equipment';
+      keyElements = 'mission control screens, space suits, rocket models, satellite displays';
+      props = 'space suits, control panels, space vehicles, scientific equipment, planet models';
+    } else if (titleLower.includes('submarine') || titleLower.includes('ocean') || titleLower.includes('underwater') || titleLower.includes('marine')) {
+      setting = 'an underwater research facility and marine laboratory';
+      environment = 'marine research center with aquariums and underwater viewing areas';
+      keyElements = 'marine specimens, underwater cameras, research equipment, ocean displays';
+      props = 'diving equipment, marine specimens, underwater cameras, research tools';
+    } else if (titleLower.includes('dinosaur') || titleLower.includes('paleontology') || titleLower.includes('fossil') || titleLower.includes('prehistoric')) {
+      setting = 'a paleontology dig site and natural history museum';
+      environment = 'excavation site with fossil discoveries and research facilities';
+      keyElements = 'fossil excavation, dinosaur bones, research tools, dig site, museum displays';
+      props = 'excavation tools, fossil bones, research equipment, dig site markers, museum cases';
+    } else if (titleLower.includes('volcano') || titleLower.includes('geological') || titleLower.includes('earthquake') || titleLower.includes('seismology')) {
+      setting = 'a volcanic monitoring station and geological research facility';
+      environment = 'scientific outpost with monitoring equipment and geological displays';
+      keyElements = 'seismic equipment, monitoring displays, geological samples, research stations';
+      props = 'seismic instruments, monitoring devices, geological samples, research equipment';
+    } else if (titleLower.includes('robot') || titleLower.includes('automation') || titleLower.includes('ai') || titleLower.includes('artificial intelligence')) {
+      setting = 'a robotics laboratory and AI development center';
+      environment = 'high-tech lab with robotic equipment and computer systems';
+      keyElements = 'robotic arms, AI displays, circuit boards, programming interfaces';
+      props = 'robots, circuit boards, computers, sensors, mechanical parts, programming displays';
+    } else if (titleLower.includes('particle accelerator') || titleLower.includes('physics') || titleLower.includes('quantum') || titleLower.includes('nuclear')) {
+      setting = 'a particle physics laboratory';
+      environment = 'advanced scientific facility with particle detection equipment';
+      keyElements = 'particle accelerator, scientific displays, research equipment, data visualization';
+      props = 'scientific instruments, computer displays, research equipment, laboratory tools';
+    } else if (titleLower.includes('fusion reactor') || titleLower.includes('energy research') || titleLower.includes('power plant')) {
+      setting = 'a clean energy research facility';
+      environment = 'advanced energy research center with reactor components and safety systems';
+      keyElements = 'energy equipment, control systems, research stations, safety equipment';
+      props = 'energy equipment, control panels, safety gear, monitoring equipment';
+    
+    // === ENGINEERING & CONSTRUCTION ===
+    } else if (titleLower.includes('skyscraper') || titleLower.includes('construction') || titleLower.includes('building') || titleLower.includes('architecture')) {
+      setting = 'a skyscraper construction site and architectural office';
+      environment = 'construction site with cranes and scaffolding, architectural planning areas';
+      keyElements = 'construction cranes, building blueprints, hard hats, scaffolding, architectural models';
+      props = 'construction equipment, blueprints, hard hats, measuring tools, building models, cranes';
+    } else if (titleLower.includes('bridge') || titleLower.includes('civil engineering') || titleLower.includes('infrastructure')) {
+      setting = 'a bridge construction site and civil engineering office';
+      environment = 'major infrastructure project with engineering equipment';
+      keyElements = 'bridge construction, engineering plans, construction vehicles, structural components';
+      props = 'engineering blueprints, construction equipment, measuring instruments, safety gear';
+    } else if (titleLower.includes('rollercoaster') || titleLower.includes('amusement park') || titleLower.includes('theme park')) {
+      setting = 'an amusement park construction site';
+      environment = 'theme park with rollercoaster construction and engineering equipment';
+      keyElements = 'rollercoaster tracks, construction equipment, safety systems, park attractions';
+      props = 'track components, construction tools, safety equipment, engineering plans';
+    } else if (titleLower.includes('water park') || titleLower.includes('aquatic') || titleLower.includes('pool design')) {
+      setting = 'a water park construction site';
+      environment = 'aquatic entertainment complex with water features';
+      keyElements = 'water slides, pool systems, safety equipment, aquatic attractions';
+      props = 'water slide components, pool equipment, safety gear, construction tools';
+    } else if (titleLower.includes('rube goldberg') || titleLower.includes('contraption') || titleLower.includes('mechanical')) {
+      setting = 'an engineering workshop with mechanical contraptions';
+      environment = 'inventor workshop with pulleys, ramps, and mechanical devices';
+      keyElements = 'mechanical contraptions, pulleys, ramps, engineering materials, chain reactions';
+      props = 'pulleys, ramps, mechanical parts, engineering tools, contraption components';
+    
+    // === ARTS & MEDIA ===
+    } else if (titleLower.includes('animation') || titleLower.includes('animator') || titleLower.includes('cartoon')) {
+      setting = 'a modern animation studio';
+      environment = 'creative workspace with drawing tablets, animation software, and storyboards';
+      keyElements = 'animation workstations, drawing tablets, storyboards, character designs';
+      props = 'digital drawing tablets, animation software, storyboards, character sketches, monitors';
+    } else if (titleLower.includes('graphic') || titleLower.includes('logo') || titleLower.includes('design') || titleLower.includes('brand')) {
+      setting = 'a graphic design studio';
+      environment = 'modern creative workspace with design materials and inspiration boards';
+      keyElements = 'design mockups, color palettes, brand materials, computer workstations';
+      props = 'design tablets, color wheels, brand boards, computer monitors, design materials';
+    } else if (titleLower.includes('comic book') || titleLower.includes('graphic novel') || titleLower.includes('illustration')) {
+      setting = 'a comic book studio and illustration workshop';
+      environment = 'artistic workspace with drawing materials and comic creation tools';
+      keyElements = 'comic pages, illustration boards, drawing tools, character designs';
+      props = 'drawing tablets, comic art supplies, illustration tools, character sketches';
+    } else if (titleLower.includes('podcast') || titleLower.includes('interview') || titleLower.includes('journalism') || titleLower.includes('radio')) {
+      setting = 'a professional podcast studio and newsroom';
+      environment = 'broadcast facility with recording equipment and interview setups';
+      keyElements = 'podcast microphones, recording booth, interview setup, broadcast equipment';
+      props = 'microphones, headphones, recording equipment, interview chairs, broadcast displays';
+    } else if (titleLower.includes('video game') || titleLower.includes('game design') || titleLower.includes('gaming') || titleLower.includes('game studio')) {
+      setting = 'a video game development studio';
+      environment = 'modern game studio with development workstations and testing areas';
+      keyElements = 'game development screens, coding workstations, game controllers, testing setups';
+      props = 'computers, game controllers, development software, testing equipment, game displays';
+    } else if (titleLower.includes('music') || titleLower.includes('composition') || titleLower.includes('musical')) {
+      setting = 'a music production studio';
+      environment = 'professional recording studio with instruments and mixing equipment';
+      keyElements = 'mixing boards, microphones, instruments, sound waves, recording booth';
+      props = 'musical instruments, microphones, mixing console, headphones, sound panels';
+    } else if (titleLower.includes('broadway') || titleLower.includes('theater') || titleLower.includes('stage') || titleLower.includes('theatrical')) {
+      setting = 'a Broadway theater and stage production facility';
+      environment = 'theater setting with stage, lighting equipment, and costume areas';
+      keyElements = 'theater stage, lighting rigs, costume displays, set pieces, theater seating';
+      props = 'stage lighting, costumes, set pieces, theater equipment, performance materials';
+    } else if (titleLower.includes('stop-motion') || titleLower.includes('claymation') || titleLower.includes('puppet')) {
+      setting = 'a stop-motion animation studio';
+      environment = 'specialized studio with puppet sets and animation equipment';
+      keyElements = 'puppet sets, animation cameras, puppet characters, miniature props';
+      props = 'puppets, miniature sets, animation cameras, puppet-making materials';
+    
+    // === ADVENTURE & EXPLORATION ===
+    } else if (titleLower.includes('safari') || titleLower.includes('wildlife') || titleLower.includes('nature') || titleLower.includes('zoo')) {
+      setting = 'a wildlife safari park and conservation center';
+      environment = 'natural habitat with wildlife viewing areas and conservation facilities';
+      keyElements = 'safari vehicles, wildlife habitats, conservation equipment, animal observation';
+      props = 'safari jeeps, binoculars, camera equipment, wildlife tracking gear, conservation tools';
+    } else if (titleLower.includes('treasure hunt') || titleLower.includes('archaeology') || titleLower.includes('expedition')) {
+      setting = 'an archaeological dig site and treasure hunting expedition';
+      environment = 'excavation site with archaeological tools and discovery areas';
+      keyElements = 'excavation sites, archaeological tools, treasure maps, discovery equipment';
+      props = 'excavation tools, treasure maps, archaeological equipment, discovery artifacts';
+    } else if (titleLower.includes('escape room') || idLower.includes('escape-room')) {
+      setting = 'a mysterious escape room puzzle chamber';
+      environment = 'immersive themed room with locks, puzzles, and hidden compartments';
+      keyElements = 'combination locks, puzzle boxes, hidden keys, mysterious symbols, cryptic clues';
+      props = 'locked boxes, padlocks, puzzle pieces, magnifying glasses, cipher wheels';
+    } else if (titleLower.includes('adventure') || titleLower.includes('quest') || titleLower.includes('exploration')) {
+      setting = 'an adventure exploration base camp';
+      environment = 'outdoor expedition camp with exploration equipment and maps';
+      keyElements = 'expedition tents, exploration maps, adventure gear, discovery equipment';
+      props = 'camping gear, maps, compasses, exploration tools, adventure equipment';
+    
+    // === AGRICULTURE & ENVIRONMENT ===
+    } else if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
+      setting = 'a modern vertical farming facility';
+      environment = 'indoor hydroponic tower garden with LED grow lights';
+      keyElements = 'stacked growing towers, LED panels, nutrient systems, fresh vegetables';
+      props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
+    } else if (titleLower.includes('farm') || titleLower.includes('ranch') || idLower.includes('farm') || idLower.includes('ranch')) {
+      setting = 'a traditional farm and ranch operation';
+      environment = 'pastoral countryside with barns, fields, and livestock areas';
+      keyElements = 'red barn, farmhouse, tractors, crops, farm animals, pastures';
+      props = 'wooden barn, farm equipment, hay bales, farm animals, crops, rustic fencing';
+    } else if (titleLower.includes('greenhouse') || titleLower.includes('botanical') || titleLower.includes('garden')) {
+      setting = 'a botanical greenhouse and garden center';
+      environment = 'glass greenhouse with tropical plants and gardening equipment';
+      keyElements = 'greenhouse structure, tropical plants, gardening tools, plant displays';
+      props = 'gardening tools, plant pots, watering equipment, botanical specimens';
+    
+    // === AUTOMOTIVE & TRANSPORTATION ===
+    } else if (titleLower.includes('self-driving') || titleLower.includes('autonomous') || titleLower.includes('car ai')) {
+      setting = 'an autonomous vehicle testing facility';
+      environment = 'high-tech automotive lab with self-driving cars and computer systems';
+      keyElements = 'autonomous vehicles, AI computer screens, sensor arrays, testing equipment';
+      props = 'self-driving cars, computer monitors, LIDAR sensors, cameras, automotive equipment';
+    } else if (titleLower.includes('car customization') || titleLower.includes('automotive') || titleLower.includes('garage')) {
+      setting = 'an automotive customization shop';
+      environment = 'garage workshop with car lifts, tools, and customization equipment';
+      keyElements = 'car lifts, automotive tools, custom parts, paint booth, vehicle displays';
+      props = 'automotive tools, car parts, paint equipment, diagnostic tools, vehicle lifts';
+    
+    // === HEALTH & WELLNESS ===
+    } else if (titleLower.includes('hospital') || titleLower.includes('medical') || titleLower.includes('healthcare')) {
+      setting = 'a modern medical facility';
+      environment = 'hospital setting with medical equipment and patient care areas';
+      keyElements = 'medical equipment, examination rooms, health monitoring displays';
+      props = 'medical instruments, hospital beds, health monitors, medical supplies';
+    } else if (titleLower.includes('fitness') || titleLower.includes('gym') || titleLower.includes('wellness')) {
+      setting = 'a fitness center and wellness facility';
+      environment = 'modern gym with exercise equipment and wellness programs';
+      keyElements = 'exercise equipment, fitness areas, wellness programs, training spaces';
+      props = 'gym equipment, fitness tools, wellness materials, training apparatus';
+    
+    // === GOVERNMENT & POLITICS ===
+    } else if (titleLower.includes('mayor') || titleLower.includes('politics') || titleLower.includes('government')) {
+      setting = 'a city hall and government office';
+      environment = 'civic building with government offices and meeting areas';
+      keyElements = 'government offices, civic meetings, political displays, public service areas';
+      props = 'government documents, civic materials, meeting equipment, political displays';
+    } else if (titleLower.includes('law') || titleLower.includes('legal') || titleLower.includes('court') || titleLower.includes('trial')) {
+      setting = 'a courthouse and legal facility';
+      environment = 'legal setting with courtrooms, law libraries, and research areas';
+      keyElements = 'courtroom, legal documents, law books, judicial equipment';
+      props = 'legal books, court equipment, legal documents, judicial materials';
+    
+    // === RETAIL & COMMERCE ===
+    } else if (titleLower.includes('shop') || titleLower.includes('store') || titleLower.includes('retail')) {
+      setting = 'a modern retail store and shopping center';
+      environment = 'commercial space with product displays and customer service areas';
+      keyElements = 'product displays, shopping areas, retail equipment, customer service';
+      props = 'retail displays, shopping equipment, product samples, customer service tools';
+    } else if (titleLower.includes('antique') || titleLower.includes('vintage') || titleLower.includes('collectibles')) {
+      setting = 'an antique shop and vintage collectibles store';
+      environment = 'nostalgic setting with vintage items and historical displays';
+      keyElements = 'antique furniture, vintage collectibles, historical items';
+      props = 'antique items, vintage collectibles, historical artifacts, nostalgic decorations';
+    } else if (titleLower.includes('sneaker') || titleLower.includes('shoe') || titleLower.includes('footwear')) {
+      setting = 'a custom sneaker design studio';
+      environment = 'modern footwear design facility with shoe displays and design equipment';
+      keyElements = 'sneaker displays, design workstations, shoe-making equipment, custom designs';
+      props = 'sneakers, design tools, shoe-making equipment, custom materials';
+    
+    // === EDUCATION & TRAINING ===
+    } else if (titleLower.includes('tutoring') || titleLower.includes('education center') || titleLower.includes('learning center')) {
+      setting = 'a modern tutoring and learning center';
+      environment = 'educational facility with study areas and learning technology';
+      keyElements = 'study areas, educational technology, learning materials, tutoring spaces';
+      props = 'educational materials, learning tools, study equipment, teaching aids';
+    } else if (titleLower.includes('language') || titleLower.includes('translation') || titleLower.includes('linguistics')) {
+      setting = 'a language learning center';
+      environment = 'multilingual environment with cultural displays and learning tools';
+      keyElements = 'language displays, cultural materials, translation equipment';
+      props = 'language materials, cultural artifacts, translation tools, educational displays';
+    
+    // === TRAVEL & TOURISM ===
+    } else if (titleLower.includes('travel') || titleLower.includes('tourism') || titleLower.includes('vacation') || titleLower.includes('trip')) {
+      setting = 'a travel agency and tourism center';
+      environment = 'travel office with destination displays and planning materials';
+      keyElements = 'travel maps, destination photos, planning materials, tourism displays';
+      props = 'travel brochures, maps, luggage, travel planning tools, destination materials';
+    } else if (titleLower.includes('airline') || titleLower.includes('airport') || titleLower.includes('aviation')) {
+      setting = 'an airport terminal and aviation facility';
+      environment = 'aviation setting with aircraft terminals and flight operations';
+      keyElements = 'aircraft, airport terminals, flight displays, aviation equipment';
+      props = 'airplanes, airport equipment, flight materials, aviation tools';
+    
+    // === MUSEUM & CULTURE ===
+    } else if (titleLower.includes('museum') || titleLower.includes('exhibition') || titleLower.includes('gallery')) {
+      setting = 'a natural history museum and cultural center';
+      environment = 'museum setting with educational displays and interactive exhibits';
+      keyElements = 'museum exhibits, display cases, educational materials, interactive displays';
+      props = 'museum displays, exhibit materials, educational tools, interactive equipment';
+    } else if (titleLower.includes('library') || titleLower.includes('archive') || titleLower.includes('research')) {
+      setting = 'a modern library and research facility';
+      environment = 'academic setting with books, research materials, and study areas';
+      keyElements = 'library shelves, research materials, study areas, academic resources';
+      props = 'books, research tools, study equipment, academic materials';
+    
+    // === MANUFACTURING & PRODUCTION ===
+    } else if (titleLower.includes('factory') || titleLower.includes('manufacturing') || titleLower.includes('production')) {
+      setting = 'a modern manufacturing facility';
+      environment = 'industrial setting with production lines and manufacturing equipment';
+      keyElements = 'production lines, manufacturing equipment, quality control stations';
+      props = 'industrial equipment, production tools, manufactured goods, safety equipment';
+    } else if (titleLower.includes('3d printing') || titleLower.includes('fabrication') || titleLower.includes('prototype')) {
+      setting = 'a 3D printing and fabrication lab';
+      environment = 'modern fabrication facility with 3D printers and design workstations';
+      keyElements = '3D printers, prototype models, design workstations, fabrication tools';
+      props = '3D printers, prototype materials, design software, fabrication equipment';
+    
+    // === SMART HOME & TECHNOLOGY ===
+    } else if (titleLower.includes('smart home') || titleLower.includes('home automation') || titleLower.includes('iot')) {
+      setting = 'a smart home technology demonstration center';
+      environment = 'modern home setting with smart devices and automation systems';
+      keyElements = 'smart devices, home automation systems, control panels, connected appliances';
+      props = 'smart speakers, automated systems, control interfaces, connected devices';
+    } else if (titleLower.includes('computer') || titleLower.includes('pc build') || titleLower.includes('custom computer')) {
+      setting = 'a computer assembly and technology workshop';
+      environment = 'tech workshop with computer components and assembly stations';
+      keyElements = 'computer components, assembly workstations, testing equipment';
+      props = 'computer parts, assembly tools, testing equipment, technology components';
+    
+    // === FALLBACK PATTERNS - More specific than generic classroom ===
+    } else if (titleLower.includes('workshop') || titleLower.includes('maker') || titleLower.includes('build')) {
+      setting = 'a makerspace workshop';
+      environment = 'creative workshop with tools, materials, and building equipment';
+      keyElements = 'workshop tools, building materials, fabrication equipment, creative projects';
+      props = 'hand tools, building materials, workshop equipment, fabrication tools';
+    } else if (titleLower.includes('studio') || titleLower.includes('creative') || titleLower.includes('art')) {
+      setting = 'a creative arts studio';
+      environment = 'artistic workspace with art supplies and exhibition areas';
+      keyElements = 'art supplies, creative materials, studio equipment, artistic displays';
+      props = 'art materials, creative tools, studio equipment, artistic supplies';
+    } else if (titleLower.includes('lab') || titleLower.includes('laboratory') || titleLower.includes('experiment')) {
+      setting = 'a modern research laboratory';
+      environment = 'scientific laboratory with research equipment and experimental setups';
+      keyElements = 'lab equipment, research displays, experimental apparatus, scientific instruments';
+      props = 'laboratory tools, research equipment, scientific instruments, experimental materials';
+    } else if (titleLower.includes('center') || titleLower.includes('facility') || titleLower.includes('institute')) {
+      setting = 'a specialized learning center';
+      environment = 'professional facility with specialized equipment and resources';
+      keyElements = 'specialized equipment, professional resources, learning materials';
+      props = 'professional tools, specialized equipment, learning resources, facility materials';
+    }
+
+    return `Cinematic wide shot of ${setting}. ${environment}. Prominently featuring ${keyElements}. Photorealistic style with ${props} visible in the scene. Vibrant colors, dynamic lighting, engaging composition. No text, no people faces in focus, family-friendly content.`;
+  };
     
     // Graphics, Animation & Design
     if (titleLower.includes('infographic') || titleLower.includes('animator') || titleLower.includes('animation')) {
