@@ -421,7 +421,7 @@ Deno.serve(async (req) => {
     }
 
     return `Cinematic wide shot of ${setting}. ${environment}. Prominently featuring ${keyElements}. Photorealistic style with ${props} visible in the scene. Vibrant colors, dynamic lighting, engaging composition. No text, no people faces in focus, family-friendly content.`;
-  };
+  }
     
     // Graphics, Animation & Design
     if (titleLower.includes('infographic') || titleLower.includes('animator') || titleLower.includes('animation')) {
