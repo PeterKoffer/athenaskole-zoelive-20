@@ -10,6 +10,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthProvider } from "@/hooks/useAuth";
 import { BudgetDebugProvider } from "@/debug/BudgetDebugOverlay";
 import "./index.css";
+import "./games"; // Initialize game registry
 
 // Bootstrap auth cache wiring
 import { wireAuthCache } from "@/utils/cacheAuth";
