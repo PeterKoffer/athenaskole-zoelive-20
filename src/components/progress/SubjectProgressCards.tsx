@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from "lucide-react";
 
 interface UserProgress {
-  matematik: number;
-  dansk: number;
-  engelsk: number;
-  naturteknik: number;
+  mathematics: number;
+  danish: number;
+  english: number;
+  science: number;
 }
 
 interface SubjectProgressCardsProps {
@@ -24,10 +24,10 @@ const SubjectProgressCards = ({ userProgress }: SubjectProgressCardsProps) => {
   };
 
   const subjectNames = {
-    matematik: "Mathematics",
-    dansk: "Danish",
-    engelsk: "English", 
-    naturteknik: "Science & Tech"
+    mathematics: "Mathematics",
+    danish: "Danish",
+    english: "English", 
+    science: "Science & Tech"
   };
 
   return (

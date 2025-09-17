@@ -129,23 +129,23 @@ async function generateHook(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = `Du er en inspirerende lærer der laver fængende undervisningsintroer. Du skal skabe nysgerrighed og motivation hos eleverne. Returner valid JSON.`;
+  const system = `You are an inspiring teacher who creates engaging lesson introductions. You must create curiosity and motivation in students. Return valid JSON.`;
   
-  const user = `Skriv en inspirerende og engagerende introduktion til lektionen "${context.title}" for ${context.gradeLevel}. klasse i faget ${context.subject}.
+  const user = `Write an inspiring and engaging introduction to the lesson "${context.title}" for grade ${context.gradeLevel} in the subject ${context.subject}.
 
-KRAV:
-- Start med et spændende scenario, problem eller spørgsmål der fanger elevernes opmærksomhed
-- Forklar hvorfor dette emne er relevant for eleverne i deres dagligdag
-- Stil provocerende spørgsmål der får eleverne til at tænke
-- Brug et sprog der passer til aldersgruppen
-- Skab forventning og nysgerrighed
+REQUIREMENTS:
+- Start with an exciting scenario, problem, or question that captures students' attention
+- Explain why this topic is relevant to students in their daily lives
+- Ask provocative questions that make students think
+- Use language appropriate for the age group
+- Create anticipation and curiosity
 
-Returner JSON format:
+Return JSON format:
 {
-  "text": "Engagerende og inspirerende introduktionstekst der motiverer eleverne (150-200 ord)",
-  "hook_question": "Et provocerende spørgsmål der starter diskussion",
-  "real_world_connection": "Hvordan emnet relaterer til elevernes hverdag",
-  "image_prompt": "Beskrivelse til generering af inspirerende billede der understøtter intro"
+  "text": "Engaging and inspiring introduction text that motivates students (150-200 words)",
+  "hook_question": "A provocative question that starts discussion",
+  "real_world_connection": "How the topic relates to students' everyday lives",
+  "image_prompt": "Description for generating an inspiring image that supports the intro"
 }`;
 
   try {
@@ -179,49 +179,49 @@ async function generatePhaseplan(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = `Du er en erfaren uddannelsesekspert og læreruddanner. Du designer detaljerede, engagerende undervisningsforløb med konkrete læringsaktiviteter. Returner altid valid JSON.`;
+  const system = `You are an experienced education expert and teacher trainer. You design detailed, engaging learning sequences with concrete learning activities. Always return valid JSON.`;
   
-  const prompt = `Design et komplet undervisningsforløb for "${context.title}" til ${context.gradeLevel}. klasse i faget ${context.subject}.
+  const prompt = `Design a complete learning sequence for "${context.title}" for grade ${context.gradeLevel} in the subject ${context.subject}.
 
-KRAV TIL UNDERVISNINGSINDHOLD:
-- Hver fase skal indeholde konkrete læringsaktiviteter med trin-for-trin instruktioner
-- Inkluder praktiske øvelser, diskussioner og hands-on aktiviteter  
-- Tilføj reflekssionsspørgsmål og læringsevaluering
-- Designet skal være interaktivt og elevengagerende
-- Inkluder både individuelle og gruppeopgaver
+REQUIREMENTS FOR LEARNING CONTENT:
+- Each phase should contain concrete learning activities with step-by-step instructions
+- Include practical exercises, discussions, and hands-on activities  
+- Add reflection questions and learning evaluation
+- Design should be interactive and student-engaging
+- Include both individual and group tasks
 
-Returner JSON format:
+Return JSON format:
 {
   "title": "${context.title}",
-  "description": "Detaljeret beskrivelse af hele læringsforløbet (100-150 ord)",
+  "description": "Detailed description of the entire learning sequence (100-150 words)",
   "learning_objectives": [
-    "Konkret læringsmål 1",
-    "Konkret læringsmål 2", 
-    "Konkret læringsmål 3"
+    "Concrete learning objective 1",
+    "Concrete learning objective 2", 
+    "Concrete learning objective 3"
   ],
   "phases": [
     {
-      "name": "Fase navn",
+      "name": "Phase name",
       "duration": 30,
       "type": "introduction|exploration|practice|reflection|assessment",
-      "description": "Kort beskrivelse af fasens formål",
+      "description": "Brief description of the phase's purpose",
       "activities": [
         {
-          "name": "Aktivitetsnavn",
+          "name": "Activity name",
           "duration": 10,
           "type": "discussion|exercise|game|project|quiz|reflection",
-          "instructions": "Detaljerede trin-for-trin instruktioner til aktiviteten",
-          "materials": ["nødvendige materialer"],
+          "instructions": "Detailed step-by-step instructions for the activity",
+          "materials": ["necessary materials"],
           "interaction": "individual|pairs|groups|class"
         }
       ],
-      "assessment": "Hvordan evalueres elevernes læring i denne fase",
-      "reflection_questions": ["Refleksionsspørgsmål til eleverne"]
+      "assessment": "How students' learning is evaluated in this phase",
+      "reflection_questions": ["Reflection questions for students"]
     }
   ],
   "total_duration": 180,
-  "key_concepts": ["Vigtige begreber der læres"],
-  "extension_activities": ["Ekstra aktiviteter for hurtige elever"]
+  "key_concepts": ["Important concepts that are learned"],
+  "extension_activities": ["Extra activities for fast learners"]
 }`;
 
   try {
@@ -241,12 +241,12 @@ Returner JSON format:
     return {
       data: {
         title: context.title,
-        description: "En spændende læringseventyr venter!",
+        description: "An exciting learning adventure awaits!",
         phases: [
           {
-            name: "Intro",
+            name: "Introduction",
             duration: 30,
-            activity: "Start din adventure"
+            activity: "Start your adventure"
           }
         ]
       }
@@ -267,51 +267,51 @@ async function generateBudgetAdventure(context: any) {
   // Use phaseplan data or fallback
   const adventureData = phasePlanResult.data || {
     title: context.title,
-    description: "Et detaljeret undervisningsforløb der engagerer eleverne gennem hands-on aktiviteter og refleksion.",
+    description: "A detailed learning sequence that engages students through hands-on activities and reflection.",
     learning_objectives: [
-      "Udvikle forståelse for emnet gennem praktiske aktiviteter",
-      "Arbejde selvstændigt og i grupper med faglige problemstillinger",
-      "Reflektere over læring og anvende ny viden"
+      "Develop understanding of the topic through practical activities",
+      "Work independently and in groups with academic problems",
+      "Reflect on learning and apply new knowledge"
     ],
     phases: [
       {
-        name: "Introduktion og Motivation",
+        name: "Introduction and Motivation",
         duration: 45,
         type: "introduction",
-        description: "Skaber interesse og etablerer læringsmål",
+        description: "Creates interest and establishes learning objectives",
         activities: [
           {
-            name: "Åbningsdiskussion",
+            name: "Opening Discussion",
             duration: 15,
             type: "discussion",
-            instructions: "Stil indledende spørgsmål til klassen og lad eleverne dele deres eksisterende viden om emnet.",
-            materials: ["Whiteboard", "Spørgsmål"],
+            instructions: "Ask introductory questions to the class and let students share their existing knowledge about the topic.",
+            materials: ["Whiteboard", "Questions"],
             interaction: "class"
           },
           {
-            name: "Læringsmål Præsentation",
+            name: "Learning Objectives Presentation",
             duration: 15,
             type: "presentation",
-            instructions: "Præsenter dagens læringsmål og forklar hvorfor emnet er relevant.",
-            materials: ["Slides", "Eksempler"],
+            instructions: "Present today's learning objectives and explain why the topic is relevant.",
+            materials: ["Slides", "Examples"],
             interaction: "class"
           },
           {
-            name: "Brainstorm Aktivitet",
+            name: "Brainstorm Activity",
             duration: 15,
             type: "exercise",
-            instructions: "Lad eleverne brainstorme i grupper om emnet og dele deres ideer.",
-            materials: ["Papir", "Markører"],
+            instructions: "Let students brainstorm in groups about the topic and share their ideas.",
+            materials: ["Paper", "Markers"],
             interaction: "groups"
           }
         ],
-        assessment: "Observér elevernes engagement og tidligere viden gennem diskussion",
-        reflection_questions: ["Hvad ved I allerede om dette emne?", "Hvorfor tror I dette er vigtigt at lære?"]
+        assessment: "Observe students' engagement and prior knowledge through discussion",
+        reflection_questions: ["What do you already know about this topic?", "Why do you think this is important to learn?"]
       }
     ],
     total_duration: 180,
-    key_concepts: ["Grundlæggende emneforståelse", "Kritisk tænkning", "Samarbejde"],
-    extension_activities: ["Selvstændig research", "Kreative projekter", "Peer teaching"]
+    key_concepts: ["Basic topic understanding", "Critical thinking", "Collaboration"],
+    extension_activities: ["Independent research", "Creative projects", "Peer teaching"]
   };
 
   logSuccess('✅ Budget adventure generated successfully');
@@ -390,12 +390,12 @@ serve(async (req) => {
       error: error.message || 'Unknown error occurred',
       lesson: {
         title: "Test Adventure",
-        description: "En simpel test adventure",
+        description: "A simple test adventure",
         stages: [
           {
             name: "Test Phase",
             duration: 30,
-            activity: "Test aktivitet"
+            activity: "Test activity"
           }
         ],
         activities: []

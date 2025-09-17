@@ -4,10 +4,10 @@ import ProgressDashboard from '@/components/ProgressDashboard';
 
 // Mock user progress data - in a real app this would come from an API/database
 const mockUserProgress = {
-  matematik: 75,
-  dansk: 68,
-  engelsk: 82,
-  naturteknik: 71
+  mathematics: 75,
+  danish: 68,
+  english: 82,
+  science: 71
 };
 
 const ProgressDashboardPage: React.FC = () => {

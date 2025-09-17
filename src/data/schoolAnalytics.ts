@@ -8,11 +8,11 @@ export const monthlyData = [
 ];
 
 export const subjectPerformance = [
-  { subject: 'Matematik', score: 85, students: 456 },
-  { subject: 'Dansk', score: 92, students: 456 },
-  { subject: 'Engelsk', score: 78, students: 456 },
-  { subject: 'Naturteknik', score: 81, students: 456 },
-  { subject: 'Historie', score: 88, students: 456 }
+  { subject: 'Mathematics', score: 85, students: 456 },
+  { subject: 'Danish', score: 92, students: 456 },
+  { subject: 'English', score: 78, students: 456 },
+  { subject: 'Science', score: 81, students: 456 },
+  { subject: 'History', score: 88, students: 456 }
 ];
 
 export const classDistribution = [
@@ -31,13 +31,13 @@ export const weeklyActivity = [
 ];
 
 export const topPerformances = [
-  { category: "Bedste klasse", value: "3.A - 95%", color: "yellow" },
-  { category: "Bedste fag", value: "Dansk - 92%", color: "green" },
-  { category: "Højeste fremmøde", value: "1.B - 98%", color: "blue" }
+  { category: "Best Class", value: "3.A - 95%", color: "yellow" },
+  { category: "Best Subject", value: "Danish - 92%", color: "green" },
+  { category: "Highest Attendance", value: "1.B - 98%", color: "blue" }
 ];
 
 export const monthlyImprovements = [
-  { category: "Matematik scores", improvement: "+12%", color: "green" },
-  { category: "Elev engagement", improvement: "+8%", color: "green" },
-  { category: "Opgave aflevering", improvement: "+15%", color: "green" }
+  { category: "Mathematics scores", improvement: "+12%", color: "green" },
+  { category: "Student engagement", improvement: "+8%", color: "green" },
+  { category: "Assignment delivery", improvement: "+15%", color: "green" }
 ];

@@ -33,7 +33,7 @@ const UserAnalyticsDashboard = () => {
       ]);
 
       // Get progress data for common subjects
-      const subjects = ['matematik', 'dansk', 'engelsk', 'naturteknik'];
+      const subjects = ['mathematics', 'danish', 'english', 'science'];
       const progressPromises = subjects.map(subject => 
         userProgressService.getUserProgress(user.id, subject)
       );

@@ -4,13 +4,13 @@ import { Calendar } from "lucide-react";
 
 const WeeklyActivityChart = () => {
   const weeklyData = [
-    { day: "Monday", matematik: 45, dansk: 30, engelsk: 20 },
-    { day: "Tuesday", matematik: 60, dansk: 40, engelsk: 35 },
-    { day: "Wednesday", matematik: 30, dansk: 55, engelsk: 25 },
-    { day: "Thursday", matematik: 75, dansk: 20, engelsk: 40 },
-    { day: "Friday", matematik: 40, dansk: 35, engelsk: 30 },
-    { day: "Saturday", matematik: 20, dansk: 15, engelsk: 45 },
-    { day: "Sunday", matematik: 35, dansk: 25, engelsk: 20 }
+    { day: "Monday", mathematics: 45, danish: 30, english: 20 },
+    { day: "Tuesday", mathematics: 60, danish: 40, english: 35 },
+    { day: "Wednesday", mathematics: 30, danish: 55, english: 25 },
+    { day: "Thursday", mathematics: 75, danish: 20, english: 40 },
+    { day: "Friday", mathematics: 40, danish: 35, english: 30 },
+    { day: "Saturday", mathematics: 20, danish: 15, english: 45 },
+    { day: "Sunday", mathematics: 35, danish: 25, english: 20 }
   ];
 
   return (
@@ -27,20 +27,20 @@ const WeeklyActivityChart = () => {
             <div key={index} className="space-y-2">
               <div className="flex justify-between text-sm font-medium text-white">
                 <span>{day.day}</span>
-                <span>{day.matematik + day.dansk + day.engelsk} minutes</span>
+                <span>{day.mathematics + day.danish + day.english} minutes</span>
               </div>
               <div className="flex space-x-1 h-3 bg-gray-700 rounded-full overflow-hidden">
                 <div 
                   className="bg-blue-500" 
-                  style={{ width: `${(day.matematik / 120) * 100}%` }}
+                  style={{ width: `${(day.mathematics / 120) * 100}%` }}
                 />
                 <div 
                   className="bg-red-500" 
-                  style={{ width: `${(day.dansk / 120) * 100}%` }}
+                  style={{ width: `${(day.danish / 120) * 100}%` }}
                 />
                 <div 
                   className="bg-green-500" 
-                  style={{ width: `${(day.engelsk / 120) * 100}%` }}
+                  style={{ width: `${(day.english / 120) * 100}%` }}
                 />
               </div>
             </div>

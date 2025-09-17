@@ -7,10 +7,10 @@ import WeeklyGoalsCard from "./progress/WeeklyGoalsCard";
 import ParentEmailCard from "./progress/ParentEmailCard";
 
 interface UserProgress {
-  matematik: number;
-  dansk: number;
-  engelsk: number;
-  naturteknik: number;
+  mathematics: number;
+  danish: number;
+  english: number;
+  science: number;
 }
 
 interface ProgressDashboardProps {
