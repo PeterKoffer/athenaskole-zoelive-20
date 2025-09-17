@@ -13,180 +13,110 @@ interface AgeGroupPrompt {
   aspect_ratio: string;
 }
 
-// Age group specific styles
-const styleByAgeGroup = {
+// ====== UNIFIED ADVENTURE-SPECIFIC SCENE MAPPING ======
+// Same mapping as in image-ensure function for consistency
+const MAP: Array<[RegExp, string]> = [
+  [/record label|music (producer|studio)/i,
+    "modern recording studio, mixing console, microphones on boom arms, acoustic panels"],
+  [/graphic design|design agency|branding|poster|logo/i,
+    "creative design studio, large monitors with vector tools, drawing tablets, mood boards"],
+  [/self[- ]?driv|autonom|robot|ai lab/i,
+    "robotics lab with LiDAR rigs and a test vehicle on a garage bay track"],
+  [/non[- ]?profit|nonprofit|ngo|charit/i,
+    "non-profit operations hub with donor dashboards on screens, project pinboard, volunteer kits"],
+  [/dinosaur|paleo|jurassic|safari/i,
+    "field research outpost at a dinosaur park, safety railings, dig crates, lush foliage"],
+  [/miniature city|urban plan|city planner/i,
+    "urban planning studio with a detailed scale model city and zoning maps"],
+  [/construction|skyscraper|civil|bridge/i,
+    "active construction site with tower cranes, scaffolding, and blueprints on a table"],
+  [/news|journalis|podcast|broadcast/i,
+    "newsroom / podcast studio with cameras, boom mics, light panels, editing bays"],
+  [/kitchen|culinary|restaurant|food truck/i,
+    "professional kitchen line with stainless counters and the pass"],
+  [/earthquake|seismic|tremor|geological/i,
+    "seismology research lab with earthquake monitoring equipment, seismographs, geological rock samples"],
+  [/national park|park manager|conservation/i,
+    "park ranger station with trail maps, wildlife monitoring equipment, conservation research center"],
+  [/anti.?bullying|campaign|advocacy|social.?change/i,
+    "community outreach center with campaign materials, advocacy posters, meeting space with presentation boards"],
+  [/budget|financial|accounting|economics/i,
+    "modern financial planning office with charts, calculators, budget spreadsheets on monitors"],
+  [/vertical farm|hydroponic|agriculture/i,
+    "modern vertical farming facility with LED grow lights, hydroponic towers, nutrient systems"],
+  [/negotiation|business deal|contract/i,
+    "professional meeting room with presentation boards, conference table, business materials"],
+  [/toy|design|prototype|manufacturing/i,
+    "product design studio with prototyping equipment, 3D printers, design sketches on walls"],
+  [/rocket|launch|engineering|rube goldberg/i,
+    "engineering workshop with rocket prototypes, launch equipment, testing apparatus"],
+  [/constitution|founding|democracy|government/i,
+    "historic meeting hall with period furniture, founding documents, quill pens, colonial architecture"],
+];
+
+// ====== AGE-SPECIFIC ADVENTURE PROMPT BUILDER ======
+// Age group specific enhancement styles - all use 16:9 for perfect framing
+type AgeGroup = 'child' | 'teen' | 'adult';
+
+const ageEnhancements = {
   child: {
-    positive: 'bright saturated colors, cartoon style, simple rounded shapes, thick outlines, smiling characters, playful elements, high contrast, child-friendly illustration, fantasy elements welcome',
-    negative: 'no scary elements, no violence, no dark themes, no realistic weapons, no complex details, no tiny text, no adult themes',
-    ar: '1:1', size: '1024x1024'
+    visual: "bright colors, rounded shapes, thick outlines, flat shading, minimal background",
+    mood: "joyful, playful, wonder-filled",
+    negative: "no realism, no text, no clutter, no scary elements, no violence, no dark themes",
+    size: "1024x576" // 16:9 ratio like main adventures
   },
   teen: {
-    positive: 'vibrant but balanced colors, stylized realistic illustration, moderate detail level, dynamic compositions, relatable characters, modern aesthetic, engaging visual elements',
-    negative: 'no overly childish cartoon style, no adult content, no graphic violence, avoid overly simplistic imagery',
-    ar: '16:9', size: '1280x720'
+    visual: "vibrant stylized illustration, soft shading, playful but neat composition",
+    mood: "confident, curious, collaborative", 
+    negative: "no babyish style, no overly childish cartoon style",
+    size: "1024x576" // 16:9 ratio like main adventures
   },
   adult: {
-    positive: 'sophisticated color palette, photorealistic or cinematic illustration, professional quality, detailed compositions, mature themes acceptable, documentary style, technical accuracy',
-    negative: 'no cartoonish elements, no toy-like appearance, no overly bright colors, avoid childish aesthetics',
-    ar: '16:9', size: '1600x900'
-  },
-};
-
-// Embedded domain detection and prompt generation for edge function
-function getDomainFromTitle(title: string): string {
-  const titleLower = title.toLowerCase();
-  
-  if (titleLower.includes('food') || titleLower.includes('truck') || titleLower.includes('restaurant'))
-    return 'food-truck';
-  if (titleLower.includes('vertical') || titleLower.includes('farm') || titleLower.includes('hydroponic'))
-    return 'vertical-farm';
-  if (titleLower.includes('negotiation') || titleLower.includes('deal') || titleLower.includes('business'))
-    return 'negotiation';
-  if (titleLower.includes('rocket') || titleLower.includes('water') || titleLower.includes('launch'))
-    return 'water-rocket';
-  if (titleLower.includes('toy') || titleLower.includes('design') || titleLower.includes('prototype'))
-    return 'toy-design';
-  if (titleLower.includes('constitution') || titleLower.includes('founding') || titleLower.includes('democracy'))
-    return 'constitution';
-  
-  return 'vertical-farm'; // Default fallback
-}
-
-function buildCinematicPrompt(adventureId: string, title: string, ageGroup: string): string {
-  const titleLower = title.toLowerCase();
-  const idLower = adventureId.toLowerCase();
-  
-  // Adventure-specific contexts - NO CLASSROOMS
-  let setting = 'a professional adventure focused on ' + title;
-  let environment = 'modern professional workspace or research facility';
-  let keyElements = 'professional equipment, research tools, collaborative workspace';
-  let props = 'professional materials, equipment, tools, displays';
-  
-  if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
-    setting = 'a modern vertical farming facility';
-    environment = 'indoor hydroponic tower garden with LED grow lights';
-    keyElements = 'stacked growing towers, LED panels, nutrient systems, fresh vegetables';
-    props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
-  } else if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
-    setting = 'a business negotiation workshop';
-    environment = 'professional meeting room or conference center';
-    keyElements = 'meeting tables, presentation boards, handshake moments, business materials';
-    props = 'meeting tables, chairs, notebooks, presentation materials, name tags';
-  } else if (titleLower.includes('toy line') || idLower.includes('toy') || titleLower.includes('design')) {
-    setting = 'a toy design and manufacturing workshop';
-    environment = 'creative design studio with prototyping materials';
-    keyElements = 'toy prototypes, design sketches, colorful materials, craft supplies';
-    props = 'craft materials, design tools, toy prototypes, sketch pads, markers';
-  } else if (titleLower.includes('water rocket') || idLower.includes('rocket') || titleLower.includes('rube goldberg')) {
-    setting = 'a rocket launch competition area or engineering workshop';
-    environment = 'outdoor launch field with safety equipment and measuring tools, or indoor workshop with engineering materials';
-    keyElements = 'rockets, launch pads, trajectory paths, measuring equipment, engineering contraptions';
-    props = 'rockets, launch pads, safety goggles, measuring tapes, engineering materials, pulleys, ramps';
-  } else if (titleLower.includes('constitutional') || idLower.includes('constitution')) {
-    setting = 'a historical constitutional convention';
-    environment = 'colonial-style meeting hall with period furniture';
-    keyElements = 'colonial architecture, founding documents, quill pens, historical furniture';
-    props = 'wooden desks, quill pens, parchment, candles, colonial chairs';
-  }
-  
-  // Age-appropriate subject prefixes
-  const ageConfig = cinematicStylesByAgeGroup[ageGroup] || cinematicStylesByAgeGroup.teen;
-  const subjectPrefix = ageConfig.subjectPrefix;
-  
-  const consistency = `NELIE-cin-real-01 ${adventureId.replace(/[^a-z0-9]/gi, '-')}`;
-  
-  return [
-    "cinematic stylized realism",
-    "high-end animation film aesthetic", 
-    "soft PBR materials",
-    "depth-of-field bokeh",
-    `cinematic establishing shot of ${setting}, showing ${keyElements}`,
-    `${subjectPrefix} ${environment}, ${props}`,
-    "wide establishing, 35mm anamorphic, eye-level, gentle parallax",
-    "golden hour backlight, soft rim, warm bounce",
-    ageConfig.colorOverride || "teal & warm amber cinematic grade",
-    ageConfig.moodOverride || "hopeful, inviting, educational",
-    "age-appropriate, wholesome",
-    "no text overlay, no brand logos",
-    `CONSISTENCY_TAG: ${consistency}`
-  ].join(" — ");
-}
-
-async function importPromptEngine() {
-  // Return embedded functions instead of trying to import
-  return {
-    buildImagePrompts: null, // We'll use buildCinematicPrompt instead
-    getDomainFromTitle
-  };
-}
-
-// Age group specific cinematic styles
-const cinematicStylesByAgeGroup = {
-  child: {
-    stylePackId: "kidbook-gouache",
-    realismBlend: 0.3, // More stylized for children
-    subjectPrefix: "colorful and friendly students discovering",
-    moodOverride: "joyful, playful, wonder-filled",
-    colorOverride: "bright rainbow colors, warm pastels"
-  },
-  teen: {
-    stylePackId: "cinematic-stylized-realism",
-    realismBlend: 0.7, // Balanced realism for teens
-    subjectPrefix: "engaged teenage students exploring",
-    moodOverride: "confident, curious, collaborative",
-    colorOverride: "vibrant but balanced colors"
-  },
-  adult: {
-    stylePackId: "cinematic-stylized-realism",
-    realismBlend: 0.9, // High realism for adults
-    subjectPrefix: "professional students mastering",
-    moodOverride: "focused, sophisticated, achievement-oriented",
-    colorOverride: "sophisticated cinematic palette"
+    visual: "realistic to photorealistic, professional tone, technical overlays ok",
+    mood: "focused, sophisticated, achievement-oriented",
+    negative: "no childish/kawaii style, no cartoon aesthetics",
+    size: "1024x576" // 16:9 ratio like main adventures
   }
 };
+
+function buildUnifiedAdventurePrompt(title: string, ageGroup: AgeGroup): string {
+  // Same style & composition as main adventure system
+  const STYLE = "cinematic hybrid photoreal with subtle Pixar warmth, global illumination, HDR, gentle film grain, no text or watermarks";
+  const COMPOSITION = "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
+  const SAFE_MARGINS = "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
+  const COLOR_MOOD = "rich but natural palette; inspiring, capable, modern";
+
+  // Get adventure-specific scene
+  const t = title.toLowerCase();
+  let scene = "professional real-world environment relevant to the adventure";
+  for (const [rx, s] of MAP) if (rx.test(t)) { scene = s; break; }
+
+  // Age-specific enhancements
+  const ageConfig = ageEnhancements[ageGroup];
+  
+  // NO CLASSROOM EVER
+  const NEG_PRO = "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, teachers or students";
+
+  return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — Adventure: ${title}. Age group: ${ageGroup} learners. Visual style: ${ageConfig.visual}. Mood: ${ageConfig.mood}. Scene: ${scene} — ${NEG_PRO}, ${ageConfig.negative}`;
+}
 
 async function buildCinematicAgeGroupPrompt(
   universeTitle: string, 
   universeId: string,
-  ageGroup: 'child' | 'teen' | 'adult', 
+  ageGroup: AgeGroup, 
   description?: string
 ): Promise<AgeGroupPrompt> {
-  const promptEngine = await importPromptEngine();
   
-  // Use embedded cinematic prompt generation
-  const { getDomainFromTitle } = promptEngine;
-  const style = cinematicStylesByAgeGroup[ageGroup];
-  
-  // Generate the cinematic prompt directly
-  const finalPrompt = buildCinematicPrompt(universeId, universeTitle, ageGroup);
+  const ageConfig = ageEnhancements[ageGroup];
+  const finalPrompt = buildUnifiedAdventurePrompt(universeTitle, ageGroup);
   
   const baseNegativePrompt = "text, watermark, logo, low-res, blurry, extra fingers, deformed hands, gore, hyperreal skin, sexualized, noisy background, posterized, oversaturated";
   
   return {
     prompt: finalPrompt,
-    negative_prompt: baseNegativePrompt + ', uncanny valley, waxy skin, readable text, grade signs, brand logos',
-    size: ageGroup === 'child' ? '1024x1024' : '1280x720',
-    aspect_ratio: ageGroup === 'child' ? '1:1' : '16:9'
-  };
-  
-  // Fallback to enhanced legacy system with cinematic elements
-  const legacyStyle = styleByAgeGroup[ageGroup];
-  const prompt = [
-    'cinematic stylized realism',
-    ageGroup === 'child' ? 'children\'s storybook illustration' : 'high-end animation film aesthetic',
-    `${cinematicStylesByAgeGroup[ageGroup].subjectPrefix} ${universeTitle} adventure`,
-    description ? `Context: ${description}` : null,
-    `Target: ${ageGroup} learners`,
-    `Style: ${legacyStyle.positive}`,
-    'depth-of-field bokeh, age-appropriate, no text overlay',
-    `CONSISTENCY_TAG: NELIE-${ageGroup}-${universeTitle.replace(/[^a-z0-9]/gi, '-')}`
-  ].filter(Boolean).join(' — ');
-
-  return {
-    prompt,
-    negative_prompt: legacyStyle.negative + ', uncanny valley, waxy skin, readable text, grade signs, brand logos',
-    size: legacyStyle.size,
-    aspect_ratio: legacyStyle.ar
+    negative_prompt: baseNegativePrompt + ', uncanny valley, waxy skin, readable text, grade signs, brand logos, classroom, school desks',
+    size: ageConfig.size, // All use 1024x576 (16:9) now
+    aspect_ratio: '16:9'
   };
 }
 
@@ -207,8 +137,8 @@ async function generateImageWithOpenAI(prompt: string, size: string): Promise<st
         model: 'gpt-image-1',
         prompt: prompt,
         n: 1,
-        size: '1024x1024', // Use consistent size for all age groups
-        quality: 'medium',
+        size: size, // Use the size from the prompt spec
+        quality: 'high',
         output_format: 'webp',
       }),
     });
@@ -230,7 +160,10 @@ async function generateImageWithOpenAI(prompt: string, size: string): Promise<st
 async function uploadImageToStorage(
   supabase: any,
   imageData: string,
-  path: string
+  path: string,
+  adventure: any,
+  ageGroup: string,
+  promptSpec: AgeGroupPrompt
 ): Promise<string | null> {
   try {
     // Convert base64 to bytes
@@ -251,6 +184,33 @@ async function uploadImageToStorage(
     const { data: { publicUrl } } = supabase.storage
       .from('universe-images')
       .getPublicUrl(path);
+
+    // ====== SAVE TO PICTURE BANK (image_assets table) ======
+    try {
+      await supabase.from('image_assets').insert({
+        storage_path: path,
+        adventure_id: adventure.universe_id,
+        prompt: promptSpec.prompt,
+        negative_prompt: promptSpec.negative_prompt,
+        alt_text: `${adventure.title} - ${ageGroup} age group`,
+        subjects: [adventure.subject || 'General'],
+        tags: [ageGroup, 'adventure-cover', 'generated', '16:9'],
+        width: 1024,
+        height: 576,
+        bytes: bytes.length,
+        mime: 'image/webp',
+        provider: 'openai',
+        model: 'gpt-image-1',
+        style_pack: `adventure-${ageGroup}`,
+        consistency_tag: `adventure-${adventure.universe_id}-${ageGroup}`,
+        reusable: true,
+        created_by: '00000000-0000-0000-0000-000000000000' // System user
+      });
+      console.log(`✅ Saved ${ageGroup} image to picture bank: ${adventure.title}`);
+    } catch (bankError) {
+      console.error('⚠️ Failed to save to picture bank:', bankError);
+      // Don't fail the whole operation if picture bank save fails
+    }
 
     return publicUrl;
   } catch (error) {
@@ -315,7 +275,7 @@ serve(async (req) => {
             
             if (imageData) {
               const imagePath = `${adventure.universe_id}/${adventure.grade_int}/${ageGroup}_cover.webp`;
-              const imageUrl = await uploadImageToStorage(supabaseClient, imageData, imagePath);
+              const imageUrl = await uploadImageToStorage(supabaseClient, imageData, imagePath, adventure, ageGroup, promptSpec);
               
               if (imageUrl) {
                 // Update adventure with generated image URL
