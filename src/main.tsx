@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthProvider } from "@/hooks/useAuth";
+import { BudgetDebugProvider } from "@/debug/BudgetDebugOverlay";
 import "./index.css";
 
 // Bootstrap auth cache wiring
@@ -35,10 +36,12 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <ErrorBoundary>
-            <App />
-            <Toaster />
-          </ErrorBoundary>
+          <BudgetDebugProvider>
+            <ErrorBoundary>
+              <App />
+              <Toaster />
+            </ErrorBoundary>
+          </BudgetDebugProvider>
         </AuthProvider>
       </TooltipProvider>
       <ReactQueryDevtools initialIsOpen={false} />

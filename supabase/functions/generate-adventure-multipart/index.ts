@@ -1,6 +1,7 @@
-// Simplified Multi-Prompt Adventure Generation Edge Function
+// Simplified Multi-Prompt Adventure Generation Edge Function with Budget Control
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { BudgetGuard, extractUsageFromLLMResponse, type StepName } from "../_shared/BudgetGuard.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,15 +33,56 @@ function logSuccess(message: string, data?: any) {
   }
 }
 
-// Simplified AI call for testing
-async function callOpenAI(prompt: string): Promise<any> {
+// Budget Guard Configuration
+const PLANNED_STEPS: StepName[] = ["hook", "phaseplan", "narrative", "quiz", "writing", "scenario", "images", "exit", "validator"];
+
+function modelSpec(name: string, in_cost: number, out_cost: number, maxOut = 2048) {
+  return { name, in_per_mtok: in_cost, out_per_mtok: out_cost, max_output_tokens: maxOut };
+}
+
+const budgetGuard = new BudgetGuard({
+  plannedSteps: PLANNED_STEPS,
+  tokenBudgetTotal: Number(Deno.env.get("TOKEN_BUDGET_TOTAL") ?? "18000"),
+  costCapUSD: Deno.env.get("COST_CAP_USD") ? Number(Deno.env.get("COST_CAP_USD")) : undefined,
+  jsonMinified: (Deno.env.get("USE_JSON_MINIFIED") ?? "true").toLowerCase() === "true",
+  reserveForCritical: 1500,
+  modelMap: {
+    hook: modelSpec(Deno.env.get("MODEL_HOOK") ?? "gpt-4o-mini", 0.15, 0.6, 256),
+    phaseplan: modelSpec(Deno.env.get("MODEL_PHASEPLAN") ?? "gpt-4o-mini", 0.15, 0.6, 1024),
+    narrative: modelSpec(Deno.env.get("MODEL_NARRATIVE") ?? "gpt-4o-mini", 0.15, 0.6, 512),
+    quiz: modelSpec(Deno.env.get("MODEL_QUIZ") ?? "gpt-4o-mini", 0.15, 0.6, 700),
+    writing: modelSpec(Deno.env.get("MODEL_WRITING") ?? "gpt-4o-mini", 0.15, 0.6, 900),
+    scenario: modelSpec(Deno.env.get("MODEL_SCENARIO") ?? "gpt-4o-mini", 0.15, 0.6, 600),
+    minigame: modelSpec(Deno.env.get("MODEL_MINIGAME") ?? "gpt-4o-mini", 0.15, 0.6, 400),
+    images: modelSpec(Deno.env.get("MODEL_IMAGES") ?? "gpt-4o-mini", 0.15, 0.6, 160),
+    exit: modelSpec(Deno.env.get("MODEL_EXIT") ?? "gpt-4o-mini", 0.15, 0.6, 180),
+    validator: modelSpec(Deno.env.get("MODEL_VALIDATOR") ?? "gpt-4o-mini", 0.15, 0.6, 200),
+    enrichment: modelSpec(Deno.env.get("MODEL_ENRICH") ?? "gpt-4o-mini", 0.15, 0.6, 200),
+  },
+  stepConfig: {
+    hook: { priority: 1, default_max_output_tokens: 180 },
+    phaseplan: { priority: 1, default_max_output_tokens: 900 },
+    narrative: { priority: 2, default_max_output_tokens: 400 },
+    quiz: { priority: 1, default_max_output_tokens: 700 },
+    writing: { priority: 1, default_max_output_tokens: 900 },
+    scenario: { priority: 2, default_max_output_tokens: 600 },
+    minigame: { priority: 3, default_max_output_tokens: 300 },
+    images: { priority: 3, default_max_output_tokens: 140 },
+    exit: { priority: 2, default_max_output_tokens: 150 },
+    validator: { priority: 1, default_max_output_tokens: 120 },
+    enrichment: { priority: 3, default_max_output_tokens: 180 },
+  },
+});
+
+// Budget-aware AI call
+async function callOpenAI(model: string, system: string, user: string, max_tokens: number): Promise<{text: string; usage?: any; raw: any}> {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
     logError('OpenAI API key not configured');
     throw new Error('OpenAI API key not configured');
   }
 
-  logInfo('🤖 Calling OpenAI...');
+  logInfo(`🤖 Calling OpenAI (${model}, max_tokens: ${max_tokens})...`);
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -50,18 +92,12 @@ async function callOpenAI(prompt: string): Promise<any> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model,
         messages: [
-          {
-            role: 'system',
-            content: 'Du er en uddannelsesekspert. Returner valid JSON.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
+          { role: 'system', content: system },
+          { role: 'user', content: user }
         ],
-        max_tokens: 1000,
+        max_tokens,
         temperature: 0.7
       }),
     });
@@ -73,8 +109,11 @@ async function callOpenAI(prompt: string): Promise<any> {
     }
 
     const data = await response.json();
+    const text = data.choices?.[0]?.message?.content ?? "";
+    const usage = extractUsageFromLLMResponse(data);
+    
     logSuccess('✅ OpenAI response received');
-    return data;
+    return { text, usage, raw: data };
 
   } catch (error) {
     logError('Error calling OpenAI', error);
@@ -82,11 +121,54 @@ async function callOpenAI(prompt: string): Promise<any> {
   }
 }
 
-// Simple adventure generator
-async function generateSimpleAdventure(context: any) {
-  logInfo('🚀 Starting simple adventure generation', context);
-  
-  const prompt = `Lav en simpel adventure for "${context.title}" til ${context.gradeLevel}. klasse.
+// Generate hook step
+async function generateHook(context: any) {
+  const begin = budgetGuard.beginStep("hook");
+  if (!begin.allowed) {
+    logInfo(`❌ Hook step skipped: ${begin.reason}`);
+    return { skipped: true, reason: begin.reason };
+  }
+
+  const system = "Du skriver kun JSON: {text, image_prompt}. Max 120 ord i text.";
+  const user = JSON.stringify({ 
+    adventureId: context.title, 
+    title: context.title, 
+    grade: context.gradeLevel 
+  });
+
+  try {
+    const { text, usage } = await callOpenAI(begin.model.name, system, user, begin.max_tokens);
+    budgetGuard.finishStep(begin.logIndex, usage);
+
+    // Parse JSON response
+    const match = text.match(/\{[\s\S]*\}/);
+    const jsonText = match ? match[0] : text;
+    const data = JSON.parse(jsonText);
+    
+    logSuccess('✅ Hook generated successfully');
+    return { data };
+  } catch (error) {
+    budgetGuard.finishStep(begin.logIndex, text);
+    logError('Error generating hook', error);
+    return { 
+      data: { 
+        text: "Welcome to an exciting learning adventure!", 
+        image_prompt: "students learning together" 
+      } 
+    };
+  }
+}
+
+// Generate phase plan step
+async function generatePhaseplan(context: any) {
+  const begin = budgetGuard.beginStep("phaseplan");
+  if (!begin.allowed) {
+    logInfo(`❌ Phaseplan step skipped: ${begin.reason}`);
+    return { skipped: true, reason: begin.reason };
+  }
+
+  const system = "Du er en uddannelsesekspert. Returner valid JSON.";
+  const prompt = `Lav en detaljeret phaseplan for "${context.title}" til ${context.gradeLevel}. klasse.
   
   Returner JSON format:
   {
@@ -94,26 +176,29 @@ async function generateSimpleAdventure(context: any) {
     "description": "En kort beskrivelse af adventure",
     "phases": [
       {
-        "name": "Intro",
+        "name": "Phase navn",
         "duration": 30,
-        "activity": "Beskrivelse af aktivitet"
+        "activity": "Detaljeret beskrivelse af aktivitet"
       }
-    ],
-    "success": true
+    ]
   }`;
 
   try {
-    const response = await callOpenAI(prompt);
-    const content = response.choices[0].message.content;
+    const { text, usage } = await callOpenAI(begin.model.name, system, prompt, begin.max_tokens);
+    budgetGuard.finishStep(begin.logIndex, usage);
+
+    // Parse JSON response
+    const match = text.match(/\{[\s\S]*\}/);
+    const jsonText = match ? match[0] : text;
+    const data = JSON.parse(jsonText);
     
-    try {
-      const parsed = JSON.parse(content);
-      logSuccess('✅ Adventure generated successfully');
-      return parsed;
-    } catch (parseError) {
-      logError('Failed to parse JSON', parseError);
-      // Return fallback response
-      return {
+    logSuccess('✅ Phaseplan generated successfully');
+    return { data };
+  } catch (error) {
+    budgetGuard.finishStep(begin.logIndex, text);
+    logError('Error generating phaseplan', error);
+    return {
+      data: {
         title: context.title,
         description: "En spændende læringseventyr venter!",
         phases: [
@@ -122,14 +207,37 @@ async function generateSimpleAdventure(context: any) {
             duration: 30,
             activity: "Start din adventure"
           }
-        ],
-        success: true
-      };
-    }
-  } catch (error) {
-    logError('Error generating adventure', error);
-    throw error;
+        ]
+      }
+    };
   }
+}
+
+// Budget-controlled adventure generator
+async function generateBudgetAdventure(context: any) {
+  logInfo('🚀 Starting budget-controlled adventure generation', context);
+  
+  // Generate hook
+  const hookResult = await generateHook(context);
+  
+  // Generate main phase plan
+  const phasePlanResult = await generatePhaseplan(context);
+  
+  // Use phaseplan data or fallback
+  const adventureData = phasePlanResult.data || {
+    title: context.title,
+    description: "En spændende læringseventyr venter!",
+    phases: [
+      {
+        name: "Intro",
+        duration: 30,
+        activity: "Start din adventure"
+      }
+    ]
+  };
+
+  logSuccess('✅ Budget adventure generated successfully');
+  return adventureData;
 }
 
 // Main request handler
@@ -159,8 +267,8 @@ serve(async (req) => {
 
     logInfo('📋 Adventure context', context);
 
-    // Generate adventure
-    const adventure = await generateSimpleAdventure(context);
+    // Generate adventure with budget control
+    const adventure = await generateBudgetAdventure(context);
 
     logSuccess('✅ Adventure generation completed');
 
@@ -186,8 +294,11 @@ serve(async (req) => {
         })),
         estimatedTime: (adventure.phases || []).reduce((total: number, phase: any) => total + (phase.duration || 30), 0)
       },
-      generationType: 'multi-prompt-simplified',
-      timestamp: new Date().toISOString()
+      generationType: 'multi-prompt-budget-controlled',
+      timestamp: new Date().toISOString(),
+      meta: {
+        budget: budgetGuard.report()
+      }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
