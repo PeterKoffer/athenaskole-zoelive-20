@@ -155,25 +155,31 @@ export class LessonSourceManager {
       imageUrl: '' // Will be set below
     };
 
-    // Handle image generation/retrieval with immediate fallback
-    let imageUrl = null;
-    try {
-      // Generate deterministic UUID from slug
-      const universeUuid = uuidv5(selectedUniverse.id, UNIVERSE_NAMESPACE);
-      const isUUID = true; // We now have a valid UUID
-      
-      if (isUUID) {
-        imageUrl = await ensureDailyProgramCover({
-          universeId: universeUuid, // Use the generated UUID
-          title: selectedUniverse.title,
-          gradeInt: resolvedGrade
-        });
-      }
-      
-      // Fallback to local image if no UUID or generation failed
-      if (!imageUrl) {
-        imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
-      }
+      // Handle image generation/retrieval with immediate fallback
+      let imageUrl = null;
+      try {
+        // Generate deterministic UUID from slug
+        const universeUuid = uuidv5(selectedUniverse.id, UNIVERSE_NAMESPACE);
+        const isUUID = true; // We now have a valid UUID
+        
+        if (isUUID) {
+          // Only generate cover if not in development/test mode
+          const shouldGenerateCover = process.env.NODE_ENV === 'production' || 
+                                    !window.location.hostname.includes('localhost');
+          
+          if (shouldGenerateCover) {
+            imageUrl = await ensureDailyProgramCover({
+              universeId: universeUuid, // Use the generated UUID
+              title: selectedUniverse.title,
+              gradeInt: resolvedGrade
+            });
+          }
+        }
+        
+        // Fallback to local image if no UUID or generation failed/skipped
+        if (!imageUrl) {
+          imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
+        }
     } catch (error) {
       console.warn('Image generation failed, using fallback:', error);
       imageUrl = this.getSubjectFallbackImage(selectedUniverse.subjectHint);
@@ -325,11 +331,17 @@ export class LessonSourceManager {
       // Handle image generation
       let imageUrl = null;
       try {
-        imageUrl = await ensureDailyProgramCover({
-          universeId: `ai-${date}`, // Not a UUID, will use fallback
-          title: structuredLesson.hero.title,
-          gradeInt: resolvedGrade
-        });
+        // Only generate covers in production to avoid waste during testing
+        const shouldGenerateCover = process.env.NODE_ENV === 'production' || 
+                                  !window.location.hostname.includes('localhost');
+        
+        if (shouldGenerateCover) {
+          imageUrl = await ensureDailyProgramCover({
+            universeId: `ai-${date}`, // Not a UUID, will use fallback
+            title: structuredLesson.hero.title,
+            gradeInt: resolvedGrade
+          });
+        }
         imageUrl = imageUrl || this.getSubjectFallbackImage(structuredLesson.hero.subject);
       } catch (error) {
         console.warn('Image generation failed:', error);

@@ -71,8 +71,28 @@ Deno.serve(async (req) => {
   const universeId = String(body.universeId ?? "default");
 
   try {
-    // 1) Generate via OpenAI
-    console.log("[image-service] submitting to OpenAI, prompt:", prompt, "w/h:", width, height);
+    // 1) Check if cover already exists to avoid wasteful regeneration
+    const coverPath = `${universeId}/cover.webp`;
+    const { data: existingFile, error: checkError } = await supabase.storage
+      .from(bucket)
+      .download(coverPath);
+    
+    if (existingFile && existingFile.size > 1024) {
+      console.log("[image-service] Cover already exists, returning cached version");
+      const pub = supabase.storage.from(bucket).getPublicUrl(coverPath);
+      return ok({
+        impl: "cached-existing-v1", 
+        width, height,
+        bucket,
+        path: coverPath,
+        coverPath,
+        publicUrl: pub.data.publicUrl,
+        cached: true
+      });
+    }
+
+    // 2) Generate via OpenAI only if no existing cover
+    console.log("[image-service] No existing cover found, generating new image with OpenAI, prompt:", prompt, "w/h:", width, height);
 
     let imageBytes: Uint8Array;
     try {
@@ -106,16 +126,16 @@ Deno.serve(async (req) => {
       return bad(`OpenAI API error: ${openaiError instanceof Error ? openaiError.message : String(openaiError)}`, 502);
     }
 
-    // 2) Create blob from bytes
+    // 3) Create blob from bytes
     const contentType = "image/webp";
     const blob = new Blob([imageBytes], { type: contentType });
 
-    // 3) Extension
+    // 4) Extension
     const ext = "webp";
 
-    // 4) Upload timestamped AND canonical "cover"
+    // 5) Upload timestamped AND canonical "cover" 
     const tsPath = `${universeId}/${Date.now()}-${slug(prompt)}.${ext}`;
-    const coverPath = `${universeId}/cover.${ext}`; // <- what the UI expects
+    // coverPath already defined above
 
     const up1 = await supabase.storage.from(bucket).upload(tsPath, blob, {
       contentType, upsert: true,
