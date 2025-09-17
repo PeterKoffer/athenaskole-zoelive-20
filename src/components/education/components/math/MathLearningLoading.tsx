@@ -1,17 +1,13 @@
 
 import { Brain, Calculator } from 'lucide-react';
-import ClassroomEnvironment from '../shared/ClassroomEnvironment';
-import { getClassroomConfig } from '../shared/classroomConfigs';
 
 interface MathLearningLoadingProps {
   studentName: string;
 }
 
 const MathLearningLoading = ({ studentName }: MathLearningLoadingProps) => {
-  const classroomConfig = getClassroomConfig('mathematics');
-
   return (
-    <ClassroomEnvironment config={classroomConfig}>
+    <div className="min-h-screen">
       <div className="w-full max-w-4xl mx-auto px-4 py-6">
         <div className="bg-gray-800/80 border-gray-700 rounded-lg p-8 text-center backdrop-blur-sm">
           <div className="flex items-center justify-center space-x-2 mb-4">
@@ -27,7 +23,7 @@ const MathLearningLoading = ({ studentName }: MathLearningLoadingProps) => {
           </div>
         </div>
       </div>
-    </ClassroomEnvironment>
+    </div>
   );
 };
 

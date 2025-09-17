@@ -29,13 +29,8 @@ async function withGate<T>(fn: () => Promise<T>) {
 export async function generateActivityImage(prompt?: string, phaseType: "cover" | "math" | "language" | "science" | "exit" = "cover"): Promise<string | null> {
   if (!prompt) return null;
   
-  // Use enhanced prompt builder for better quality
-  const enhancedPrompt = buildImagePrompt({
-    style: "kidbook-gouache",
-    subject: prompt,
-    setting: "professional research environment, modern laboratory, scientific workspace, no classrooms",
-    consistency: `NELIE-activity-v2-${phaseType}`
-  });
+  // Professional environment prompt - NO CLASSROOM
+  const enhancedPrompt = `Professional modern environment for "${prompt}". Cinematic lighting, realistic props, inspiring atmosphere, no text overlay, no classroom elements.`;
   
   const key = hashKey(`${PROMPT_VERSION}:${enhancedPrompt}`);
   if (imageCache.has(key)) return imageCache.get(key)!;
@@ -47,24 +42,20 @@ export async function generateActivityImage(prompt?: string, phaseType: "cover" 
       
       const seed = seedFromId(key);
       
-      const res = await fetch(`${base}/image-service`, {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/image-ensure`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'apikey': (import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY || '',
-          'authorization': `Bearer ${(import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY || ''}`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          prompt: enhancedPrompt,
-          negative_prompt: NEGATIVE_PROMPT,
-          seed: seed,
-          universeId: `activity-${key}`,
-          width: 1920,
-          height: 1080
-        })
+          universeId: 'activity-image',
+          gradeInt: 6,
+          title: enhancedPrompt,
+        }),
       });
       const data = await res.json().catch(() => ({}));
-      return data?.data?.publicUrl || data?.data?.bflUrl || null;
+      return data?.url || null;
     } catch {
       return null;
     }

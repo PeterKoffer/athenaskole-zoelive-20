@@ -3,8 +3,6 @@ import MathLessonHeader from './MathLessonHeader';
 import MathLessonControlPanel from './MathLessonControlPanel';
 import MentalMathStrategies from './MentalMathStrategies';
 import MathLessonContentRenderer from './MathLessonContentRenderer';
-import ClassroomEnvironment from '../shared/ClassroomEnvironment';
-import { getClassroomConfig } from '../shared/classroomConfigs';
 import { LessonActivity } from '../types/LessonTypes';
 
 interface MathLearningMainContentProps {
@@ -48,7 +46,7 @@ const MathLearningMainContent = ({
   canNavigateForward = false,
   isCurrentActivityCompleted = false
 }: MathLearningMainContentProps) => {
-  const classroomConfig = getClassroomConfig('mathematics');
+  
 
   const handleNavigateBack = () => {
     if (canNavigateBack && onNavigateToActivity) {
@@ -65,7 +63,7 @@ const MathLearningMainContent = ({
   };
 
   return (
-    <ClassroomEnvironment config={classroomConfig}>
+    <div className="min-h-screen">
       <div className="w-full space-y-0">
         <MathLessonHeader
           studentName={studentName}
@@ -140,7 +138,7 @@ const MathLearningMainContent = ({
           </div>
         </div>
       </div>
-    </ClassroomEnvironment>
+    </div>
   );
 };
 

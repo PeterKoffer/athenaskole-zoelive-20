@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedSpeech } from '@/hooks/useUnifiedSpeech';
 import { UserMetadata } from '@/types/auth';
-import ClassroomEnvironment from '../shared/ClassroomEnvironment';
-import { getClassroomConfig } from '../shared/classroomConfigs';
 import FunctionalMathScoreboard from './FunctionalMathScoreboard';
 import AIGeneratedMathQuestion from './AIGeneratedMathQuestion';
 import MathWelcomeMessage from './MathWelcomeMessage';
@@ -25,7 +23,7 @@ const FullyFunctionalMathLearning = ({ onBackToProgram }: FullyFunctionalMathLea
   const [questionsCompleted, setQuestionsCompleted] = useState(0);
   const [hasWelcomed, setHasWelcomed] = useState(false);
   
-  const classroomConfig = getClassroomConfig("mathematics");
+  
   const studentName = (user?.user_metadata as UserMetadata)?.first_name || 'Student';
   const totalQuestions = 6;
 
@@ -145,47 +143,43 @@ const FullyFunctionalMathLearning = ({ onBackToProgram }: FullyFunctionalMathLea
 
   if (showWelcome) {
     return (
-      <ClassroomEnvironment config={classroomConfig}>
-        <div className="min-h-screen flex items-center justify-center px-4">
-          <MathWelcomeMessage
-            studentName={studentName}
-            onStartLesson={handleStartLesson}
-          />
-        </div>
-      </ClassroomEnvironment>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <MathWelcomeMessage
+          studentName={studentName}
+          onStartLesson={handleStartLesson}
+        />
+      </div>
     );
   }
 
   return (
-    <ClassroomEnvironment config={classroomConfig}>
-      <div className="min-h-screen py-4 px-2">
-        {/* Functional Scoreboard */}
-        <FunctionalMathScoreboard
-          studentName={studentName}
-          timeElapsed={timeElapsed}
-          score={score}
-          currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={totalQuestions}
-          correctStreak={correctStreak}
-          questionsCompleted={questionsCompleted}
-          onBackToProgram={handleBackToProgram}
-        />
+    <div className="min-h-screen py-4 px-2">
+      {/* Functional Scoreboard */}
+      <FunctionalMathScoreboard
+        studentName={studentName}
+        timeElapsed={timeElapsed}
+        score={score}
+        currentQuestionIndex={currentQuestionIndex}
+        totalQuestions={totalQuestions}
+        correctStreak={correctStreak}
+        questionsCompleted={questionsCompleted}
+        onBackToProgram={handleBackToProgram}
+      />
 
 
-        {/* AI Generated Math Content */}
-        <div className="flex items-center justify-center">
-          <div className="w-full max-w-4xl">
-            <AIGeneratedMathQuestion
-              questionNumber={currentQuestionIndex + 1}
-              totalQuestions={totalQuestions}
-              studentGrade={4}
-              onQuestionComplete={handleQuestionComplete}
-              key={currentQuestionIndex} // Force re-render for new questions
-            />
-          </div>
+      {/* AI Generated Math Content */}
+      <div className="flex items-center justify-center">
+        <div className="w-full max-w-4xl">
+          <AIGeneratedMathQuestion
+            questionNumber={currentQuestionIndex + 1}
+            totalQuestions={totalQuestions}
+            studentGrade={4}
+            onQuestionComplete={handleQuestionComplete}
+            key={currentQuestionIndex} // Force re-render for new questions
+          />
         </div>
       </div>
-    </ClassroomEnvironment>
+    </div>
   );
 };
 

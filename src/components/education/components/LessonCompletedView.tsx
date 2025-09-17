@@ -1,8 +1,6 @@
 
 import { CheckCircle, Star, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ClassroomEnvironment from './shared/ClassroomEnvironment';
-import { getClassroomConfig } from './shared/classroomConfigs';
 
 interface LessonCompletedViewProps {
   onBackToProgram: () => void;
@@ -19,10 +17,8 @@ const LessonCompletedView = ({
   timeSpent = 0,
   achievements = []
 }: LessonCompletedViewProps) => {
-  const classroomConfig = getClassroomConfig(subject);
-
   return (
-    <ClassroomEnvironment config={classroomConfig}>
+    <div className="min-h-screen">
       <div className="w-full max-w-4xl mx-auto px-4 py-6">
         <div className="bg-gray-800/80 border-gray-700 rounded-lg p-8 text-center backdrop-blur-sm">
           <div className="mb-6">
@@ -31,7 +27,7 @@ const LessonCompletedView = ({
             </div>
             <h2 className="text-3xl font-bold text-white mb-2">Lesson Complete!</h2>
             <p className="text-gray-300 text-lg">
-              Congratulations on completing your {classroomConfig.subjectName} lesson!
+              Congratulations on completing your {subject} lesson!
             </p>
           </div>
 
@@ -84,7 +80,7 @@ const LessonCompletedView = ({
           </div>
         </div>
       </div>
-    </ClassroomEnvironment>
+    </div>
   );
 };
 
