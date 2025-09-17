@@ -80,10 +80,38 @@ Deno.serve(async (req) => {
     : undefined;
 
   const titleIn = String(body.title ?? query.title ?? "Today's Program");
-  // Use UTF-8 prompt for the model; sanitize only for file path
-  const prompt =
-    String(body.prompt ??
-      `${titleIn}${gradeInt ? `, engaging classroom cover image for grade ${gradeInt}` : ""}, vibrant, friendly, clean composition`);
+  
+  // Build adventure-specific prompt instead of generic classroom prompt
+  const prompt = buildAdventureSpecificPrompt(universeId, titleIn, gradeInt);
+
+function buildAdventureSpecificPrompt(universeId: string, title: string, gradeInt?: number): string {
+  const titleLower = title.toLowerCase();
+  const idLower = universeId.toLowerCase();
+
+  // Map specific adventures to contextual prompts
+  if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
+    return `children's storybook illustration, modern vertical farming facility with stacked growing towers, LED grow lights, hydroponic systems, fresh vegetables, indoor garden environment, soft gouache texture, warm natural lighting, educational setting, age-appropriate, no text overlay`;
+  }
+
+  if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
+    return `children's storybook illustration, business negotiation workshop, professional meeting room, students learning communication skills, presentation boards, collaborative workspace, soft gouache texture, warm lighting, educational setting, age-appropriate, no text overlay`;
+  }
+
+  if (titleLower.includes('toy line') || idLower.includes('toy') || titleLower.includes('design')) {
+    return `children's storybook illustration, toy design workshop, creative studio with colorful toy prototypes, design materials, craft supplies, students creating and designing, soft gouache texture, bright creative lighting, educational setting, age-appropriate, no text overlay`;
+  }
+
+  if (titleLower.includes('water rocket') || idLower.includes('rocket')) {
+    return `children's storybook illustration, rocket launch competition area, outdoor field with water rockets, launch pads, safety equipment, students conducting experiments, soft gouache texture, natural daylight, educational setting, age-appropriate, no text overlay`;
+  }
+
+  if (titleLower.includes('constitutional') || idLower.includes('constitution')) {
+    return `children's storybook illustration, historical constitutional convention, colonial-style meeting hall, period furniture, students learning about democracy, historical documents, soft gouache texture, warm historical lighting, educational setting, age-appropriate, no text overlay`;
+  }
+
+  // Default adventure-specific prompt (remove generic "grade X" text)
+  return `children's storybook illustration, learning adventure focused on ${title}, educational activity, students engaged in hands-on learning, modern classroom or learning space, soft gouache texture, warm natural lighting, vibrant colors, friendly atmosphere, age-appropriate, no text overlay`;
+}
 
   try {
     console.log("[image-ensure] Starting OpenAI image generation...", { prompt, openaiSize });
