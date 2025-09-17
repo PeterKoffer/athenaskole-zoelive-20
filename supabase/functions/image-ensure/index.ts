@@ -92,6 +92,137 @@ Deno.serve(async (req) => {
     let keyElements = 'educational materials, learning tools, collaborative workspace';
     let props = 'learning materials, books, tools, presentation boards';
     
+    // Graphics, Animation & Design
+    if (titleLower.includes('infographic') || titleLower.includes('animator') || titleLower.includes('animation')) {
+      setting = 'a modern animation and design studio';
+      environment = 'creative workspace with multiple monitors, drawing tablets, and design software';
+      keyElements = 'computer workstations, drawing tablets, colorful graphics on screens, animation timelines';
+      props = 'digital drawing tablets, multiple monitors, design software interfaces, color palettes, stylus pens';
+    } else if (titleLower.includes('graphic') || titleLower.includes('logo') || titleLower.includes('brand')) {
+      setting = 'a graphic design studio';
+      environment = 'modern creative workspace with design materials and inspiration boards';
+      keyElements = 'design mockups, color swatches, typography samples, brand identity materials';
+      props = 'design tablets, color wheels, font samples, logo sketches, brand boards';
+    
+    // Agriculture & Farming
+    } else if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
+      setting = 'a modern vertical farming facility';
+      environment = 'indoor hydroponic tower garden with LED grow lights';
+      keyElements = 'stacked growing towers, LED panels, nutrient systems, fresh vegetables';
+      props = 'hydroponic towers, grow lights, water pumps, pH meters, harvest baskets';
+    } else if (titleLower.includes('farm') || titleLower.includes('ranch') || idLower.includes('farm') || idLower.includes('ranch')) {
+      setting = 'a traditional farm or ranch operation';
+      environment = 'pastoral countryside with farmhouse, barns, fields, and livestock areas';
+      keyElements = 'red barn, farmhouse, tractors, crops, farm animals, pastures, fence lines';
+      props = 'wooden barn, farm equipment, hay bales, farm animals, crops in fields, rustic fencing';
+    
+    // Science & Technology
+    } else if (titleLower.includes('satellite') || titleLower.includes('space') || titleLower.includes('network')) {
+      setting = 'a mission control center or satellite facility';
+      environment = 'high-tech control room with screens showing orbital paths and communications';
+      keyElements = 'satellite dishes, orbital displays, communication arrays, mission control screens';
+      props = 'control panels, satellite models, orbital maps, communication equipment, radar dishes';
+    } else if (titleLower.includes('water rocket') || titleLower.includes('rocket') || titleLower.includes('rube goldberg')) {
+      setting = 'a rocket launch competition area or engineering workshop';
+      environment = 'outdoor launch field with safety equipment and measuring tools, or indoor workshop with engineering materials';
+      keyElements = 'rockets, launch pads, trajectory paths, measuring equipment, engineering contraptions';
+      props = 'rockets, launch pads, safety goggles, measuring tapes, engineering materials, pulleys, ramps';
+    } else if (titleLower.includes('robot') || titleLower.includes('automation') || titleLower.includes('ai')) {
+      setting = 'a robotics laboratory or automation facility';
+      environment = 'modern tech lab with robotic equipment and programming stations';
+      keyElements = 'robotic arms, circuit boards, programming interfaces, mechanical components';
+      props = 'robots, circuit boards, computers, sensors, mechanical parts, programming displays';
+    
+    // Business & Economics
+    } else if (titleLower.includes('negotiation') || idLower.includes('negotiation')) {
+      setting = 'a business negotiation workshop';
+      environment = 'professional meeting room or classroom setup';
+      keyElements = 'meeting tables, presentation boards, handshake moments, business materials';
+      props = 'meeting tables, chairs, notebooks, presentation materials, name tags';
+    } else if (titleLower.includes('startup') || titleLower.includes('entrepreneur') || titleLower.includes('business')) {
+      setting = 'a modern startup incubator or co-working space';
+      environment = 'open collaborative workspace with whiteboards and presentation areas';
+      keyElements = 'brainstorming sessions, pitch presentations, business plans, team collaboration';
+      props = 'whiteboards, laptops, presentation screens, sticky notes, business charts';
+    } else if (titleLower.includes('market') || titleLower.includes('economics') || titleLower.includes('trade')) {
+      setting = 'a bustling marketplace or trading floor';
+      environment = 'active commercial environment with vendors and buyers';
+      keyElements = 'market stalls, price displays, trading activities, commercial exchanges';
+      props = 'market stalls, price tags, calculators, goods displays, cash registers';
+    
+    // History & Culture
+    } else if (titleLower.includes('constitutional') || idLower.includes('constitution')) {
+      setting = 'a historical constitutional convention';
+      environment = 'colonial-style meeting hall with period furniture';
+      keyElements = 'colonial architecture, founding documents, quill pens, historical furniture';
+      props = 'wooden desks, quill pens, parchment, candles, colonial chairs';
+    } else if (titleLower.includes('history') || titleLower.includes('museum') || titleLower.includes('artifact')) {
+      setting = 'a historical research center or museum';
+      environment = 'archive room with historical documents and artifacts';
+      keyElements = 'historical documents, artifacts, research materials, preservation equipment';
+      props = 'old documents, magnifying glasses, archive boxes, historical artifacts, research desks';
+    } else if (titleLower.includes('cultural') || titleLower.includes('exchange') || titleLower.includes('international')) {
+      setting = 'an international cultural center';
+      environment = 'multicultural space with flags, maps, and cultural displays';
+      keyElements = 'world maps, cultural artifacts, international flags, language materials';
+      props = 'world globes, cultural items, language books, international flags, communication devices';
+    
+    // Arts & Media
+    } else if (titleLower.includes('music') || titleLower.includes('sound') || titleLower.includes('audio')) {
+      setting = 'a music production studio';
+      environment = 'professional recording studio with instruments and mixing equipment';
+      keyElements = 'mixing boards, microphones, instruments, sound waves, recording booth';
+      props = 'musical instruments, microphones, mixing console, headphones, sound panels';
+    } else if (titleLower.includes('film') || titleLower.includes('video') || titleLower.includes('cinema')) {
+      setting = 'a film production studio';
+      environment = 'movie set with cameras, lighting, and film equipment';
+      keyElements = 'film cameras, lighting rigs, director chairs, film reels, movie screens';
+      props = 'film cameras, lighting equipment, clapperboards, film reels, editing screens';
+    } else if (titleLower.includes('podcast') || titleLower.includes('interview') || titleLower.includes('journalism')) {
+      setting = 'a podcast studio or newsroom';
+      environment = 'professional broadcast studio with recording equipment';
+      keyElements = 'microphones, soundproofing, recording equipment, interview setup';
+      props = 'professional microphones, headphones, recording devices, soundproof panels, interview table';
+    
+    // Manufacturing & Design
+    } else if (titleLower.includes('toy line') || titleLower.includes('toy') || titleLower.includes('product design')) {
+      setting = 'a toy design and manufacturing workshop';
+      environment = 'creative design studio with prototyping materials';
+      keyElements = 'toy prototypes, design sketches, colorful materials, craft supplies';
+      props = 'craft materials, design tools, toy prototypes, sketch pads, markers';
+    } else if (titleLower.includes('fashion') || titleLower.includes('textile') || titleLower.includes('clothing')) {
+      setting = 'a fashion design atelier';
+      environment = 'design studio with mannequins, fabric samples, and sewing equipment';
+      keyElements = 'dress forms, fabric swatches, fashion sketches, sewing machines';
+      props = 'mannequins, fabric rolls, sewing machines, design sketches, measuring tools';
+    
+    // Food & Culinary
+    } else if (titleLower.includes('restaurant') || titleLower.includes('culinary') || titleLower.includes('chef')) {
+      setting = 'a professional kitchen or culinary school';
+      environment = 'modern commercial kitchen with cooking stations and equipment';
+      keyElements = 'cooking stations, professional equipment, fresh ingredients, plated dishes';
+      props = 'chef knives, cooking pans, fresh ingredients, plated food, kitchen equipment';
+    } else if (titleLower.includes('nutrition') || titleLower.includes('food science') || titleLower.includes('diet')) {
+      setting = 'a nutrition laboratory or health clinic';
+      environment = 'clean laboratory with food analysis equipment and health materials';
+      keyElements = 'laboratory equipment, nutritional charts, healthy foods, analysis tools';
+      props = 'microscopes, nutritional charts, fresh produce, measuring scales, lab equipment';
+    
+    // Sports & Recreation
+    } else if (titleLower.includes('sports') || titleLower.includes('athletics') || titleLower.includes('fitness')) {
+      setting = 'a modern sports facility or training center';
+      environment = 'athletic facility with training equipment and sports fields';
+      keyElements = 'sports equipment, training gear, athletic fields, fitness machines';
+      props = 'sports balls, fitness equipment, training cones, athletic gear, scoreboards';
+    
+    // Environment & Sustainability
+    } else if (titleLower.includes('environment') || titleLower.includes('sustainability') || titleLower.includes('green')) {
+      setting = 'an environmental research center';
+      environment = 'eco-friendly facility with renewable energy and natural elements';
+      keyElements = 'solar panels, wind turbines, green plants, recycling systems, natural lighting';
+      props = 'solar panels, plants, recycling bins, environmental charts, renewable energy displays';
+    }
+    
     if (titleLower.includes('vertical farm') || idLower.includes('vertical-farm')) {
       setting = 'a modern vertical farming facility';
       environment = 'indoor hydroponic tower garden with LED grow lights';
