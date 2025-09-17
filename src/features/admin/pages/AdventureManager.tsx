@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, Image, RefreshCw, AlertCircle, Archive, Sparkles } from 'lucide-react';
 import { AdventureImageService } from '@/services/AdventureImageService';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AdventureManager() {
   const [importing, setImporting] = useState(false);
@@ -20,6 +21,7 @@ export default function AdventureManager() {
     teenGenerated: number;
     adultGenerated: number;
   } | null>(null);
+  const [bankImages, setBankImages] = useState<any[]>([]);
 
   const handleImportAdventures = async (filename: string) => {
     setImporting(true);
@@ -73,6 +75,24 @@ export default function AdventureManager() {
       setStatus(statusData);
     } catch (error) {
       console.error('Failed to load status:', error);
+    }
+  };
+
+  const loadPictureBank = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('image_assets')
+        .select('*')
+        .contains('tags', ['adventure-cover'])
+        .order('created_at', { ascending: false })
+        .limit(12);
+      
+      if (error) throw error;
+      setBankImages(data || []);
+      toast.success(`Loaded ${data?.length || 0} images from picture bank`);
+    } catch (error) {
+      console.error('Failed to load picture bank:', error);
+      toast.error('Failed to load picture bank');
     }
   };
 
@@ -335,6 +355,57 @@ export default function AdventureManager() {
                 Adult (9+)
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Picture Bank */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5" />
+              Picture Bank
+            </CardTitle>
+            <CardDescription>
+              View recently generated adventure images
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={loadPictureBank}
+              variant="outline"
+              className="w-full mb-4"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Load Recent Images
+            </Button>
+            
+            {bankImages.length > 0 && (
+              <div className="grid grid-cols-3 gap-4">
+                {bankImages.map((img) => (
+                  <div key={img.id} className="space-y-2">
+                    <img 
+                      src={img.url} 
+                      alt={img.alt_text || 'Generated image'}
+                      className="w-full aspect-video object-cover rounded border"
+                    />
+                    <div className="text-xs text-muted-foreground">
+                      <div>{img.alt_text}</div>
+                      <div className="flex gap-1 flex-wrap">
+                        {img.tags?.map((tag: string) => (
+                          <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {bankImages.length === 0 && (
+              <p className="text-center text-muted-foreground py-4">
+                No images found in picture bank
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
