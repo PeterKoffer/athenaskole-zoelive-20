@@ -1,8 +1,10 @@
 // src/services/media/imagePrefetch.ts
+import { buildImagePrompt, NEGATIVE_PROMPT, seedFromId } from "../imagePromptBuilder";
+
 let inflight = 0;
 const MAX_CONCURRENCY = 3;
 const imageCache = new Map<string, Promise<string | null>>();
-const PROMPT_VERSION = (import.meta.env?.VITE_PROMPT_VERSION ?? 'v1').toString().trim();
+const PROMPT_VERSION = (import.meta.env?.VITE_PROMPT_VERSION ?? 'v2').toString().trim();
 
 // Lightweight FNV-like hash for stable keys
 function hashKey(s: string): string {
@@ -24,15 +26,27 @@ async function withGate<T>(fn: () => Promise<T>) {
   }
 }
 
-export async function generateActivityImage(prompt?: string): Promise<string | null> {
+export async function generateActivityImage(prompt?: string, phaseType: "cover" | "math" | "language" | "science" | "exit" = "cover"): Promise<string | null> {
   if (!prompt) return null;
-  const key = hashKey(`${PROMPT_VERSION}:${prompt.trim()}`);
+  
+  // Use enhanced prompt builder for better quality
+  const enhancedPrompt = buildImagePrompt({
+    style: "kidbook-gouache",
+    subject: prompt,
+    setting: "educational classroom or school environment, age-appropriate props and materials",
+    consistency: `NELIE-activity-v2-${phaseType}`
+  });
+  
+  const key = hashKey(`${PROMPT_VERSION}:${enhancedPrompt}`);
   if (imageCache.has(key)) return imageCache.get(key)!;
 
   const p = withGate(async () => {
     try {
       const base = (import.meta as any)?.env?.VITE_IMAGE_EDGE_URL;
       if (!base) return null;
+      
+      const seed = seedFromId(key);
+      
       const res = await fetch(`${base}/image-service`, {
         method: 'POST',
         headers: { 
@@ -41,10 +55,12 @@ export async function generateActivityImage(prompt?: string): Promise<string | n
           'authorization': `Bearer ${(import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY || ''}`
         },
         body: JSON.stringify({
-          prompt: prompt,
+          prompt: enhancedPrompt,
+          negative_prompt: NEGATIVE_PROMPT,
+          seed: seed,
           universeId: `activity-${key}`,
-          width: 1024,
-          height: 576
+          width: 1920,
+          height: 1080
         })
       });
       const data = await res.json().catch(() => ({}));
