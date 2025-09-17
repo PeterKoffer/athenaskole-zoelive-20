@@ -646,7 +646,7 @@ Deno.serve(async (req) => {
       "no text overlay, no brand logos",
       `CONSISTENCY_TAG: ${consistency}`
     ].join(" — ");
-  };
+  }
   
   const prompt = buildCinematicPrompt(universeId, titleIn);
   
