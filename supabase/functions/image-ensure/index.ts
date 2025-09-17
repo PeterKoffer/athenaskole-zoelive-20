@@ -16,48 +16,72 @@ function isClassroomAllowed(title: string): boolean {
   return CLASSROOM_ALLOWED.some(pattern => pattern.test(title));
 }
 
-// ====== THE ONLY PROMPT BUILDER IN THE ENTIRE SYSTEM ======
-function buildSinglePrompt(title: string, mode: "professional" | "classroom" = "professional"): string {
-  const STYLE = "cinematic hybrid photoreal + subtle Pixar warmth, HDR, volumetric light, shallow DOF, filmic color grade, no text/watermarks, no logos";
-  
-  // Force professional mode if classroom not allowed
-  if (mode === "classroom" && !isClassroomAllowed(title)) {
-    mode = "professional";
-  }
+// ====== ADVENTURE-AWARE, BANNER-SAFE PROMPT BUILDER ======
+type PromptInput = {
+  title: string;              // "Launch a Non-Profit Organization"
+  subject?: string;           // "Civics", "Life Skills", etc.
+  tags?: string[];            // ["Grade 6-8","Project-based"]
+  mode?: "pro" | "classroom"; // classroom only if allow-listed elsewhere
+};
+
+// keyword → scene snippets (zero classrooms)
+const MAP: Array<[RegExp, string]> = [
+  [/record label|music (producer|studio)/i,
+    "modern recording studio, mixing console, microphones on boom arms, acoustic panels"],
+  [/graphic design|design agency|branding|poster|logo/i,
+    "creative design studio, large monitors with vector tools, drawing tablets, mood boards"],
+  [/self[- ]?driv|autonom|robot|ai lab/i,
+    "robotics lab with LiDAR rigs and a test vehicle on a garage bay track"],
+  [/non[- ]?profit|nonprofit|ngo|charit/i,
+    "non-profit operations hub with donor dashboards on screens, project pinboard, volunteer kits"],
+  [/dinosaur|paleo|jurassic|safari/i,
+    "field research outpost at a dinosaur park, safety railings, dig crates, lush foliage"],
+  [/miniature city|urban plan|city planner/i,
+    "urban planning studio with a detailed scale model city and zoning maps"],
+  [/construction|skyscraper|civil|bridge/i,
+    "active construction site with tower cranes, scaffolding, and blueprints on a table"],
+  [/news|journalis|podcast|broadcast/i,
+    "newsroom / podcast studio with cameras, boom mics, light panels, editing bays"],
+  [/hospital|clinic|medical|er|wellness/i,
+    "modern diagnostics room with ultrasound/ECG equipment, clinicians conferring"],
+  [/kitchen|culinary|restaurant|food truck/i,
+    "professional kitchen line with stainless counters and the pass"],
+];
+
+function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: PromptInput): string {
+  // Style & composition force banner fitness (no tight crops)
+  const STYLE =
+    "cinematic hybrid photoreal with subtle Pixar warmth, global illumination, HDR, gentle film grain, no text or watermarks";
+  const COMPOSITION =
+    "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
+  const SAFE_MARGINS =
+    "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
+  const COLOR_MOOD =
+    "rich but natural palette; inspiring, capable, modern";
+
+  // negative rules (pro mode forbids classrooms)
+  const NEG_PRO =
+    "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, teachers or students";
+
+  const NEG_CLASSROOM =
+    "no boardrooms, no factories, no hospitals, no construction sites";
+
+  const t = title.toLowerCase();
+  let scene = "professional real-world environment relevant to the adventure";
+  for (const [rx, s] of MAP) if (rx.test(t)) { scene = s; break; }
+
+  const subjectHint = subject ? `Subject: ${subject}. ` : "";
+  const tagHint = tags.length ? `Tags: ${tags.join(", ")}. ` : "";
 
   if (mode === "classroom") {
-    return `${STYLE} — bright modern classroom with collaborative learning setup, natural daylight, educational posters, students working together, inspiring atmosphere — NO corporate settings, NO boardrooms`;
+    // server should already gate this by allowlist
+    const CLASSROOM_SCENE =
+      "bright, modern classroom; collaborative tables; learning posters; natural daylight; friendly atmosphere";
+    return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — Adventure: ${title}. ${subjectHint}${tagHint}${CLASSROOM_SCENE} — ${NEG_CLASSROOM}`;
   }
 
-  // Professional environments based on adventure title
-  const t = title.toLowerCase();
-  let scene = "professional modern workspace";
-  
-  if (/(record label|music|studio|audio)/.test(t)) {
-    scene = "modern recording studio with mixing console, sound equipment, acoustic panels";
-  } else if (/(graphic|design|agency|branding)/.test(t)) {
-    scene = "creative design studio with large monitors, drawing tablets, mood boards";
-  } else if (/(robot|ai|tech|programming)/.test(t)) {
-    scene = "modern tech lab with computers, robotic equipment, innovation workspace";
-  } else if (/(dinosaur|paleo|fossil|expedition)/.test(t)) {
-    scene = "paleontology field station with excavation tools, fossil displays, research tent";
-  } else if (/(antarctic|ice|polar|climate)/.test(t)) {
-    scene = "arctic research station with ice core samples, scientific equipment, snowy landscape";
-  } else if (/(marine|ocean|underwater|aquatic)/.test(t)) {
-    scene = "marine research facility with aquariums, diving gear, underwater cameras";
-  } else if (/(space|satellite|mission|astronaut)/.test(t)) {
-    scene = "space mission control center with monitoring screens, satellite displays";
-  } else if (/(construction|building|architect)/.test(t)) {
-    scene = "construction site office with blueprints, hard hats, building equipment";
-  } else if (/(medical|health|clinic|hospital)/.test(t)) {
-    scene = "modern medical facility with diagnostic equipment, clean environment";
-  } else if (/(sports|team|athletics|fitness)/.test(t)) {
-    scene = "professional sports facility with training equipment, performance analytics";
-  }
-
-  const ANTI_CLASSROOM = "ABSOLUTELY NO classroom, school desks, chalkboards, whiteboards, lockers, teachers, students, school supplies, educational posters, academic settings";
-  
-  return `${STYLE} — ${scene} — inspiring professional atmosphere — ${ANTI_CLASSROOM}`;
+  // pro (default) — adventure-specific, classroom-proof
+  return `${STYLE} — ${COMPOSITION} — ${SAFE_MARGINS} — ${COLOR_MOOD} — Adventure: ${title}. ${subjectHint}${tagHint}${scene} — ${NEG_PRO}`;
 }
 
 
@@ -146,8 +170,13 @@ Deno.serve(async (req) => {
     console.log("[image-ensure] No suitable existing image found, generating new one...");
 
     // THE ONLY PROMPT BUILDER - NO OTHER PROMPTS ALLOWED
-    const finalMode = (requestedMode === "classroom" && isClassroomAllowed(titleIn)) ? "classroom" : "professional";
-    const fullPrompt = buildSinglePrompt(titleIn, finalMode);
+    const finalMode = (requestedMode === "classroom" && isClassroomAllowed(titleIn)) ? "classroom" : "pro";
+    const fullPrompt = buildAdventurePrompt({
+      title: titleIn,
+      subject: body.subject ?? query.subject,
+      tags: body.tags ?? query.tags ?? [],
+      mode: finalMode
+    });
     
     console.log("[image-ensure] ===== PROMPT DETAILS =====");
     console.log("[image-ensure] Title:", titleIn);
@@ -170,7 +199,7 @@ Deno.serve(async (req) => {
         model: "gpt-image-1",
         prompt: fullPrompt,
         n: 1,
-        size: "1536x1024", // Supported size for gpt-image-1
+        size: "1792x1024", // 16:9 banner format for adventure covers
         quality: "high",
         output_format: "webp",
       }),
