@@ -129,12 +129,24 @@ async function generateHook(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = "Du skriver kun JSON: {text, image_prompt}. Max 120 ord i text.";
-  const user = JSON.stringify({ 
-    adventureId: context.title, 
-    title: context.title, 
-    grade: context.gradeLevel 
-  });
+  const system = `Du er en inspirerende lærer der laver fængende undervisningsintroer. Du skal skabe nysgerrighed og motivation hos eleverne. Returner valid JSON.`;
+  
+  const user = `Skriv en inspirerende og engagerende introduktion til lektionen "${context.title}" for ${context.gradeLevel}. klasse i faget ${context.subject}.
+
+KRAV:
+- Start med et spændende scenario, problem eller spørgsmål der fanger elevernes opmærksomhed
+- Forklar hvorfor dette emne er relevant for eleverne i deres dagligdag
+- Stil provocerende spørgsmål der får eleverne til at tænke
+- Brug et sprog der passer til aldersgruppen
+- Skab forventning og nysgerrighed
+
+Returner JSON format:
+{
+  "text": "Engagerende og inspirerende introduktionstekst der motiverer eleverne (150-200 ord)",
+  "hook_question": "Et provocerende spørgsmål der starter diskussion",
+  "real_world_connection": "Hvordan emnet relaterer til elevernes hverdag",
+  "image_prompt": "Beskrivelse til generering af inspirerende billede der understøtter intro"
+}`;
 
   try {
     const { text, usage } = await callOpenAI(begin.model.name, system, user, begin.max_tokens);
@@ -167,21 +179,50 @@ async function generatePhaseplan(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = "Du er en uddannelsesekspert. Returner valid JSON.";
-  const prompt = `Lav en detaljeret phaseplan for "${context.title}" til ${context.gradeLevel}. klasse.
+  const system = `Du er en erfaren uddannelsesekspert og læreruddanner. Du designer detaljerede, engagerende undervisningsforløb med konkrete læringsaktiviteter. Returner altid valid JSON.`;
   
-  Returner JSON format:
-  {
-    "title": "${context.title}",
-    "description": "En kort beskrivelse af adventure",
-    "phases": [
-      {
-        "name": "Phase navn",
-        "duration": 30,
-        "activity": "Detaljeret beskrivelse af aktivitet"
-      }
-    ]
-  }`;
+  const prompt = `Design et komplet undervisningsforløb for "${context.title}" til ${context.gradeLevel}. klasse i faget ${context.subject}.
+
+KRAV TIL UNDERVISNINGSINDHOLD:
+- Hver fase skal indeholde konkrete læringsaktiviteter med trin-for-trin instruktioner
+- Inkluder praktiske øvelser, diskussioner og hands-on aktiviteter  
+- Tilføj reflekssionsspørgsmål og læringsevaluering
+- Designet skal være interaktivt og elevengagerende
+- Inkluder både individuelle og gruppeopgaver
+
+Returner JSON format:
+{
+  "title": "${context.title}",
+  "description": "Detaljeret beskrivelse af hele læringsforløbet (100-150 ord)",
+  "learning_objectives": [
+    "Konkret læringsmål 1",
+    "Konkret læringsmål 2", 
+    "Konkret læringsmål 3"
+  ],
+  "phases": [
+    {
+      "name": "Fase navn",
+      "duration": 30,
+      "type": "introduction|exploration|practice|reflection|assessment",
+      "description": "Kort beskrivelse af fasens formål",
+      "activities": [
+        {
+          "name": "Aktivitetsnavn",
+          "duration": 10,
+          "type": "discussion|exercise|game|project|quiz|reflection",
+          "instructions": "Detaljerede trin-for-trin instruktioner til aktiviteten",
+          "materials": ["nødvendige materialer"],
+          "interaction": "individual|pairs|groups|class"
+        }
+      ],
+      "assessment": "Hvordan evalueres elevernes læring i denne fase",
+      "reflection_questions": ["Refleksionsspørgsmål til eleverne"]
+    }
+  ],
+  "total_duration": 180,
+  "key_concepts": ["Vigtige begreber der læres"],
+  "extension_activities": ["Ekstra aktiviteter for hurtige elever"]
+}`;
 
   try {
     const { text, usage } = await callOpenAI(begin.model.name, system, prompt, begin.max_tokens);
@@ -226,14 +267,51 @@ async function generateBudgetAdventure(context: any) {
   // Use phaseplan data or fallback
   const adventureData = phasePlanResult.data || {
     title: context.title,
-    description: "En spændende læringseventyr venter!",
+    description: "Et detaljeret undervisningsforløb der engagerer eleverne gennem hands-on aktiviteter og refleksion.",
+    learning_objectives: [
+      "Udvikle forståelse for emnet gennem praktiske aktiviteter",
+      "Arbejde selvstændigt og i grupper med faglige problemstillinger",
+      "Reflektere over læring og anvende ny viden"
+    ],
     phases: [
       {
-        name: "Intro",
-        duration: 30,
-        activity: "Start din adventure"
+        name: "Introduktion og Motivation",
+        duration: 45,
+        type: "introduction",
+        description: "Skaber interesse og etablerer læringsmål",
+        activities: [
+          {
+            name: "Åbningsdiskussion",
+            duration: 15,
+            type: "discussion",
+            instructions: "Stil indledende spørgsmål til klassen og lad eleverne dele deres eksisterende viden om emnet.",
+            materials: ["Whiteboard", "Spørgsmål"],
+            interaction: "class"
+          },
+          {
+            name: "Læringsmål Præsentation",
+            duration: 15,
+            type: "presentation",
+            instructions: "Præsenter dagens læringsmål og forklar hvorfor emnet er relevant.",
+            materials: ["Slides", "Eksempler"],
+            interaction: "class"
+          },
+          {
+            name: "Brainstorm Aktivitet",
+            duration: 15,
+            type: "exercise",
+            instructions: "Lad eleverne brainstorme i grupper om emnet og dele deres ideer.",
+            materials: ["Papir", "Markører"],
+            interaction: "groups"
+          }
+        ],
+        assessment: "Observér elevernes engagement og tidligere viden gennem diskussion",
+        reflection_questions: ["Hvad ved I allerede om dette emne?", "Hvorfor tror I dette er vigtigt at lære?"]
       }
-    ]
+    ],
+    total_duration: 180,
+    key_concepts: ["Grundlæggende emneforståelse", "Kritisk tænkning", "Samarbejde"],
+    extension_activities: ["Selvstændig research", "Kreative projekter", "Peer teaching"]
   };
 
   logSuccess('✅ Budget adventure generated successfully');
