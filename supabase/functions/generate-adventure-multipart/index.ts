@@ -5,6 +5,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 interface AdventureContext {
@@ -46,7 +47,8 @@ function logSuccess(message: string, data?: any) {
 async function callAI(prompt: string, context: string = "general"): Promise<any> {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
-    throw new Error('OpenAI API key not configured');
+    logError('OpenAI API key not configured');
+    throw new Error('OpenAI API key not configured - please check environment variables');
   }
 
   logInfo(`🤖 Calling AI for: ${context}`);
@@ -409,6 +411,7 @@ async function generateMultiPromptAdventure(context: AdventureContext) {
 
 // Main request handler
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
