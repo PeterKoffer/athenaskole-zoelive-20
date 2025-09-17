@@ -296,6 +296,7 @@ Deno.serve(async (req) => {
     idLower: universeId.toLowerCase()
   });
 
+  try {
     // ---- 3) Check if image exists in storage first (with version check)
     const promptVersion = 'v2'; // Increment when prompt logic changes
     const expectedPath = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
