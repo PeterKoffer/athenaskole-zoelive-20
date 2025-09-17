@@ -406,7 +406,6 @@ Deno.serve(async (req) => {
     // ---- 4) Upload to Storage
     // Use the expected path format: universeId/gradeInt/cover.webp
     // Add version suffix to force regeneration when prompts change
-    const promptVersion = 'v3'; // Increment when prompt logic changes
     const path = `${universeId}/${gradeInt}/cover-${promptVersion}.webp`;
     const up = await supa.storage.from(bucket).upload(path, bytes, {
       contentType: "image/webp", // Always save as webp for consistency
