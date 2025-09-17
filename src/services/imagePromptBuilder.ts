@@ -153,72 +153,120 @@ export function buildAdventureImagePrompt(
   phaseType: "cover" | "math" | "language" | "science" | "exit",
   subject?: string
 ): { prompt: string; negativePrompt: string; seed: number } {
-  const consistency = `NELIE-kidbook-gouache-01 ${adventureId.replace(/[^a-z0-9]/gi, '-')}`;
-  const seed = seedFromId(adventureId, phaseIndex);
-
-  // Generate adventure-specific context based on title and adventureId
-  const adventureContext = getAdventureContext(title, adventureId);
-
-  const phasePrompts = {
-    cover: {
-      subject: `${adventureContext.setting}, showing ${adventureContext.keyElements}`,
-      setting: `${adventureContext.environment}, ${adventureContext.props}`,
-      camera: "wide establishing, 35mm, eye-level, rule-of-thirds, shallow depth of field",
-      light: "soft daylight, warm bounce, subtle rim light",
-      color: "warm peach, mint green, teal accents",
-      mood: "hopeful, inviting, educational"
-    },
-    math: {
-      subject: `students working with mathematical concepts in ${adventureContext.setting}, ${adventureContext.mathElements}`,
-      setting: `${adventureContext.environment} with mathematical tools: calculators, charts, measuring devices, ${adventureContext.props}`,
-      camera: "medium-wide, 35mm, slight top-down angle, shallow DOF on math tools",
-      light: "soft daylight shade, gentle ambient occlusion",
-      color: "mint green, warm beige, tomato red accents",
-      mood: "focused, analytical, optimistic"
-    },
-    language: {
-      subject: `students practicing communication skills related to ${adventureContext.setting}, ${adventureContext.communicationElements}`,
-      setting: `${adventureContext.environment} with presentation setup: blank poster boards, speaking area, ${adventureContext.props}`,
-      camera: "medium shot, eye-level, 50mm look, shallow DOF on students",
-      light: "soft indoor daylight or canopy shade",
-      color: "peach, soft teal, sunflower yellow",
-      mood: "confident, expressive, collaborative"
-    },
-    science: {
-      subject: `students conducting scientific activities in ${adventureContext.setting}, ${adventureContext.scienceElements}`,
-      setting: `${adventureContext.environment} with scientific equipment: ${adventureContext.scienceTools}, observation charts, ${adventureContext.props}`,
-      camera: "medium-wide, 35mm, slightly low angle, clear focal point on scientific equipment",
-      light: "cool indoor light with soft highlights",
-      color: "cool blue, mint, stainless steel grey",
-      mood: "curious, methodical, discovery-focused"
-    },
-    exit: {
-      subject: `students presenting their completed ${adventureContext.setting} project, showing ${adventureContext.outcomes}`,
-      setting: `${adventureContext.environment} with final presentations, completed projects, proud displays`,
-      camera: "wide, 28–35mm, eye-level, slight vignette to focus on achievement",
-      light: "warm afternoon light, gentle rim, soft shadows",
-      color: "warm peach, mint, teal",
-      mood: "proud, accomplished, successful"
+  // Use the new cinematic prompt engine
+  try {
+    const { buildImagePrompts } = require('./imagePromptEngine');
+    const { getDomainFromTitle } = require('../config/propsBanks');
+    
+    const domain = getDomainFromTitle(title);
+    const role = phaseType === "cover" ? "cover" : "phase";
+    
+    // Create phase-specific subject lines
+    let subjectLine = subject;
+    if (!subjectLine) {
+      const configs: Record<string, string> = {
+        math: `students solving mathematical challenges in ${title} adventure context`,
+        language: `students engaging in storytelling and communication during ${title} activities`,
+        science: `students conducting scientific experiments related to ${title}`,
+        exit: `students celebrating successful completion of ${title} adventure`,
+        cover: `students beginning their exciting ${title} learning adventure`
+      };
+      subjectLine = configs[phaseType] || configs.cover;
     }
-  };
+    
+    const prompts = buildImagePrompts(role, {
+      adventureId,
+      phaseId: `${phaseType}_${phaseIndex}`,
+      domain,
+      title,
+      subjectLine,
+      stylePackId: "cinematic-stylized-realism",
+      realismBlend: 0.85,
+      consistencyTag: `NELIE-cin-real-01 ${domain}`,
+      avoid: ["classroom", "readable text", "grade signs", "brand logos"],
+      variantSalt: phaseIndex
+    });
+    
+    return {
+      prompt: prompts[0].prompt,
+      negativePrompt: prompts[0].negative,
+      seed: parseInt(prompts[0].seed)
+    };
+    
+  } catch (error) {
+    console.warn('Falling back to legacy prompt system:', error);
+    
+    // Fallback to enhanced legacy system with cinematic elements
+    const adventureContext = getAdventureContext(title, adventureId);
+    const consistency = `NELIE-cin-real-01 ${adventureId.replace(/[^a-z0-9]/gi, '-')}`;
+    const seed = seedFromId(adventureId, phaseIndex);
+    
+    const cinematicPhasePrompts = {
+      cover: {
+        subject: `cinematic establishing shot of ${adventureContext.setting}, showing ${adventureContext.keyElements}`,
+        setting: `${adventureContext.environment}, ${adventureContext.props}`,
+        camera: "wide establishing, 35mm anamorphic, eye-level, gentle parallax",
+        light: "golden hour backlight, soft rim, warm bounce",
+        color: "teal & warm amber cinematic grade",
+        mood: "hopeful, inviting, educational"
+      },
+      math: {
+        subject: `cinematic shot of students working with mathematical concepts in ${adventureContext.setting}, ${adventureContext.mathElements}`,
+        setting: `${adventureContext.environment} with mathematical tools and ${adventureContext.props}`,
+        camera: "midshot, 50mm, slight 3/4 angle, portrait depth",
+        light: "bright overcast, giant softbox feel, clean color",
+        color: "butter yellow, forest green, sky blue",
+        mood: "focused, analytical, confident"
+      },
+      language: {
+        subject: `cinematic shot of students practicing communication in ${adventureContext.setting}, ${adventureContext.communicationElements}`,
+        setting: `${adventureContext.environment} with presentation setup and ${adventureContext.props}`,
+        camera: "over-the-shoulder learner POV, 50mm, shallow depth of field",
+        light: "indoor practicals + soft fill, gentle roll-off",
+        color: "coral, seafoam, lilac accents",
+        mood: "expressive, communicative, creative"
+      },
+      science: {
+        subject: `cinematic shot of students conducting scientific activities in ${adventureContext.setting}, ${adventureContext.scienceElements}`,
+        setting: `${adventureContext.environment} with scientific equipment: ${adventureContext.scienceTools}, ${adventureContext.props}`,
+        camera: "close-up macro on hands/tools, creamy bokeh",
+        light: "cool daylight through windows, volumetric shafts",
+        color: "terracotta, sage, powder blue",
+        mood: "curious, investigative, discovery-focused"
+      },
+      exit: {
+        subject: `cinematic shot of students presenting completed ${adventureContext.setting} project, showing ${adventureContext.outcomes}`,
+        setting: `${adventureContext.environment} with final presentations and completed projects`,
+        camera: "low-angle hero shot, 28mm, subtle perspective stretch",
+        light: "even diffuse light, studio-like, controlled speculars",
+        color: "deep navy, saffron, mint highlights",
+        mood: "accomplished, proud, successful"
+      }
+    };
 
-  const config = phasePrompts[phaseType];
-  
-  const prompt = buildImagePrompt({
-    style: "kidbook-gouache",
-    subject: config.subject,
-    setting: config.setting,
-    camera: config.camera,
-    light: config.light,
-    color: config.color,
-    mood: config.mood,
-    consistency,
-    notes: "age-appropriate, wholesome, no text overlay, no logos"
-  });
-
-  return {
-    prompt,
-    negativePrompt: NEGATIVE_PROMPT,
-    seed
-  };
+    const config = cinematicPhasePrompts[phaseType];
+    
+    // Build cinematic prompt manually
+    const cinematicPrompt = [
+      "cinematic stylized realism",
+      "high-end animation film aesthetic",
+      "soft PBR materials",
+      "depth-of-field bokeh",
+      config.subject,
+      config.setting,
+      config.camera,
+      config.light,
+      config.color,
+      config.mood,
+      "age-appropriate, wholesome",
+      "no text overlay, no brand logos",
+      `CONSISTENCY_TAG: ${consistency}`
+    ].join(" — ");
+    
+    return {
+      prompt: cinematicPrompt,
+      negativePrompt: NEGATIVE_PROMPT,
+      seed
+    };
+  }
 }
