@@ -32,28 +32,111 @@ const styleByAgeGroup = {
   },
 };
 
-function buildAgeGroupPrompt(universeTitle: string, scene: string, ageGroup: 'child' | 'teen' | 'adult', description?: string): AgeGroupPrompt {
-  const style = styleByAgeGroup[ageGroup];
-  
-  const prompt = [
-    `Create an engaging educational illustration that directly represents the adventure: ${universeTitle}`,
-    description ? `Story context: ${description}` : null,
-    `Visual scene: ${scene}`,
-    `Target audience: ${ageGroup} learners`,
-    `Art style: ${style.positive}`,
-    'The image should capture the essence and excitement of this specific learning adventure'
-  ].filter(Boolean).join(' — ');
+// Import the new cinematic prompt engine
+async function importPromptEngine() {
+  try {
+    // Dynamic import of the prompt engine modules
+    const { buildImagePrompts } = await import('../../../src/services/imagePromptEngine.ts');
+    const { getDomainFromTitle } = await import('../../../src/config/propsBanks.ts');
+    return { buildImagePrompts, getDomainFromTitle };
+  } catch (error) {
+    console.warn('Could not load new prompt engine, falling back to legacy:', error);
+    return null;
+  }
+}
 
-  const negative = [
-    style.negative,
-    'generic stock photos, unrelated imagery, blurry, watermark, signature, text overlay, misspelled labels, extra fingers, deformed anatomy'
-  ].join(', ');
+// Age group specific cinematic styles
+const cinematicStylesByAgeGroup = {
+  child: {
+    stylePackId: "kidbook-gouache",
+    realismBlend: 0.3, // More stylized for children
+    subjectPrefix: "colorful and friendly students discovering",
+    moodOverride: "joyful, playful, wonder-filled",
+    colorOverride: "bright rainbow colors, warm pastels"
+  },
+  teen: {
+    stylePackId: "cinematic-stylized-realism",
+    realismBlend: 0.7, // Balanced realism for teens
+    subjectPrefix: "engaged teenage students exploring",
+    moodOverride: "confident, curious, collaborative",
+    colorOverride: "vibrant but balanced colors"
+  },
+  adult: {
+    stylePackId: "cinematic-stylized-realism",
+    realismBlend: 0.9, // High realism for adults
+    subjectPrefix: "professional students mastering",
+    moodOverride: "focused, sophisticated, achievement-oriented",
+    colorOverride: "sophisticated cinematic palette"
+  }
+};
+
+async function buildCinematicAgeGroupPrompt(
+  universeTitle: string, 
+  universeId: string,
+  ageGroup: 'child' | 'teen' | 'adult', 
+  description?: string
+): Promise<AgeGroupPrompt> {
+  const promptEngine = await importPromptEngine();
+  
+  if (promptEngine) {
+    try {
+      const { buildImagePrompts, getDomainFromTitle } = promptEngine;
+      const domain = getDomainFromTitle(universeTitle);
+      const style = cinematicStylesByAgeGroup[ageGroup];
+      
+      // Create age-specific subject line
+      const subjectLine = `${style.subjectPrefix} ${universeTitle} adventure, ${description || 'hands-on learning experience'}`;
+      
+      const prompts = buildImagePrompts("cover", {
+        adventureId: universeId,
+        domain,
+        title: universeTitle,
+        subjectLine,
+        stylePackId: style.stylePackId,
+        realismBlend: style.realismBlend,
+        consistencyTag: `NELIE-${ageGroup}-${domain}`,
+        avoid: ["classroom", "readable text", "grade signs", "brand logos", "generic education"],
+        variantSalt: ageGroup === 'child' ? 1 : ageGroup === 'teen' ? 2 : 3
+      });
+      
+      // Override mood and color for age group
+      let finalPrompt = prompts[0].prompt;
+      if (style.moodOverride) {
+        finalPrompt = finalPrompt.replace(/hopeful, inviting, educational|curious, hands-on, focused|energetic, festival-like, welcoming|calm, precise, craftsmanlike/g, style.moodOverride);
+      }
+      if (style.colorOverride) {
+        finalPrompt = finalPrompt.replace(/teal & warm amber cinematic grade|butter yellow, forest green, sky blue|coral, seafoam, lilac accents|terracotta, sage, powder blue|deep navy, saffron, mint highlights/g, style.colorOverride);
+      }
+      
+      return {
+        prompt: finalPrompt,
+        negative_prompt: prompts[0].negative,
+        size: ageGroup === 'child' ? '1024x1024' : '1280x720',
+        aspect_ratio: ageGroup === 'child' ? '1:1' : '16:9'
+      };
+    } catch (error) {
+      console.warn('Error using new prompt engine, falling back:', error);
+    }
+  }
+  
+  // Fallback to enhanced legacy system with cinematic elements
+  const legacyStyle = styleByAgeGroup[ageGroup];
+  const prompt = [
+    'cinematic stylized realism',
+    ageGroup === 'child' ? 'children\'s storybook illustration' : 'high-end animation film aesthetic',
+    `${cinematicStylesByAgeGroup[ageGroup].subjectPrefix} ${universeTitle} adventure`,
+    description ? `Context: ${description}` : null,
+    `Target: ${ageGroup} learners`,
+    `Style: ${legacyStyle.positive}`,
+    'depth-of-field bokeh, age-appropriate, no text overlay',
+    `CONSISTENCY_TAG: NELIE-${ageGroup}-${universeTitle.replace(/[^a-z0-9]/gi, '-')}`
+  ].filter(Boolean).join(' — ');
 
   return {
     prompt,
-    negative_prompt: negative,
-    size: style.size,
-    aspect_ratio: style.ar
+    negative_prompt: legacyStyle.negative + ', uncanny valley, waxy skin, readable text, grade signs, brand logos',
+    size: legacyStyle.size,
+    aspect_ratio: legacyStyle.ar
   };
 }
 
@@ -169,13 +252,14 @@ serve(async (req) => {
           }
 
           try {
-            const promptSpec = buildAgeGroupPrompt(
+            const promptSpec = await buildCinematicAgeGroupPrompt(
               adventure.title, 
-              adventure.prompt || adventure.title, 
+              adventure.universe_id,
               ageGroup as any,
               adventure.description
             );
-            console.log(`Generating ${ageGroup} image for: ${adventure.title}`);
+            console.log(`Generating ${ageGroup} image for: ${adventure.title} with cinematic prompt`);
+            console.log(`Prompt preview: ${promptSpec.prompt.substring(0, 200)}...`);
             
             const imageData = await generateImageWithOpenAI(promptSpec.prompt, promptSpec.size);
             
