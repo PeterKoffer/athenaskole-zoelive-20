@@ -166,8 +166,8 @@ Deno.serve(async (req) => {
       
       const existingFile = files?.find(f => f.name === "cover.webp");
       if (existingFile) {
-        console.log("[image-ensure] Found existing file with version: undefined need version: v4");
-        // For now, let's regenerate to ensure we get the new style
+        console.log("[image-ensure] Found existing file with version: undefined need version: v5-nelie");
+        // Force regeneration with new NELIE Cinemagic v1.1 style
       } else {
         console.log("[image-ensure] No existing cover.webp found, will generate new one");
       }
