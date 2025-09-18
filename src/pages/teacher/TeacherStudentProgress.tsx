@@ -9,9 +9,8 @@ import TeacherSidebar from '@/components/teacher/TeacherSidebar';
 const TeacherStudentProgress = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedClass, setSelectedClass] = useState('All Classes');
-
-  const classesList = ['All Classes', 'Math 6A', 'Science 5B', 'English 4A', 'Math 5A'];
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'classes' | 'students'>('classes');
 
   const studentsByClass = {
     'Math 6A': [
@@ -104,21 +103,46 @@ const TeacherStudentProgress = () => {
     ]
   };
 
-  // Get all students or filtered by class
-  const getAllStudents = () => {
-    if (selectedClass === 'All Classes') {
-      return Object.entries(studentsByClass).flatMap(([className, students]) => 
-        students.map(student => ({ ...student, class: className }))
-      );
-    }
+  // Generate class overview data
+  const classOverview = Object.entries(studentsByClass).map(([className, students]) => ({
+    name: className,
+    studentCount: students.length,
+    averageScore: Math.round(students.reduce((sum, s) => sum + s.avgScore, 0) / students.length),
+    completedAssignments: students.reduce((sum, s) => sum + s.assignments.completed, 0),
+    totalAssignments: students.reduce((sum, s) => sum + s.assignments.total, 0),
+    recentActivity: students.filter(s => s.lastActivity.includes('hour')).length,
+    color: getClassColor(className)
+  }));
+
+  function getClassColor(className: string) {
+    const colors = {
+      'Math 6A': 'bg-blue-500',
+      'Science 5B': 'bg-green-500', 
+      'English 4A': 'bg-purple-500',
+      'Math 5A': 'bg-orange-500'
+    };
+    return colors[className as keyof typeof colors] || 'bg-gray-500';
+  }
+
+  // Filter students in selected class
+  const getStudentsInClass = () => {
+    if (!selectedClass) return [];
     return (studentsByClass[selectedClass as keyof typeof studentsByClass] || [])
+      .filter(student => student.name.toLowerCase().includes(searchTerm.toLowerCase()))
       .map(student => ({ ...student, class: selectedClass }));
   };
 
-  // Filter students by search term
-  const filteredStudents = getAllStudents().filter(student =>
-    student.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleClassClick = (className: string) => {
+    setSelectedClass(className);
+    setViewMode('students');
+    setSearchTerm(''); // Reset search when entering class
+  };
+
+  const handleBackToClasses = () => {
+    setSelectedClass(null);
+    setViewMode('classes');
+    setSearchTerm('');
+  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -149,100 +173,173 @@ const TeacherStudentProgress = () => {
           <div>
             <h1 className="text-xl font-semibold text-white flex items-center">
               <Users className="w-6 h-6 mr-3 text-green-400" />
-              Student Progress
+              {viewMode === 'classes' ? 'Student Progress Overview' : `${selectedClass} - Students`}
             </h1>
-            <p className="text-sm text-slate-400">Monitor individual student performance and engagement</p>
+            <p className="text-sm text-slate-400">
+              {viewMode === 'classes' 
+                ? 'Monitor class performance and select a class to view individual students'
+                : `Individual student performance and engagement in ${selectedClass}`
+              }
+            </p>
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <Input
-                placeholder="Search students..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64 bg-slate-700 border-slate-600 text-slate-200 placeholder-slate-400"
-              />
-            </div>
+            {viewMode === 'students' && (
+              <Button
+                variant="outline"
+                onClick={handleBackToClasses}
+                className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+              >
+                ← Back to Classes
+              </Button>
+            )}
             
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="bg-slate-700 border border-slate-600 text-slate-200 rounded-md px-3 py-2 text-sm"
-            >
-              {classesList.map((className) => (
-                <option key={className} value={className}>
-                  {className}
-                </option>
-              ))}
-            </select>
-            
-            <div className="flex items-center space-x-4 bg-slate-800 rounded-lg px-4 py-2">
-              <div className="text-center">
-                <p className="text-xs text-slate-400">Total Students</p>
-                <p className="text-lg font-semibold text-green-400">{filteredStudents.length}</p>
+            {viewMode === 'students' && (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                <Input
+                  placeholder="Search students..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64 bg-slate-700 border-slate-600 text-slate-200 placeholder-slate-400"
+                />
               </div>
-            </div>
+            )}
             
-            <div className="flex items-center space-x-4 bg-slate-800 rounded-lg px-4 py-2">
-              <div className="text-center">
-                <p className="text-xs text-slate-400">Class Average</p>
-                <p className="text-lg font-semibold text-blue-400">
-                  {filteredStudents.length > 0 
-                    ? Math.round(filteredStudents.reduce((sum, s) => sum + s.avgScore, 0) / filteredStudents.length)
-                    : 0}%
-                </p>
+            {viewMode === 'classes' && (
+              <div className="flex items-center space-x-4 bg-slate-800 rounded-lg px-4 py-2">
+                <div className="text-center">
+                  <p className="text-xs text-slate-400">Total Classes</p>
+                  <p className="text-lg font-semibold text-green-400">{classOverview.length}</p>
+                </div>
               </div>
-            </div>
+            )}
+            
+            {viewMode === 'students' && (
+              <>
+                <div className="flex items-center space-x-4 bg-slate-800 rounded-lg px-4 py-2">
+                  <div className="text-center">
+                    <p className="text-xs text-slate-400">Students</p>
+                    <p className="text-lg font-semibold text-green-400">{getStudentsInClass().length}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4 bg-slate-800 rounded-lg px-4 py-2">
+                  <div className="text-center">
+                    <p className="text-xs text-slate-400">Class Average</p>
+                    <p className="text-lg font-semibold text-blue-400">
+                      {getStudentsInClass().length > 0 
+                        ? Math.round(getStudentsInClass().reduce((sum, s) => sum + s.avgScore, 0) / getStudentsInClass().length)
+                        : 0}%
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+            
+            {viewMode === 'classes' && (
+              <div className="flex items-center space-x-4 bg-slate-800 rounded-lg px-4 py-2">
+                <div className="text-center">
+                  <p className="text-xs text-slate-400">Total Students</p>
+                  <p className="text-lg font-semibold text-blue-400">
+                    {Object.values(studentsByClass).reduce((sum, students) => sum + students.length, 0)}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Content */}
         <div className="p-6 h-[calc(100%-5rem)] overflow-y-auto">
-          {selectedClass === 'All Classes' ? (
-            // Group by class view
-            <div className="space-y-8">
-              {Object.entries(studentsByClass).map(([className, students]) => {
-                const classStudents = students.filter(student =>
-                  student.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-                
-                if (classStudents.length === 0) return null;
-                
-                return (
-                  <div key={className}>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-white">{className}</h3>
-                      <span className="text-sm text-slate-400">{classStudents.length} students</span>
+          {viewMode === 'classes' ? (
+            // Class Overview View
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {classOverview.map((classInfo) => (
+                <Card 
+                  key={classInfo.name} 
+                  className="bg-slate-800 border-slate-700 hover:border-slate-600 transition-all cursor-pointer hover:bg-slate-750"
+                  onClick={() => handleClassClick(classInfo.name)}
+                >
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-4 h-4 rounded-full ${classInfo.color}`}></div>
+                        <div>
+                          <CardTitle className="text-white text-lg">{classInfo.name}</CardTitle>
+                          <p className="text-sm text-slate-400">{classInfo.studentCount} students</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-green-400">{classInfo.averageScore}%</span>
+                        <p className="text-xs text-slate-400">Average</p>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {classStudents.map((student) => (
-                        <StudentCard key={student.id} student={{ ...student, class: className }} />
-                      ))}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-3 bg-slate-700/50 rounded-lg">
+                          <p className="text-xs text-slate-400 mb-1">Assignments</p>
+                          <p className="text-sm font-medium text-slate-200">
+                            {classInfo.completedAssignments}/{classInfo.totalAssignments}
+                          </p>
+                          <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2">
+                            <div 
+                              className="bg-blue-500 h-1.5 rounded-full"
+                              style={{ 
+                                width: `${(classInfo.completedAssignments / classInfo.totalAssignments) * 100}%` 
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-slate-700/50 rounded-lg">
+                          <p className="text-xs text-slate-400 mb-1">Active Today</p>
+                          <p className="text-sm font-medium text-slate-200">
+                            {classInfo.recentActivity} students
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {Math.round((classInfo.recentActivity / classInfo.studentCount) * 100)}% active
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        variant="outline" 
+                        className="w-full bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClassClick(classInfo.name);
+                        }}
+                      >
+                        View Students →
+                      </Button>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            // Single class view
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filteredStudents.map((student) => (
-                <StudentCard key={student.id} student={student} />
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          )}
-          
-          {filteredStudents.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-300 mb-2">No students found</h3>
-              <p className="text-slate-400">
-                {searchTerm 
-                  ? `No students match "${searchTerm}"` 
-                  : "No students in the selected class"
-                }
-              </p>
+          ) : (
+            // Student Detail View
+            <div>
+              {getStudentsInClass().length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {getStudentsInClass().map((student) => (
+                    <StudentCard key={student.id} student={student} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-slate-300 mb-2">No students found</h3>
+                  <p className="text-slate-400">
+                    {searchTerm 
+                      ? `No students match "${searchTerm}" in ${selectedClass}` 
+                      : `No students in ${selectedClass}`
+                    }
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
