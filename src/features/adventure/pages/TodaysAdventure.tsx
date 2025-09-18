@@ -18,6 +18,8 @@ export default function TodaysAdventure() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [lessonData, setLessonData] = useState<any>(null);
+  const [preloadingLesson, setPreloadingLesson] = useState(false);
+  const [preloadedLesson, setPreloadedLesson] = useState<any>(null);
 
   async function loadTodaysAdventure() {
     if (!user?.id) {
@@ -41,6 +43,11 @@ export default function TodaysAdventure() {
       });
       
       setData(result);
+      
+      // Start preloading the lesson in the background
+      if (result?.universe) {
+        preloadLesson(result.universe, result.isRecap);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setData(null);
@@ -49,15 +56,14 @@ export default function TodaysAdventure() {
     }
   }
 
-  const handleStartAdventure = async (universe: AdventureUniverse, isRecap: boolean) => {
-    if (!user?.id) return;
+  // Preload lesson in the background to reduce waiting time
+  const preloadLesson = async (universe: AdventureUniverse, isRecap: boolean) => {
+    if (!user?.id || preloadingLesson) return;
     
-    console.log('🚀 Starting adventure lesson generation:', universe.title, isRecap ? '(Recap)' : '(New)');
+    console.log('🔄 Preloading lesson for:', universe.title);
+    setPreloadingLesson(true);
     
     try {
-      setLoading(true);
-      
-      // Call our new edge function to generate the lesson
       const { data: lessonData, error } = await supabase.functions.invoke('generate-adventure-multipart', {
         body: {
           adventure: {
@@ -78,7 +84,72 @@ export default function TodaysAdventure() {
           schoolSettings: {
             curriculum: 'broadly accepted topics and skills for that grade',
             teachingPerspective: 'balanced, evidence-based style',
-            lessonDuration: 135  // 2.25 hours when no teacher parameters set
+            lessonDuration: 135
+          },
+          teacherPreferences: {
+            subjectWeights: {
+              [universe.subject]: 'medium'
+            }
+          },
+          calendarContext: {
+            keywords: ['interactive learning', 'problem solving'],
+            duration: 'single session'
+          }
+        }
+      });
+      
+      if (!error && lessonData?.success) {
+        console.log('✅ Lesson preloaded successfully!');
+        setPreloadedLesson(lessonData.lesson);
+      } else {
+        console.log('⚠️ Lesson preload failed, will generate on demand');
+      }
+      
+    } catch (error) {
+      console.log('⚠️ Lesson preload failed:', error);
+    } finally {
+      setPreloadingLesson(false);
+    }
+  };
+
+  const handleStartAdventure = async (universe: AdventureUniverse, isRecap: boolean) => {
+    if (!user?.id) return;
+    
+    console.log('🚀 Starting adventure lesson generation:', universe.title, isRecap ? '(Recap)' : '(New)');
+    
+    try {
+      setLoading(true);
+      
+      // Check if we have a preloaded lesson ready
+      if (preloadedLesson) {
+        console.log('⚡ Using preloaded lesson!');
+        setLessonData(preloadedLesson);
+        return;
+      }
+      
+      // Fall back to generating lesson on demand
+      console.log('🔄 Generating lesson on demand...');
+      const { data: lessonData, error } = await supabase.functions.invoke('generate-adventure-multipart', {
+        body: {
+          adventure: {
+            id: universe.id,
+            title: universe.title,
+            subject: universe.subject,
+            category: universe.category || 'General',
+            gradeLevel: universe.grade_level,
+            description: universe.description,
+            tags: universe.metadata?.tags || [],
+            crossSubjects: universe.metadata?.crossSubjects || []
+          },
+          studentProfile: {
+            abilities: 'mixed ability with both support and challenges',
+            learningStyle: 'multimodal approach',
+            interests: ['technology', 'games', 'creativity']
+          },
+          schoolSettings: {
+            curriculum: 'broadly accepted topics and skills for that grade',
+            teachingPerspective: 'balanced, evidence-based style',
+            lessonDuration: 135
           },
           teacherPreferences: {
             subjectWeights: {
@@ -102,11 +173,7 @@ export default function TodaysAdventure() {
         console.log('📚 Lesson preview:', lessonData.lesson.title);
         console.log('🎯 Number of stages:', lessonData.lesson.stages?.length);
         
-        // Set the lesson data to show the lesson player
         setLessonData(lessonData.lesson);
-        
-        // TODO: Save adventure completion when database table is ready
-        // await AdventureService.completeAdventure(user.id, universe.id, isRecap);
       } else {
         throw new Error('Lesson generation failed');
       }
@@ -226,15 +293,25 @@ export default function TodaysAdventure() {
 
 
 
+                {/* Preloading indicator */}
+                {preloadingLesson && (
+                  <div className="text-center py-2">
+                    <p className="text-white/70 text-sm">
+                      ⚡ Preparing your lesson in the background...
+                    </p>
+                  </div>
+                )}
+
                 {/* Start Button */}
                 <div className="flex justify-center pt-4">
                   <Button 
                     onClick={() => handleStartAdventure(data.universe, data.isRecap)}
                     size="lg"
-                    className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    disabled={loading}
+                    className="bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     <Play className="w-5 h-5 mr-3" />
-                    {data.isRecap ? 'Continue Adventure' : 'Start Adventure'}
+                    {loading ? 'Loading...' : (preloadedLesson ? '⚡ Start Adventure (Ready!)' : (data.isRecap ? 'Continue Adventure' : 'Start Adventure'))}
                   </Button>
                 </div>
               </div>

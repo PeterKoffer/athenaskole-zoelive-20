@@ -160,7 +160,7 @@ Return JSON format:
     logSuccess('✅ Hook generated successfully');
     return { data };
   } catch (error) {
-    budgetGuard.finishStep(begin.logIndex, text);
+    budgetGuard.finishStep(begin.logIndex, null);
     logError('Error generating hook', error);
     return { 
       data: { 
