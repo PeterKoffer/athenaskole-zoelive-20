@@ -188,8 +188,6 @@ Return JSON format:
         image_prompt: "students learning together" 
       } 
     };
-      } 
-    };
   }
 }
 
