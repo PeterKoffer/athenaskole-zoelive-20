@@ -55,24 +55,24 @@ const MAP: Array<[RegExp, string]> = [
 ];
 
 function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: PromptInput): string {
-  // More stylized, illustrated approach to avoid uncanny valley
+  // NELIE Cinemagic v1.1 - cinematic toy-photorealistic style
   const STYLE =
-    "vibrant illustrated style with soft cartoon warmth, bright colors, clean lines, no text or watermarks";
+    "NELIE Cinemagic v1.1 — cinematic toy-photorealistic 3D render, soft dreamy magical atmosphere, warm golden-hour lighting with gentle rim light, shallow depth of field, creamy bokeh, subtle volumetric light rays and dust motes, PBR materials with fine micro-roughness and subsurface scattering, pastel filmic color grading, slight bloom and vignette, professional composition, subject tack-sharp / background softly blurred, clean Pixar/Laika-inspired look, ultra-detailed textures, no text or watermark — NELIE Cinemagic v1.1";
   const COMPOSITION =
     "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
   const SAFE_MARGINS =
     "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
   const COLOR_MOOD =
-    "rich but friendly palette; inspiring, approachable, modern";
+    "warm, safe, wonder";
   const DIVERSITY =
-    "diverse group of children and teenagers (ages 8-17) from various ethnic backgrounds, races, and nationalities working together";
+    "All human subjects are school-age children or teenagers (6–16), age-appropriate clothing and proportions, inclusive and diverse mix of races and cultures, friendly and safe tone. No adults unless explicitly specified. No anthropomorphic animals, no mascots, no dolls or puppets";
 
-  // negative rules (pro mode forbids classrooms)
+  // negative rules (NELIE Cinemagic v1.1 compatible)
   const NEG_PRO =
-    "ABSOLUTELY NO classroom, school desks, chalkboards/whiteboards, lockers, adult teachers, adult professionals; NO adults over 18 years old";
+    "blurry, noisy, low-res, harsh shadows, oversaturated, fisheye, extreme wide-angle distortion, motion blur, horror, gore, violence, creepy, sexualized, text, logo, watermark, cluttered background, jpeg artifacts, extra fingers/limbs, deformed hands, adults (unless specified), anthropomorphic animals, mascots, furries, dolls, puppets, classroom, school desks, chalkboards/whiteboards, lockers, adult teachers, adult professionals, NO adults over 18 years old";
 
   const NEG_CLASSROOM =
-    "no boardrooms, no factories, no hospitals, no construction sites, no adults over 18";
+    "blurry, noisy, low-res, harsh shadows, oversaturated, fisheye, extreme wide-angle distortion, motion blur, horror, gore, violence, creepy, sexualized, text, logo, watermark, cluttered background, jpeg artifacts, extra fingers/limbs, deformed hands, anthropomorphic animals, mascots, furries, dolls, puppets, no boardrooms, no factories, no hospitals, no construction sites";
 
   const t = title.toLowerCase();
   let scene = "professional real-world environment relevant to the adventure";

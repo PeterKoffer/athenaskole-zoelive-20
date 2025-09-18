@@ -82,12 +82,12 @@ const ageEnhancements = {
 };
 
 function buildUnifiedAdventurePrompt(title: string, ageGroup: AgeGroup): string {
-  // More stylized, less photorealistic approach to avoid uncanny valley
-  const STYLE = "vibrant illustrated style with soft cartoon warmth, bright colors, clean lines, no text or watermarks";
+  // NELIE Cinemagic v1.1 - cinematic toy-photorealistic style
+  const STYLE = "NELIE Cinemagic v1.1 — cinematic toy-photorealistic 3D render, soft dreamy magical atmosphere, warm golden-hour lighting with gentle rim light, shallow depth of field, creamy bokeh, subtle volumetric light rays and dust motes, PBR materials with fine micro-roughness and subsurface scattering, pastel filmic color grading, slight bloom and vignette, professional composition, subject tack-sharp / background softly blurred, clean Pixar/Laika-inspired look, ultra-detailed textures, no text or watermark — NELIE Cinemagic v1.1";
   const COMPOSITION = "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
   const SAFE_MARGINS = "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
-  const COLOR_MOOD = "rich but friendly palette; inspiring, approachable, modern";
-  const DIVERSITY = "diverse group of children and teenagers from various ethnic backgrounds, races, and nationalities working together";
+  const COLOR_MOOD = "warm, safe, wonder";
+  const DIVERSITY = "All human subjects are school-age children or teenagers (6–16), age-appropriate clothing and proportions, inclusive and diverse mix of races and cultures, friendly and safe tone. No adults unless explicitly specified. No anthropomorphic animals, no mascots, no dolls or puppets";
 
   // Get adventure-specific scene
   const t = title.toLowerCase();
@@ -113,7 +113,7 @@ async function buildCinematicAgeGroupPrompt(
   const ageConfig = ageEnhancements[ageGroup];
   const finalPrompt = buildUnifiedAdventurePrompt(universeTitle, ageGroup);
   
-  const baseNegativePrompt = "photorealistic, hyperrealistic, uncanny valley, waxy skin, strange eyes, creepy faces, text, watermark, logo, low-res, blurry, extra fingers, deformed hands, gore, sexualized, noisy background, posterized, oversaturated";
+  const baseNegativePrompt = "blurry, noisy, low-res, harsh shadows, oversaturated, fisheye, extreme wide-angle distortion, motion blur, horror, gore, violence, creepy, sexualized, text, logo, watermark, cluttered background, jpeg artifacts, extra fingers/limbs, deformed hands, adults (unless specified), anthropomorphic animals, mascots, furries, dolls, puppets";
   
   return {
     prompt: finalPrompt,
