@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, Image, RefreshCw, AlertCircle, Archive, Sparkles } from 'lucide-react';
 import { AdventureImageService } from '@/services/AdventureImageService';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function AdventureManager() {
   const [importing, setImporting] = useState(false);

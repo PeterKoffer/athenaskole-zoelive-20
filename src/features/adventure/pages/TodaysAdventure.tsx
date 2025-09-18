@@ -9,7 +9,7 @@ import type { AdventureUniverse } from "@/services/adventure/service";
 import adventureIllustration from "@/assets/adventure-illustration.jpg";
 import digitalDetoxCover from "@/assets/digital-detox-cover.webp";
 import UniverseImage from "@/components/UniverseImage";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import AdventureLessonPlayer from "@/components/adventure/AdventureLessonPlayer";
 
 export default function TodaysAdventure() {
