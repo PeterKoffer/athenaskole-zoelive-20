@@ -1,0 +1,45 @@
+{
+  "adventureId": "medieval-castle",
+  "title": "Medieval Castle Builder",
+  "intro": "Step back in time to become a master castle architect! Design fortifications, manage resources, and learn about medieval life while building the ultimate defensive stronghold.",
+  "images": {
+    "cover": "/demo/medieval-castle-cover.jpg",
+    "scenes": ["/demo/castle-walls.jpg", "/demo/medieval-village.jpg", "/demo/castle-interior.jpg"]
+  },
+  "coreSubjects": ["historyReligion", "mathematics", "creativeArts", "science"],
+  "adaptiveElements": {
+    "difficulty": {
+      "emerging": "Simple geometric shapes and basic historical facts",
+      "onLevel": "Architectural planning with area calculations",
+      "advanced": "Complex engineering and historical analysis"
+    },
+    "learningStyle": {
+      "visual": "Castle blueprints and historical artwork",
+      "auditory": "Medieval stories and historical narration",
+      "kinesthetic": "Virtual castle building and siege simulations",
+      "readingWriting": "Historical research and detailed planning documents"
+    }
+  },
+  "progressionPath": [
+    {
+      "stage": "historical-research",
+      "duration": 20,
+      "subjects": ["historyReligion"]
+    },
+    {
+      "stage": "architectural-planning",
+      "duration": 25,
+      "subjects": ["mathematics", "creativeArts"]
+    },
+    {
+      "stage": "defense-systems",
+      "duration": 20,
+      "subjects": ["science", "mathematics"]
+    },
+    {
+      "stage": "medieval-life",
+      "duration": 15,
+      "subjects": ["historyReligion", "creativeArts"]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "adventureId": "food-truck",
+  "title": "Lauges Food Truck Empire",
+  "intro": "Lauge vil bygge den mest innovative food truck med solceller og avanceret køling. Han skal mestre budgetter, kemi og programmering for at skabe den perfekte mobile restaurant.",
+  "images": {
+    "cover": "/demo/advanced-food-truck.jpg",
+    "scenes": ["/demo/solar-panels.jpg", "/demo/chemistry-lab.jpg"]
+  },
+  "tasks": [
+    {
+      "subject": "mathematics",
+      "title": "Budget og overskudsberegning",
+      "body": "Lauges truck koster 45.000 kr at købe og 8.500 kr/måned at drive. Han sælger mad for 180 kr i timen i 8 timer dagligt. Hvornår går han i plus?",
+      "checks": ["Kan beregne månedlige indtægter", "Forstår break-even point", "Viser arbejdsgang"],
+      "estMinutes": 25,
+      "id": "budget-advanced",
+      "progressTags": ["Math.5.NBT.5", "business-calculations"]
+    },
+    {
+      "subject": "science",
+      "title": "Solenergi og batterisystem",
+      "body": "Design et solcellesystem til trucken. 4 paneler giver 1.200W, trucken bruger 800W. Hvor stort batteri skal der til for 3 timers drift uden sol?",
+      "checks": ["Forstår watt og energilagring", "Kan beregne energibehov", "Designer system"],
+      "estMinutes": 30,
+      "id": "solar-energy",
+      "progressTags": ["Science.5.PS3.1", "renewable-energy"]
+    },
+    {
+      "subject": "computerTech",
+      "title": "Bestillingssystem i Scratch",
+      "body": "Program et simpelt bestillingssystem hvor kunder kan vælge menu-emner og se total-pris. Brug variable og input/output.",
+      "checks": ["Bruger variable korrekt", "Laver input-validering", "Tester program"],
+      "estMinutes": 35,
+      "id": "ordering-system",
+      "progressTags": ["CS.5.AP.10", "programming-basics"]
+    },
+    {
+      "subject": "science",
+      "title": "Fødevaresikkerhed og bakterier",
+      "body": "Undersøg hvorfor mad skal holdes under 4°C. Hvad sker der med bakterier ved forskellige temperaturer? Design kølesystem.",
+      "checks": ["Forstår bakterievækst", "Kan forklare temperaturs betydning", "Designer løsning"],
+      "estMinutes": 20,
+      "id": "food-safety",
+      "progressTags": ["Science.5.LS1.1", "microbiology"]
+    }
+  ],
+  "faithBlock": {
+    "prayer": "Gud, hjælp os med at bruge vores talenter til at tjene andre og passe godt på din skabelse gennem bæredygtige løsninger.",
+    "scripture": "Vi skal forvalte Guds gaver klogt (1. Peter 4:10)"
+  },
+  "assessmentHints": [
+    "Kan Lauge forklare sine beregninger logisk?",
+    "Forstår han sammenhængen mellem energi og miljø?",
+    "Viser han systematisk problemløsning?"
+  ],
+  "totalMinutes": 110,
+  "targetMinutes": 120,
+  "timePlan": [
+    { "subject": "mathematics", "minutes": 30 },
+    { "subject": "science", "minutes": 50 },
+    { "subject": "computerTech", "minutes": 40 }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "adventureId": "basketball-manager",
+  "title": "Basketball Team Manager",
+  "intro": "Take charge of a basketball team as their manager! Analyze player statistics, develop game strategies, manage team finances, and lead your team to championship victory.",
+  "images": {
+    "cover": "/demo/basketball-court-cover.jpg",
+    "scenes": ["/demo/team-huddle.jpg", "/demo/statistics-board.jpg", "/demo/championship-trophy.jpg"]
+  },
+  "coreSubjects": ["mathematics", "physicalEd", "lifeEssentials", "computerTech"],
+  "adaptiveElements": {
+    "difficulty": {
+      "emerging": "Basic statistics and simple game concepts",
+      "onLevel": "Moderate data analysis and strategy planning",
+      "advanced": "Complex statistical modeling and advanced analytics"
+    },
+    "learningStyle": {
+      "visual": "Charts, graphs, and court diagrams",
+      "auditory": "Game commentary and strategy discussions",
+      "kinesthetic": "Interactive game simulations",
+      "readingWriting": "Statistical reports and strategy documents"
+    }
+  },
+  "progressionPath": [
+    {
+      "stage": "player-statistics",
+      "duration": 25,
+      "subjects": ["mathematics", "computerTech"]
+    },
+    {
+      "stage": "game-strategy",
+      "duration": 20,
+      "subjects": ["physicalEd", "mathematics"]
+    },
+    {
+      "stage": "team-management",
+      "duration": 20,
+      "subjects": ["lifeEssentials", "mathematics"]
+    },
+    {
+      "stage": "performance-analysis",
+      "duration": 25,
+      "subjects": ["mathematics", "computerTech"]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "adventureId": "space-mission",
+  "title": "Mars Mission Planning",
+  "intro": "Your team has been selected to plan humanity's next mission to Mars. You'll need to calculate trajectories, design life support systems, and plan for the challenges of deep space exploration.",
+  "images": {
+    "cover": "/demo/mars-mission-cover.jpg",
+    "scenes": ["/demo/mars-surface.jpg", "/demo/spacecraft-interior.jpg", "/demo/mission-control.jpg"]
+  },
+  "coreSubjects": ["science", "mathematics", "geography", "computerTech"],
+  "adaptiveElements": {
+    "difficulty": {
+      "emerging": "Focus on basic concepts and guided calculations",
+      "onLevel": "Standard mission parameters with moderate complexity",
+      "advanced": "Complex multi-variable problems and system design"
+    },
+    "learningStyle": {
+      "visual": "Diagrams, charts, and visual mission planning tools",
+      "auditory": "Mission briefings and verbal problem-solving",
+      "kinesthetic": "Interactive simulations and hands-on calculations",
+      "readingWriting": "Mission reports and detailed technical documentation"
+    }
+  },
+  "progressionPath": [
+    {
+      "stage": "mission-briefing",
+      "duration": 15,
+      "subjects": ["science", "geography"]
+    },
+    {
+      "stage": "trajectory-calculation",
+      "duration": 25,
+      "subjects": ["mathematics", "computerTech"]
+    },
+    {
+      "stage": "life-support-design",
+      "duration": 30,
+      "subjects": ["science", "mathematics"]
+    },
+    {
+      "stage": "communication-system",
+      "duration": 20,
+      "subjects": ["computerTech", "science"]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "adventureId": "music-festival",
+  "title": "Music Festival Organizer",
+  "intro": "Create the ultimate music festival experience! Manage budgets, design stages, coordinate logistics, and curate the perfect lineup for thousands of music fans.",
+  "images": {
+    "cover": "/demo/music-festival-cover.jpg",
+    "scenes": ["/demo/main-stage.jpg", "/demo/crowd-dancing.jpg", "/demo/sound-booth.jpg"]
+  },
+  "coreSubjects": ["musicDiscovery", "mathematics", "creativeArts", "lifeEssentials"],
+  "adaptiveElements": {
+    "difficulty": {
+      "emerging": "Basic music concepts and simple calculations",
+      "onLevel": "Event planning with moderate complexity",
+      "advanced": "Complex logistics and advanced music theory"
+    },
+    "learningStyle": {
+      "visual": "Stage designs and visual planning tools",
+      "auditory": "Music samples and audio production",
+      "kinesthetic": "Interactive festival simulation",
+      "readingWriting": "Event planning documents and music reviews"
+    }
+  },
+  "progressionPath": [
+    {
+      "stage": "music-curation",
+      "duration": 25,
+      "subjects": ["musicDiscovery", "creativeArts"]
+    },
+    {
+      "stage": "budget-management",
+      "duration": 20,
+      "subjects": ["mathematics", "lifeEssentials"]
+    },
+    {
+      "stage": "stage-design",
+      "duration": 25,
+      "subjects": ["creativeArts", "mathematics"]
+    },
+    {
+      "stage": "logistics-coordination",
+      "duration": 20,
+      "subjects": ["lifeEssentials", "mathematics"]
+    }
+  ]
+}

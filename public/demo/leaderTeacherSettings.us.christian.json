@@ -1,0 +1,33 @@
+{
+  "leader": {
+    "country": "US",
+    "curriculum": "US-CommonCore-2023",
+    "worldview": "christian",
+    "faithIntegrationLevel": 2,
+    "subjectWeights": {
+      "mathematics": 0.25,
+      "nativeLanguage": 0.20,
+      "science": 0.15,
+      "historyReligion": 0.15,
+      "creativeArts": 0.10,
+      "lifeEssentials": 0.15
+    },
+    "policy": {
+      "allowPrayerContent": true,
+      "allowScriptureCitations": true,
+      "creationCareFocus": true,
+      "serviceLearningFocus": true,
+      "publicDemoSafeMode": true
+    }
+  },
+  "teacher": {
+    "dayLessonMinutes": 180,
+    "subjectEmphasis": {
+      "mathematics": 0.3,
+      "science": 0.25
+    },
+    "classroomValues": ["respect", "curiosity", "collaboration", "perseverance"],
+    "constraints": ["screen-only", "individual-work-preferred"],
+    "calendarKeywords": ["spring-season", "easter-approaching"]
+  }
+}

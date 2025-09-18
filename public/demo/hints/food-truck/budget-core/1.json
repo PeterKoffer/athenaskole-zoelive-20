@@ -1,0 +1,10 @@
+{
+  "hint": "Start med at tælle de store mønter først! Hvor mange femkroner har Ingrid?",
+  "explain_like_2": "Tænk på det som legetøj - hvis du har 5 stykker legetøj og får 3 mere, hvor mange har du så?",
+  "example": "Prøv først med mindre tal: 2 femkroner + 1 tokrone = 10 + 2 = 12 kroner",
+  "check_answer": "Godt arbejde! 5 × 5 + 3 × 2 = 25 + 6 = 31 kroner. Det er rigtigt!",
+  "common_mistakes": [
+    "Glem ikke at gange mønterne med deres værdi først",
+    "5 femkroner er ikke 5 kroner, men 5 × 5 = 25 kroner"
+  ]
+}

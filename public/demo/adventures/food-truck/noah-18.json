@@ -1,0 +1,64 @@
+{
+  "adventureId": "food-truck",
+  "title": "Noah's Tech-Driven Food Empire",
+  "intro": "Noah envisions a food truck powered by cutting-edge technology - from AI-driven menu optimization to blockchain supply chain tracking. He'll merge culinary arts with computer science.",
+  "images": {
+    "cover": "/demo/tech-food-truck.jpg",
+    "scenes": ["/demo/ai-kitchen.jpg", "/demo/mobile-app.jpg"]
+  },
+  "tasks": [
+    {
+      "subject": "computerTech",
+      "title": "AI Menu Optimization System",
+      "body": "Design an AI system that optimizes menu items based on weather, local events, and historical sales data. Create a basic algorithm and explain machine learning principles.",
+      "checks": ["Understands ML concepts", "Creates functional algorithm", "Explains decision trees"],
+      "estMinutes": 45,
+      "id": "ai-system",
+      "progressTags": ["CS.12.AP.17", "machine-learning"]
+    },
+    {
+      "subject": "mathematics",
+      "title": "Supply Chain Optimization",
+      "body": "Use calculus to optimize delivery routes and inventory management. Model profit functions and find maximum efficiency points using derivatives.",
+      "checks": ["Applies calculus correctly", "Optimizes complex systems", "Interprets mathematical models"],
+      "estMinutes": 40,
+      "id": "calculus-optimization",
+      "progressTags": ["Math.12.F.IF.7", "optimization"]
+    },
+    {
+      "subject": "science",
+      "title": "Food Science & Technology",
+      "body": "Research molecular gastronomy techniques and food preservation technology. Design experiments to test optimal cooking temperatures and food safety protocols.",
+      "checks": ["Applies scientific method", "Understands food chemistry", "Designs valid experiments"],
+      "estMinutes": 35,
+      "id": "food-science",
+      "progressTags": ["Science.12.PS1.2", "chemistry"]
+    },
+    {
+      "subject": "lifeEssentials",
+      "title": "Entrepreneurship & Ethics",
+      "body": "Develop a comprehensive business strategy including ethical considerations of data privacy, fair labor practices, and environmental impact. Create investor pitch.",
+      "checks": ["Addresses ethical considerations", "Creates viable business model", "Presents professionally"],
+      "estMinutes": 30,
+      "id": "business-ethics",
+      "progressTags": ["LifeSkills.12.3", "entrepreneurship"]
+    }
+  ],
+  "faithBlock": {
+    "prayer": "God, grant us wisdom to use technology responsibly and to serve our community with integrity and innovation.",
+    "scripture": "In their hearts humans plan their course, but the Lord establishes their steps (Proverbs 16:9)"
+  },
+  "assessmentHints": [
+    "Can Noah explain complex technical concepts clearly?",
+    "Does he consider ethical implications of his technology choices?",
+    "Is his business strategy both innovative and realistic?"
+  ],
+  "totalMinutes": 150,
+  "targetMinutes": 160,
+  "timePlan": [
+    { "subject": "computerTech", "minutes": 50 },
+    { "subject": "mathematics", "minutes": 45 },
+    { "subject": "science", "minutes": 40 },
+    { "subject": "lifeEssentials", "minutes": 35 }
+  ]
+}
