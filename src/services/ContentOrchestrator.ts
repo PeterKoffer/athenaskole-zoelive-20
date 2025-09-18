@@ -1,9 +1,9 @@
 import { DailyProgramPayload, StudentProfile, TeacherSettings, SchoolLeaderSettings, SubjectKey } from "@/types/core";
-import { adventurePrompt } from "@/prompts/adventurePrompt";
+// import { adventurePrompt } from "@/prompts/adventurePrompt";
 import { faithMatrix } from "@/prompts/faithMatrix";
 import { resolveLessonDuration } from "@/services/time/resolveLessonDuration";
 import { distributeMinutes } from "@/services/time/distributeMinutes";
-import { composeTimedLesson } from "@/services/time/composeTimedLesson";
+// import { composeTimedLesson } from "@/services/time/composeTimedLesson";
 
 export async function pickAdventure({adventureId}:{adventureId?: string}) {
   // Stub – brug adventureId eller fallback til "food-truck"
@@ -23,7 +23,7 @@ export async function buildDailyProgram(args:{
   student: StudentProfile; teacher: TeacherSettings; leader: SchoolLeaderSettings; calendar?: {dayDurationMinutes?: number}; adventureId?: string;
 }): Promise<DailyProgramPayload> {
   const { student, teacher, leader, calendar } = args;
-  const faithRules = faithMatrix(leader.worldview, leader.faithIntegrationLevel, leader.policy);
+  const _faithRules = faithMatrix(leader.worldview, leader.faithIntegrationLevel, leader.policy);
   const adventure = await pickAdventure(args);
   const weights = { ...(leader?.subjectWeights||{}), ...(teacher?.subjectEmphasis||{}) };
   const targetMinutes = resolveLessonDuration({ teacherMinutes: teacher?.dayLessonMinutes, calendarMinutes: calendar?.dayDurationMinutes });

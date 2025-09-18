@@ -3,7 +3,7 @@ import { useAppKernel } from "@/state/appKernel";
 import type { NelieContext } from "@/types/nelie";
 
 export function NeliePanel({ adventureId, task }: { adventureId: string; task?: any }) {
-  const { leader, teacher, student } = useAppKernel.getState();
+  const { leader, teacher, student } = useAppKernel();
   const [mode, setMode] = useState<NelieContext["mode"]>("chat");
   const [messages, setMessages] = useState<{role:"user"|"nelie"; text:string}[]>([]);
   const [live, setLive] = useState(false);
@@ -59,8 +59,8 @@ export function NeliePanel({ adventureId, task }: { adventureId: string; task?: 
         ))}
       </div>
       <form className="p-3 flex gap-2" onSubmit={e=>{e.preventDefault(); const form = e.currentTarget as any; const v=form.q.value; if(!v) return; askNELIE(v); form.reset();}}>
-        <input name="q" className="input input-bordered flex-1" placeholder="Spørg NELIE…" />
-        <button className="btn">Send</button>
+        <input name="q" className="border rounded px-3 py-2 flex-1" placeholder="Spørg NELIE…" />
+        <button className="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
       </form>
     </aside>
   );
