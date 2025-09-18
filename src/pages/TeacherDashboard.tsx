@@ -88,93 +88,8 @@ const TeacherDashboard = () => {
           </DropdownMenu>
         </div>
 
-        {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* My Classes Card */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center text-foreground">
-                <BookOpen className="w-5 h-5 mr-2" />
-                My Classes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="p-3 bg-blue-500/20 rounded-lg">
-                  <h4 className="font-medium text-foreground">Mathematics - Grade 6</h4>
-                  <p className="text-sm text-muted-foreground">24 students • Room 201</p>
-                </div>
-                <div className="p-3 bg-green-500/20 rounded-lg">
-                  <h4 className="font-medium text-foreground">Science - Grade 5</h4>
-                  <p className="text-sm text-muted-foreground">22 students • Lab 1</p>
-                </div>
-                <div className="p-3 bg-purple-500/20 rounded-lg">
-                  <h4 className="font-medium text-foreground">English - Grade 4</h4>
-                  <p className="text-sm text-muted-foreground">20 students • Room 105</p>
-                </div>
-              </div>
-              <Button 
-                variant="outline" 
-                className="w-full mt-4"
-                onClick={() => navigate('/schedule-management')}
-              >
-                Manage Classes
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Student Progress Card */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center text-foreground">
-                <Users className="w-5 h-5 mr-2" />
-                Student Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-foreground">Average Class Performance</span>
-                  <span className="text-green-500 font-bold">87%</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Mathematics</span>
-                    <span className="text-foreground">92%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{ width: '92%' }}></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Science</span>
-                    <span className="text-foreground">85%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '85%' }}></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">English</span>
-                    <span className="text-foreground">84%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '84%' }}></div>
-                  </div>
-                </div>
-              </div>
-              <Button 
-                variant="outline" 
-                className="w-full mt-4"
-                onClick={() => navigate('/progress-tracking')}
-              >
-                View Detailed Progress
-              </Button>
-            </CardContent>
-          </Card>
-
+        {/* Main Dashboard Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Quick Actions Card */}
           <Card className="bg-card/50 backdrop-blur-sm border-border">
             <CardHeader>
@@ -220,17 +135,47 @@ const TeacherDashboard = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Recent Activity */}
+          <Card className="bg-card/50 backdrop-blur-sm border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Math Quiz submitted by Grade 6A</p>
+                    <p className="text-xs text-muted-foreground">2 hours ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Science lab reports reviewed</p>
+                    <p className="text-xs text-muted-foreground">5 hours ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Parent meeting scheduled</p>
+                    <p className="text-xs text-muted-foreground">1 day ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Weekly report generated</p>
+                    <p className="text-xs text-muted-foreground">1 day ago</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Subject Weighting Section */}
-        <div className="mb-8">
-          <TeacherSubjectWeighting />
-        </div>
-
-        {/* Lesson Duration Settings */}
-        <div className="mb-8">
-          <ClassLessonDurationSettings />
-        </div>
 
         {/* Calendar and Schedule Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
