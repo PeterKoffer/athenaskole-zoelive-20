@@ -11,7 +11,7 @@ const ClassLessonDurationSettings = () => {
   const [form, setForm] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     CLASS_OPTIONS.forEach(opt => {
-      initial[opt.value] = durations[opt.value] ?? 1.5;
+      initial[opt.value] = durations[opt.value] ?? 2.5;
     });
     return initial;
   });
@@ -48,8 +48,8 @@ const ClassLessonDurationSettings = () => {
                 </span>
               </div>
               <Slider
-                min={0.5}
-                max={4}
+                min={1}
+                max={6}
                 step={0.5}
                 value={[form[cls.value]]}
                 onValueChange={v => handleChange(cls.value, v[0])}
