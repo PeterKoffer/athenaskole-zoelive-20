@@ -359,6 +359,187 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_items: {
+        Row: {
+          choices: Json | null
+          correct_answer: string | null
+          created_at: string | null
+          created_by: string
+          id: string
+          item_type: string
+          reading_level: number | null
+          rubric: Json | null
+          stem: string
+          tags: Json | null
+        }
+        Insert: {
+          choices?: Json | null
+          correct_answer?: string | null
+          created_at?: string | null
+          created_by: string
+          id?: string
+          item_type: string
+          reading_level?: number | null
+          rubric?: Json | null
+          stem: string
+          tags?: Json | null
+        }
+        Update: {
+          choices?: Json | null
+          correct_answer?: string | null
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          item_type?: string
+          reading_level?: number | null
+          rubric?: Json | null
+          stem?: string
+          tags?: Json | null
+        }
+        Relationships: []
+      }
+      assessments: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          grade_level: string
+          id: string
+          settings: Json | null
+          standards: string[] | null
+          status: string | null
+          subject: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          grade_level: string
+          id?: string
+          settings?: Json | null
+          standards?: string[] | null
+          status?: string | null
+          subject: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          grade_level?: string
+          id?: string
+          settings?: Json | null
+          standards?: string[] | null
+          status?: string | null
+          subject?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      assignments: {
+        Row: {
+          accommodations: Json | null
+          assessment_id: string | null
+          assignees: string[] | null
+          class_id: string
+          created_at: string | null
+          created_by: string
+          due_at: string | null
+          id: string
+          open_at: string | null
+          settings: Json | null
+          time_limit_minutes: number | null
+        }
+        Insert: {
+          accommodations?: Json | null
+          assessment_id?: string | null
+          assignees?: string[] | null
+          class_id: string
+          created_at?: string | null
+          created_by: string
+          due_at?: string | null
+          id?: string
+          open_at?: string | null
+          settings?: Json | null
+          time_limit_minutes?: number | null
+        }
+        Update: {
+          accommodations?: Json | null
+          assessment_id?: string | null
+          assignees?: string[] | null
+          class_id?: string
+          created_at?: string | null
+          created_by?: string
+          due_at?: string | null
+          id?: string
+          open_at?: string | null
+          settings?: Json | null
+          time_limit_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attempts: {
+        Row: {
+          accommodations_used: Json | null
+          assignment_id: string | null
+          flags: Json | null
+          graded_at: string | null
+          id: string
+          responses: Json | null
+          score_by_item: Json | null
+          started_at: string | null
+          status: string | null
+          student_id: string
+          submitted_at: string | null
+          time_used_minutes: number | null
+        }
+        Insert: {
+          accommodations_used?: Json | null
+          assignment_id?: string | null
+          flags?: Json | null
+          graded_at?: string | null
+          id?: string
+          responses?: Json | null
+          score_by_item?: Json | null
+          started_at?: string | null
+          status?: string | null
+          student_id: string
+          submitted_at?: string | null
+          time_used_minutes?: number | null
+        }
+        Update: {
+          accommodations_used?: Json | null
+          assignment_id?: string | null
+          flags?: Json | null
+          graded_at?: string | null
+          id?: string
+          responses?: Json | null
+          score_by_item?: Json | null
+          started_at?: string | null
+          status?: string | null
+          student_id?: string
+          submitted_at?: string | null
+          time_used_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempts_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_context: {
         Row: {
           active_themes: string[] | null
@@ -697,6 +878,42 @@ export type Database = {
         }
         Relationships: []
       }
+      form_submissions: {
+        Row: {
+          form_data: Json
+          form_type: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          student_id: string | null
+          submitted_at: string | null
+          submitted_by: string
+        }
+        Insert: {
+          form_data: Json
+          form_type: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          student_id?: string | null
+          submitted_at?: string | null
+          submitted_by: string
+        }
+        Update: {
+          form_data?: Json
+          form_type?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          student_id?: string | null
+          submitted_at?: string | null
+          submitted_by?: string
+        }
+        Relationships: []
+      }
       image_assets: {
         Row: {
           adventure_id: string | null
@@ -797,6 +1014,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      integration_logs: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          id: string
+          integration_type: string
+          processed_records: number | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          integration_type: string
+          processed_records?: number | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          integration_type?: string
+          processed_records?: number | null
+          status?: string
+        }
+        Relationships: []
       }
       knowledge_component_mastery: {
         Row: {
@@ -1116,6 +1360,74 @@ export type Database = {
         }
         Relationships: []
       }
+      policies: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          created_by: string
+          file_url: string | null
+          id: string
+          policy_type: string
+          required_acknowledgment: boolean | null
+          title: string
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          created_by: string
+          file_url?: string | null
+          id?: string
+          policy_type: string
+          required_acknowledgment?: boolean | null
+          title: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          created_by?: string
+          file_url?: string | null
+          id?: string
+          policy_type?: string
+          required_acknowledgment?: boolean | null
+          title?: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
+      policy_acknowledgments: {
+        Row: {
+          acknowledged_at: string | null
+          id: string
+          policy_id: string | null
+          user_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          id?: string
+          policy_id?: string | null
+          user_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          id?: string
+          policy_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_acknowledgments_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -1218,6 +1530,171 @@ export type Database = {
         }
         Relationships: []
       }
+      ptc_actions: {
+        Row: {
+          action_text: string
+          created_at: string | null
+          due_date: string | null
+          event_id: string | null
+          id: string
+          owner_name: string | null
+          owner_type: string
+          status: string | null
+        }
+        Insert: {
+          action_text: string
+          created_at?: string | null
+          due_date?: string | null
+          event_id?: string | null
+          id?: string
+          owner_name?: string | null
+          owner_type: string
+          status?: string | null
+        }
+        Update: {
+          action_text?: string
+          created_at?: string | null
+          due_date?: string | null
+          event_id?: string | null
+          id?: string
+          owner_name?: string | null
+          owner_type?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ptc_actions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "ptc_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ptc_events: {
+        Row: {
+          attendees: Json | null
+          created_at: string | null
+          end_time: string
+          id: string
+          interpreter_language: string | null
+          location: string | null
+          meeting_link: string | null
+          start_time: string
+          status: string | null
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          attendees?: Json | null
+          created_at?: string | null
+          end_time: string
+          id?: string
+          interpreter_language?: string | null
+          location?: string | null
+          meeting_link?: string | null
+          start_time: string
+          status?: string | null
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          attendees?: Json | null
+          created_at?: string | null
+          end_time?: string
+          id?: string
+          interpreter_language?: string | null
+          location?: string | null
+          meeting_link?: string | null
+          start_time?: string
+          status?: string | null
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
+      ptc_packets: {
+        Row: {
+          attendance_summary: Json | null
+          behavior_notes: string | null
+          concerns: string[] | null
+          event_id: string | null
+          generated_at: string | null
+          id: string
+          standards_snapshot: Json | null
+          strengths: string[] | null
+          work_links: string[] | null
+        }
+        Insert: {
+          attendance_summary?: Json | null
+          behavior_notes?: string | null
+          concerns?: string[] | null
+          event_id?: string | null
+          generated_at?: string | null
+          id?: string
+          standards_snapshot?: Json | null
+          strengths?: string[] | null
+          work_links?: string[] | null
+        }
+        Update: {
+          attendance_summary?: Json | null
+          behavior_notes?: string | null
+          concerns?: string[] | null
+          event_id?: string | null
+          generated_at?: string | null
+          id?: string
+          standards_snapshot?: Json | null
+          strengths?: string[] | null
+          work_links?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ptc_packets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "ptc_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ptc_summaries: {
+        Row: {
+          acknowledged_at: string | null
+          created_at: string | null
+          event_id: string | null
+          guardian_acknowledged: boolean | null
+          id: string
+          private_teacher_notes: string | null
+          summary_for_guardians: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          guardian_acknowledged?: boolean | null
+          id?: string
+          private_teacher_notes?: string | null
+          summary_for_guardians?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          guardian_acknowledged?: boolean | null
+          id?: string
+          private_teacher_notes?: string | null
+          summary_for_guardians?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ptc_summaries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "ptc_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       real_time_progress: {
         Row: {
           achievements: Json | null
@@ -1254,6 +1731,83 @@ export type Database = {
           total_time_spent?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      resource_bookings: {
+        Row: {
+          booked_by: string
+          class_id: string | null
+          created_at: string | null
+          end_time: string
+          id: string
+          purpose: string | null
+          resource_id: string | null
+          start_time: string
+          status: string | null
+        }
+        Insert: {
+          booked_by: string
+          class_id?: string | null
+          created_at?: string | null
+          end_time: string
+          id?: string
+          purpose?: string | null
+          resource_id?: string | null
+          start_time: string
+          status?: string | null
+        }
+        Update: {
+          booked_by?: string
+          class_id?: string | null
+          created_at?: string | null
+          end_time?: string
+          id?: string
+          purpose?: string | null
+          resource_id?: string | null
+          start_time?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_bookings_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resources: {
+        Row: {
+          active: boolean | null
+          capacity: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          location: string | null
+          name: string
+          type: string
+        }
+        Insert: {
+          active?: boolean | null
+          capacity?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          type: string
+        }
+        Update: {
+          active?: boolean | null
+          capacity?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          type?: string
         }
         Relationships: []
       }
