@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, TrendingUp, Award, Clock } from 'lucide-react';
+import { Users, TrendingUp, Award, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import TeacherSidebar from '@/components/teacher/TeacherSidebar';
 
 const TeacherStudentProgress = () => {
   const navigate = useNavigate();
@@ -83,17 +84,7 @@ const TeacherStudentProgress = () => {
 
   return (
     <div className="h-[100dvh] bg-slate-900 flex">
-      {/* Sidebar placeholder */}
-      <div className="w-20 bg-slate-800 border-r border-slate-700 flex flex-col items-center py-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/teacher-dashboard')}
-          className="text-slate-400 hover:text-white hover:bg-slate-700"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-      </div>
+      <TeacherSidebar showBackButton={false} />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">

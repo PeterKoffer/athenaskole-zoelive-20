@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Users, Plus, Search } from 'lucide-react';
+import { Users, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import TeacherSidebar from '@/components/teacher/TeacherSidebar';
 
 const TeacherMyClasses = () => {
   const navigate = useNavigate();
@@ -51,17 +52,7 @@ const TeacherMyClasses = () => {
 
   return (
     <div className="h-[100dvh] bg-slate-900 flex">
-      {/* Sidebar placeholder */}
-      <div className="w-20 bg-slate-800 border-r border-slate-700 flex flex-col items-center py-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/teacher-dashboard')}
-          className="text-slate-400 hover:text-white hover:bg-slate-700"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-      </div>
+      <TeacherSidebar showBackButton={false} />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
@@ -69,7 +60,7 @@ const TeacherMyClasses = () => {
         <div className="h-20 bg-slate-850 border-b border-slate-700 px-6 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold text-white flex items-center">
-              <BookOpen className="w-6 h-6 mr-3 text-blue-400" />
+              <Users className="w-6 h-6 mr-3 text-blue-400" />
               My Classes
             </h1>
             <p className="text-sm text-slate-400">Manage your assigned classes and sections</p>

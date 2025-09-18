@@ -4,10 +4,8 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Users, BarChart3, Calendar, Menu, ChevronDown, GraduationCap, Clock, Settings, Brain } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import TeacherSubjectWeighting from '@/components/teacher/TeacherSubjectWeighting';
-import ClassLessonDurationSettings from '@/components/teacher/ClassLessonDurationSettings';
+import { BarChart3, Calendar, Users } from 'lucide-react';
+import TeacherSidebar from '@/components/teacher/TeacherSidebar';
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
@@ -29,75 +27,7 @@ const TeacherDashboard = () => {
 
   return (
     <div className="h-[100dvh] bg-slate-900 flex">
-      {/* Dark Professional Sidebar */}
-      <div className="w-20 bg-slate-800 border-r border-slate-700 flex flex-col items-center py-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/training-ground')}
-          className="text-slate-400 hover:text-white hover:bg-slate-700 mb-6"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        
-        <div className="flex flex-col space-y-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <GraduationCap className="w-6 h-6 text-white" />
-          </div>
-          
-          <div className="w-8 h-0.5 bg-slate-600 rounded-full"></div>
-          
-          {/* Navigation Icons */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={() => navigate('/teacher-dashboard')}
-          >
-            <BarChart3 className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={() => navigate('/teacher-dashboard/classes')}
-          >
-            <BookOpen className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={() => navigate('/teacher-dashboard/progress')}
-          >
-            <Users className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={() => navigate('/teacher-dashboard/ai-preferences')}
-          >
-            <Brain className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={() => navigate('/teacher-dashboard/duration')}
-          >
-            <Clock className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={() => navigate('/calendar')}
-          >
-            <Calendar className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
+      <TeacherSidebar />
 
       {/* Main Dashboard Area */}
       <div className="flex-1 overflow-hidden">
