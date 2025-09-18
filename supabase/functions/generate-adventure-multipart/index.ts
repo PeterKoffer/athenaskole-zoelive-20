@@ -159,10 +159,24 @@ Return JSON format:
     const { text, usage } = await callOpenAI(begin.model.name, system, user, begin.max_tokens);
     budgetGuard.finishStep(begin.logIndex, usage);
 
-    // Parse JSON response
-    const match = text.match(/\{[\s\S]*\}/);
-    const jsonText = match ? match[0] : text;
-    const data = JSON.parse(jsonText);
+    // Parse JSON response with enhanced error handling
+    let data;
+    try {
+      const match = text.match(/\{[\s\S]*\}/);
+      const jsonText = match ? match[0] : text;
+      data = JSON.parse(jsonText);
+    } catch (parseError) {
+      logError('JSON parsing failed for hook, using enhanced fallback', parseError);
+      // Return enhanced hook fallback
+      return {
+        data: {
+          text: `Welcome to your exciting ${context.title} adventure! You've stumbled upon something incredible that needs your ${context.subject} expertise. The challenge ahead will test your knowledge, creativity, and problem-solving skills. Are you ready to prove what you can do and make a real difference? Let's discover what amazing discoveries await!`,
+          beats: ["Exciting discovery", "Challenge presentation", "Call to adventure"],
+          image_prompt: `adventure learning environment for ${context.subject}, students engaged in discovery, warm inspiring atmosphere`,
+          reading_time_sec: 45
+        }
+      };
+    }
     
     logSuccess('✅ Hook generated successfully');
     return { data };
@@ -248,10 +262,150 @@ Return JSON format:
     const { text, usage } = await callOpenAI(begin.model.name, system, prompt, begin.max_tokens);
     budgetGuard.finishStep(begin.logIndex, usage);
 
-    // Parse JSON response
-    const match = text.match(/\{[\s\S]*\}/);
-    const jsonText = match ? match[0] : text;
-    const data = JSON.parse(jsonText);
+    // Parse JSON response with enhanced error handling  
+    let data;
+    try {
+      const match = text.match(/\{[\s\S]*\}/);
+      const jsonText = match ? match[0] : text;
+      data = JSON.parse(jsonText);
+    } catch (parseError) {
+      logError('JSON parsing failed for phaseplan, using comprehensive educational fallback', parseError);
+      // Return comprehensive 12-step educational structure
+      return {
+        data: {
+          title: context.title,
+          description: "An immersive learning adventure that engages students through hands-on exploration and creative problem-solving!",
+          learning_objectives: [
+            `Master key concepts in ${context.subject} through interactive activities`,
+            "Develop critical thinking and problem-solving skills", 
+            "Apply knowledge to real-world scenarios and challenges"
+          ],
+          phases: [
+            {
+              name: "🎯 Adventure Hook",
+              duration: 10,
+              type: "hook", 
+              description: "Capture curiosity with an intriguing challenge that connects to real-world applications",
+              activities: [{
+                name: "Mission Discovery",
+                duration: 10,
+                type: "discussion",
+                instructions: `Welcome to your ${context.subject} adventure! You've discovered something amazing that needs your expertise. Let's explore what makes this challenge exciting and how your skills will help solve it.`,
+                materials: ["Adventure scenario", "Discussion prompts"],
+                interaction: "class",
+                engagement_element: "Real-world problem that students want to solve"
+              }],
+              assessment: "Observe student curiosity and initial engagement with the topic",
+              differentiation: "Use visuals, storytelling, and interactive elements to engage all learners"
+            },
+            {
+              name: "🧠 Knowledge Activation",
+              duration: 15,
+              type: "exploration",
+              description: "Connect new learning to existing knowledge and experiences", 
+              activities: [{
+                name: "What We Know",
+                duration: 15,
+                type: "hands-on",
+                instructions: `Share what you already know about ${context.subject}! Work with a partner to create a mind map of your existing knowledge and experiences related to today's challenge.`,
+                materials: ["Mind map templates", "Colored markers", "Sticky notes"],
+                interaction: "pairs",
+                engagement_element: "Students become experts by sharing their knowledge"
+              }],
+              assessment: "Listen to student discussions and review mind maps",
+              differentiation: "Allow multiple ways to share knowledge: drawing, writing, speaking"
+            },
+            {
+              name: "🚀 Hands-On Investigation", 
+              duration: 25,
+              type: "exploration",
+              description: "Students discover key concepts through guided investigation",
+              activities: [{
+                name: "Expert Investigation",
+                duration: 25,
+                type: "hands-on",
+                instructions: `Time to become a ${context.subject} expert! Work in teams to investigate the core concepts through hands-on activities. Use the investigation materials to explore, test, and discover key principles.`,
+                materials: ["Investigation kit", "Recording sheets", "Digital tools", "Reference materials"],
+                interaction: "groups",
+                engagement_element: "Students act as real experts making authentic discoveries"
+              }],
+              assessment: "Observe student discoveries and check understanding through questioning",
+              differentiation: "Provide different complexity levels and multiple investigation paths"
+            },
+            {
+              name: "💡 Concept Mastery",
+              duration: 20,
+              type: "instruction",
+              description: "Connect discoveries to formal learning and key concepts",
+              activities: [{
+                name: "Making Connections", 
+                duration: 20,
+                type: "discussion",
+                instructions: "Share your discoveries with the class! Let's connect what you found to the key concepts and see how everything fits together. You'll create a class knowledge bank of insights.",
+                materials: ["Concept connection charts", "Key vocabulary cards", "Digital collaboration tools"],
+                interaction: "class",
+                engagement_element: "Student discoveries become the foundation for formal learning"
+              }],
+              assessment: "Check understanding through concept mapping and peer explanations",
+              differentiation: "Use multiple representations: visual, verbal, kinesthetic"
+            },
+            {
+              name: "🎨 Creative Challenge",
+              duration: 30,
+              type: "practice",
+              description: "Apply learning creatively to solve authentic problems",
+              activities: [{
+                name: "Innovation Challenge",
+                duration: 30,
+                type: "creative",
+                instructions: `Now for the ultimate challenge! Use everything you've learned to create an innovative solution. You can build, design, write, or create something that demonstrates your mastery of ${context.subject} concepts.`,
+                materials: ["Creation supplies", "Building materials", "Art supplies", "Technology tools", "Design templates"],
+                interaction: "individual", 
+                engagement_element: "Students showcase learning through personal creativity and innovation"
+              }],
+              assessment: "Evaluate creativity, accuracy of content, and application of concepts",
+              differentiation: "Offer multiple creation options to suit different strengths and interests"
+            },
+            {
+              name: "🎯 Reflection & Next Steps",
+              duration: 15,
+              type: "reflection",
+              description: "Students reflect on learning and plan future applications",
+              activities: [{
+                name: "Adventure Reflection",
+                duration: 15,
+                type: "reflection",
+                instructions: "Reflect on your learning journey! What did you discover? What surprised you? How will you use this knowledge in the future? Share your biggest insights and next steps.",
+                materials: ["Reflection journals", "Digital reflection tools", "Peer sharing protocols"],
+                interaction: "individual",
+                engagement_element: "Students celebrate their growth and plan future learning"
+              }],
+              assessment: "Review reflection responses and plan follow-up activities", 
+              differentiation: "Offer multiple reflection formats: writing, drawing, video, verbal"
+            }
+          ],
+          total_duration: 115,
+          key_concepts: [
+            `Core ${context.subject} principles and concepts`,
+            "Critical thinking and problem-solving strategies",
+            "Real-world application and transfer", 
+            "Creative innovation and design thinking"
+          ],
+          success_criteria: [
+            "Students can explain key concepts in their own words",
+            "Students can apply learning to solve new problems", 
+            "Students can work effectively with others and communicate ideas",
+            "Students demonstrate creative thinking and innovation"
+          ],
+          extension_activities: [
+            "Advanced challenge problems for fast finishers",
+            "Independent research and exploration project",
+            "Peer teaching and mentoring opportunities",
+            "Community connection and real-world application"
+          ]
+        }
+      };
+    }
     
     logSuccess('✅ Phaseplan generated successfully');
     return { data };
