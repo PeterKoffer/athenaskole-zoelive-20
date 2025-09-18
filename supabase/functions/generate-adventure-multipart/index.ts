@@ -226,11 +226,12 @@ async function callOpenAI(model: string, system: string, user: string, max_token
     const requestBody: any = {
       model,
       messages: [
-        { role: 'system', content: system + ' You MUST return valid JSON only. No additional text before or after the JSON.' },
+        { role: 'system', content: system + ' You MUST return valid JSON only. No additional text before or after the JSON object.' },
         { role: 'user', content: user }
       ],
       max_tokens,
-      temperature: 0.3
+      temperature: 0.3,
+      response_format: { type: "json_object" }
     };
 
     logInfo(`🤖 Calling OpenAI (${model}, max_tokens: ${max_tokens})...`);
@@ -294,7 +295,7 @@ async function generateHook(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = `You are an inspiring teacher who creates engaging lesson introductions. You must create curiosity and motivation in students. Return valid JSON.`;
+  const system = `You are an inspiring teacher who creates engaging lesson introductions. You must create curiosity and motivation in students. Return only valid JSON format with no additional text.`;
   
   const user = `Write an inspiring and engaging introduction to the lesson "${context.title}" for grade ${context.gradeLevel} in the subject ${context.subject}.
 
@@ -305,7 +306,7 @@ REQUIREMENTS:
 - Use language appropriate for the age group
 - Create anticipation and curiosity
 
-Return JSON format:
+Return JSON format only (no markdown formatting):
 {
   "text": "Engaging and inspiring introduction text that motivates students (150-200 words)",
   "hook_question": "A provocative question that starts discussion",
@@ -321,6 +322,7 @@ Return JSON format:
     let data;
     try {
       data = JSON.parse(text);
+      logSuccess(`✅ Hook JSON parsed successfully: ${JSON.stringify(data).substring(0, 100)}...`);
     } catch (parseError) {
       logError(`❌ Error generating hook ${parseError}`);
       logError(`❌ Raw OpenAI response: ${text}`);
@@ -370,7 +372,10 @@ async function generatePhaseplan(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = `You are an expert ${context.subject} teacher and curriculum designer. You create detailed, subject-specific learning experiences that deeply engage students with authentic ${context.subject} content and real-world applications. ALWAYS return valid JSON only.`;
+  const system = `You are an expert ${context.subject} teacher and curriculum designer. You create detailed, subject-specific learning experiences that deeply engage students with authentic ${context.subject} content and real-world applications. You must respond with valid JSON only - no markdown, no explanations, just the raw JSON object.`;
+  
+  logInfo(`📝 Using subject-specific prompt for ${context.subject}: "${context.title}"`);
+  logInfo(`🎯 Subject guidance: ${getSubjectSpecificGuidance(context.subject, context.title).substring(0, 200)}...`);
   
   const prompt = `Create a comprehensive ${context.subject} learning experience: "${context.title}" for grade ${context.gradeLevel}.
 
@@ -385,7 +390,7 @@ CRITICAL REQUIREMENTS:
 SPECIFIC TO ${context.subject.toUpperCase()}:
 ${getSubjectSpecificGuidance(context.subject, context.title)}
 
-Return ONLY this JSON structure:
+Return ONLY valid JSON in this exact structure (no markdown formatting):
 {
   "title": "${context.title}",
   "description": "Detailed description of the entire learning sequence (100-150 words)",
