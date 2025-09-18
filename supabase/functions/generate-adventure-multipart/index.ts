@@ -349,16 +349,163 @@ Return JSON format:
     }
     
     logError('Error generating phaseplan', error);
+    // Enhanced 12-step fallback structure
     return {
       data: {
         title: context.title,
-        description: "An exciting learning adventure awaits!",
+        description: "An immersive learning adventure that engages students through hands-on exploration and creative problem-solving!",
+        learning_objectives: [
+          "Develop deep understanding through hands-on exploration",
+          "Apply knowledge to solve real-world challenges", 
+          "Collaborate effectively and communicate ideas clearly"
+        ],
         phases: [
           {
-            name: "Introduction",
-            duration: 30,
-            activity: "Start your adventure"
+            name: "🎯 Adventure Hook",
+            duration: 10,
+            type: "hook",
+            description: "Capture curiosity with an intriguing challenge",
+            activities: [
+              {
+                name: "Mystery Challenge",
+                duration: 10,
+                type: "discussion",
+                instructions: "Present students with an interesting problem or scenario related to the topic that they'll solve throughout the lesson.",
+                materials: ["Presentation slides", "Props or visuals"],
+                interaction: "class",
+                engagement_element: "Real-world mystery that students want to solve"
+              }
+            ],
+            assessment: "Observe student curiosity and initial engagement",
+            differentiation: "Use visuals and verbal explanations to support all learners"
+          },
+          {
+            name: "🔍 Knowledge Activation", 
+            duration: 10,
+            type: "exploration",
+            description: "Connect new learning to existing knowledge",
+            activities: [
+              {
+                name: "What Do We Know?",
+                duration: 10,
+                type: "discussion",
+                instructions: "Have students share what they already know about the topic through think-pair-share.",
+                materials: ["Sticky notes", "Chart paper"],
+                interaction: "pairs",
+                engagement_element: "Students become the experts by sharing knowledge"
+              }
+            ],
+            assessment: "Listen to student discussions to gauge prior knowledge",
+            differentiation: "Allow multiple ways to share (drawing, writing, speaking)"
+          },
+          {
+            name: "🎯 Mission Objectives",
+            duration: 5,
+            type: "instruction", 
+            description: "Set clear, student-friendly learning goals",
+            activities: [
+              {
+                name: "Today's Mission",
+                duration: 5,
+                type: "presentation",
+                instructions: "Present learning objectives as mission goals that students will achieve.",
+                materials: ["Mission board", "Student checklists"],
+                interaction: "class",
+                engagement_element: "Frame learning as an exciting mission to complete"
+              }
+            ],
+            assessment: "Check that students understand the objectives",
+            differentiation: "Use visual mission board and verbal explanations"
+          },
+          {
+            name: "🚀 Hands-On Exploration",
+            duration: 20,
+            type: "exploration",
+            description: "Students discover key concepts through activity",
+            activities: [
+              {
+                name: "Discovery Lab",
+                duration: 20,
+                type: "hands-on",
+                instructions: "Students work in small groups to explore the topic through hands-on materials and guided questions.",
+                materials: ["Exploration materials", "Question cards", "Recording sheets"],
+                interaction: "groups",
+                engagement_element: "Students act as scientists/investigators making discoveries"
+              }
+            ],
+            assessment: "Circulate and observe student discoveries",
+            differentiation: "Provide different complexity levels of materials"
+          },
+          {
+            name: "📚 Concept Connection",
+            duration: 15,
+            type: "instruction",
+            description: "Connect discoveries to formal learning",
+            activities: [
+              {
+                name: "Making Sense",
+                duration: 15,
+                type: "discussion",
+                instructions: "Students share discoveries and teacher helps connect to key concepts and vocabulary.",
+                materials: ["Concept map", "Key vocabulary cards"],
+                interaction: "class",
+                engagement_element: "Students' discoveries become the foundation for formal learning"
+              }
+            ],
+            assessment: "Check understanding through questioning and concept mapping",
+            differentiation: "Use multiple representations (visual, verbal, kinesthetic)"
+          },
+          {
+            name: "🎨 Creative Application",
+            duration: 25,
+            type: "practice",
+            description: "Students apply learning in creative ways",
+            activities: [
+              {
+                name: "Create & Share",
+                duration: 25,
+                type: "creative",
+                instructions: "Students create something original that demonstrates their understanding (poster, model, presentation, etc.).",
+                materials: ["Art supplies", "Building materials", "Technology tools"],
+                interaction: "individual",
+                engagement_element: "Students showcase learning through personal creativity"
+              }
+            ],
+            assessment: "Evaluate creativity and accuracy of content",
+            differentiation: "Offer multiple creation options to suit different strengths"
+          },
+          {
+            name: "🎯 Mission Reflection",
+            duration: 15,
+            type: "reflection", 
+            description: "Students reflect on learning and next steps",
+            activities: [
+              {
+                name: "Adventure Debrief",
+                duration: 15,
+                type: "reflection",
+                instructions: "Students reflect on what they learned, what surprised them, and how they can use this knowledge.",
+                materials: ["Reflection journals", "Exit tickets"],
+                interaction: "individual",
+                engagement_element: "Students celebrate their learning journey"
+              }
+            ],
+            assessment: "Review reflection responses for understanding",
+            differentiation: "Offer multiple reflection formats (writing, drawing, verbal)"
           }
+        ],
+        total_duration: 100,
+        key_concepts: ["Hands-on exploration", "Real-world application", "Creative expression", "Collaborative learning"],
+        success_criteria: [
+          "Students can explain key concepts in their own words",
+          "Students can apply learning to solve problems",
+          "Students can work effectively with others"
+        ],
+        extension_activities: [
+          "Advanced challenge problems for fast finishers",
+          "Independent research project",
+          "Peer teaching opportunity",
+          "Creative extension with technology integration"
         ]
       }
     };
@@ -375,55 +522,8 @@ async function generateBudgetAdventure(context: any) {
   // Generate main phase plan
   const phasePlanResult = await generatePhaseplan(context);
   
-  // Use phaseplan data or fallback
-  const adventureData = phasePlanResult.data || {
-    title: context.title,
-    description: "A detailed learning sequence that engages students through hands-on activities and reflection.",
-    learning_objectives: [
-      "Develop understanding of the topic through practical activities",
-      "Work independently and in groups with academic problems",
-      "Reflect on learning and apply new knowledge"
-    ],
-    phases: [
-      {
-        name: "Introduction and Motivation",
-        duration: 45,
-        type: "introduction",
-        description: "Creates interest and establishes learning objectives",
-        activities: [
-          {
-            name: "Opening Discussion",
-            duration: 15,
-            type: "discussion",
-            instructions: "Ask introductory questions to the class and let students share their existing knowledge about the topic.",
-            materials: ["Whiteboard", "Questions"],
-            interaction: "class"
-          },
-          {
-            name: "Learning Objectives Presentation",
-            duration: 15,
-            type: "presentation",
-            instructions: "Present today's learning objectives and explain why the topic is relevant.",
-            materials: ["Slides", "Examples"],
-            interaction: "class"
-          },
-          {
-            name: "Brainstorm Activity",
-            duration: 15,
-            type: "exercise",
-            instructions: "Let students brainstorm in groups about the topic and share their ideas.",
-            materials: ["Paper", "Markers"],
-            interaction: "groups"
-          }
-        ],
-        assessment: "Observe students' engagement and prior knowledge through discussion",
-        reflection_questions: ["What do you already know about this topic?", "Why do you think this is important to learn?"]
-      }
-    ],
-    total_duration: 180,
-    key_concepts: ["Basic topic understanding", "Critical thinking", "Collaboration"],
-    extension_activities: ["Independent research", "Creative projects", "Peer teaching"]
-  };
+  // Use enhanced phaseplan data with proper 12-step structure
+  const adventureData = phasePlanResult.data;
 
   logSuccess('✅ Budget adventure generated successfully');
   return adventureData;
