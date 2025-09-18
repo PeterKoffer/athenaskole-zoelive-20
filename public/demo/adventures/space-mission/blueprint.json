@@ -1,45 +1,29 @@
 {
   "adventureId": "space-mission",
-  "title": "Mars Mission Planning",
-  "intro": "Your team has been selected to plan humanity's next mission to Mars. You'll need to calculate trajectories, design life support systems, and plan for the challenges of deep space exploration.",
+  "title": "Mission to Mars",
+  "ageTargets": ["1","5","9","12"],
+  "introStoryTemplate": "Mission Control brief: A new research habitat on Mars needs your team's help. {hookByGradeBand}",
   "images": {
-    "cover": "/demo/mars-mission-cover.jpg",
-    "scenes": ["/demo/mars-surface.jpg", "/demo/spacecraft-interior.jpg", "/demo/mission-control.jpg"]
+    "coverPrompt": "cinematic, dreamy, soft light, diverse kids and teens 6-18 in sleek space suits, Mars habitat in background, hopeful, photorealistic CG",
+    "scenePrompts": [
+      "inside a Mars habitat lab with tablets showing graphs and maps",
+      "outside EVA scene near rover at dusk, thin atmosphere, teamwork gesture"
+    ]
   },
-  "coreSubjects": ["science", "mathematics", "geography", "computerTech"],
-  "adaptiveElements": {
-    "difficulty": {
-      "emerging": "Focus on basic concepts and guided calculations",
-      "onLevel": "Standard mission parameters with moderate complexity",
-      "advanced": "Complex multi-variable problems and system design"
-    },
-    "learningStyle": {
-      "visual": "Diagrams, charts, and visual mission planning tools",
-      "auditory": "Mission briefings and verbal problem-solving",
-      "kinesthetic": "Interactive simulations and hands-on calculations",
-      "readingWriting": "Mission reports and detailed technical documentation"
-    }
+  "faithContextSlots": { "valuesHook": "curiosity, stewardship of creation, service", "optionalPrayer": "{shortPrayer}", "optionalScripture": "{shortScripture}" },
+  "subjects": {
+    "nativeLanguage": { "core": [ { "subject": "nativeLanguage", "title": "Mission Log Entry", "body": "Write a mission log at {gradeBand} level.", "estMinutes": 10 } ], "extensions": [ { "subject": "nativeLanguage", "title": "Technical Summary", "body": "Summarize a telemetry graph.", "estMinutes": 6 } ] },
+    "mathematics":    { "core": [ { "subject": "mathematics", "title": "Fuel & Mass Budget", "body": "Compute tradeoffs incl. safety margin.", "estMinutes": 12 } ], "extensions": [ { "subject": "mathematics", "title": "Trajectory What-If", "body": "Vary a parameter and recompute.", "estMinutes": 6 } ] },
+    "languageLab":    { "core": [ { "subject": "languageLab", "title": "Mission Phrases (EN/ES)", "body": "Learn 6 phrases; use 3 in dialogs.", "estMinutes": 8 } ], "extensions": [ { "subject": "languageLab", "title": "Bilingual Checklist", "body": "Translate safety checklist.", "estMinutes": 6 } ] },
+    "science":        { "core": [ { "subject": "science", "title": "Life Support Basics", "body": "Explain CO2 scrubbing & O2 gen.", "estMinutes": 10 } ], "extensions": [ { "subject": "science", "title": "Plant Growth Trial", "body": "Plan micro-experiment.", "estMinutes": 8 } ] },
+    "historyReligion":{ "core": [ { "subject": "historyReligion", "title": "Exploration Timeline", "body": "From early astronomy to Mars.", "estMinutes": 10 } ], "extensions": [ { "subject": "historyReligion", "title": "Ethics of Exploration", "body": "Reflect on stewardship.", "estMinutes": 8 } ] },
+    "geography":      { "core": [ { "subject": "geography", "title": "Mars Map Read", "body": "Identify features & hazards.", "estMinutes": 8 } ], "extensions": [ { "subject": "geography", "title": "Route Planning", "body": "Propose a rover route.", "estMinutes": 6 } ] },
+    "computerTech":   { "core": [ { "subject": "computerTech", "title": "Telemetry Dashboard", "body": "Sketch minimal data UI.", "estMinutes": 12 } ], "extensions": [ { "subject": "computerTech", "title": "Data Model JSON", "body": "Define 'sensor reading'.", "estMinutes": 6 } ] },
+    "creativeArts":   { "core": [ { "subject": "creativeArts", "title": "Mission Patch", "body": "Design symbolism.", "estMinutes": 8 } ], "extensions": [ { "subject": "creativeArts", "title": "Hab Poster", "body": "Motivational poster (readable 2m).", "estMinutes": 6 } ] },
+    "musicDiscovery": { "core": [ { "subject": "musicDiscovery", "title": "Focus Playlist", "body": "3 instrumental tracks; justify.", "estMinutes": 6 } ], "extensions": [ { "subject": "musicDiscovery", "title": "Wake-Up Jingle", "body": "10 sec rhythm pattern.", "estMinutes": 5 } ] },
+    "physicalEd":     { "core": [ { "subject": "physicalEd", "title": "Hab Mobility Routine", "body": "5 min low-gravity routine.", "estMinutes": 5 } ], "extensions": [ { "subject": "physicalEd", "title": "Stretch & Safety", "body": "Two stretches + EVA rule.", "estMinutes": 4 } ] },
+    "mentalWellness": { "core": [ { "subject": "mentalWellness", "title": "Isolation Toolkit", "body": "3 strategies for focus & calm.", "estMinutes": 6 } ], "extensions": [ { "subject": "mentalWellness", "title": "Buddy Check", "body": "2-question daily check-in.", "estMinutes": 4 } ] },
+    "lifeEssentials": { "core": [ { "subject": "lifeEssentials", "title": "Emergency Card", "body": "Who/what/when protocol.", "estMinutes": 8 } ], "extensions": [ { "subject": "lifeEssentials", "title": "Inventory Plan", "body": "7-day ration tracking.", "estMinutes": 6 } ] }
   },
-  "progressionPath": [
-    {
-      "stage": "mission-briefing",
-      "duration": 15,
-      "subjects": ["science", "geography"]
-    },
-    {
-      "stage": "trajectory-calculation",
-      "duration": 25,
-      "subjects": ["mathematics", "computerTech"]
-    },
-    {
-      "stage": "life-support-design",
-      "duration": 30,
-      "subjects": ["science", "mathematics"]
-    },
-    {
-      "stage": "communication-system",
-      "duration": 20,
-      "subjects": ["computerTech", "science"]
-    }
-  ]
+  "progressTags": ["ELA","MATH","SCI","CSTA","NGSS","SEL","PE"]
 }

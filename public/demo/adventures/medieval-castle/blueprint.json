@@ -1,45 +1,29 @@
 {
   "adventureId": "medieval-castle",
-  "title": "Medieval Castle Builder",
-  "intro": "Step back in time to become a master castle architect! Design fortifications, manage resources, and learn about medieval life while building the ultimate defensive stronghold.",
+  "title": "Medieval Castle Mystery",
+  "ageTargets": ["1","5","9","12"],
+  "introStoryTemplate": "A sealed letter is discovered in an old castle archive. Your team must decode clues and present findings to the town.",
   "images": {
-    "cover": "/demo/medieval-castle-cover.jpg",
-    "scenes": ["/demo/castle-walls.jpg", "/demo/medieval-village.jpg", "/demo/castle-interior.jpg"]
+    "coverPrompt": "cinematic, dreamy, soft mist, diverse kids/teens 6-18 with lanterns and tablets in a medieval archive hall, photorealistic CG",
+    "scenePrompts": [
+      "stone corridor with tapestries, students scanning symbols on a tablet",
+      "town hall presentation with projected map and findings"
+    ]
   },
-  "coreSubjects": ["historyReligion", "mathematics", "creativeArts", "science"],
-  "adaptiveElements": {
-    "difficulty": {
-      "emerging": "Simple geometric shapes and basic historical facts",
-      "onLevel": "Architectural planning with area calculations",
-      "advanced": "Complex engineering and historical analysis"
-    },
-    "learningStyle": {
-      "visual": "Castle blueprints and historical artwork",
-      "auditory": "Medieval stories and historical narration",
-      "kinesthetic": "Virtual castle building and siege simulations",
-      "readingWriting": "Historical research and detailed planning documents"
-    }
+  "faithContextSlots": { "valuesHook": "truth-seeking, integrity, community care", "optionalPrayer": "{shortPrayer}", "optionalScripture": "{shortScripture}" },
+  "subjects": {
+    "nativeLanguage": { "core": [ { "subject": "nativeLanguage", "title": "Narrative Brief", "body": "Retell discovery at {gradeBand} level.", "estMinutes": 10 } ], "extensions": [ { "subject": "nativeLanguage", "title": "Claim & Evidence", "body": "Claim + 2 evidence details.", "estMinutes": 6 } ] },
+    "mathematics":    { "core": [ { "subject": "mathematics", "title": "Scale & Proportion", "body": "Distances and area on floor map.", "estMinutes": 12 } ], "extensions": [ { "subject": "mathematics", "title": "Exhibit Budget", "body": "Plan basic costs.", "estMinutes": 6 } ] },
+    "languageLab":    { "core": [ { "subject": "languageLab", "title": "Old Terms (EN/FR/DE)", "body": "6 heritage terms + 3 labels.", "estMinutes": 8 } ], "extensions": [ { "subject": "languageLab", "title": "Docent Greeting", "body": "Short greeting in second language.", "estMinutes": 6 } ] },
+    "science":        { "core": [ { "subject": "science", "title": "Material Science", "body": "Why stone/wood endured centuries.", "estMinutes": 10 } ], "extensions": [ { "subject": "science", "title": "Preservation Plan", "body": "Humidity/light controls.", "estMinutes": 8 } ] },
+    "historyReligion":{ "core": [ { "subject": "historyReligion", "title": "Context of the Letter", "body": "Timeline + beliefs/culture.", "estMinutes": 12 } ], "extensions": [ { "subject": "historyReligion", "title": "Ethics & Heritage", "body": "Stewardship of artifacts.", "estMinutes": 8 } ] },
+    "geography":      { "core": [ { "subject": "geography", "title": "Trade Routes Map", "body": "Map 3 medieval trade routes.", "estMinutes": 8 } ], "extensions": [ { "subject": "geography", "title": "Terrain & Defense", "body": "How terrain shaped placement.", "estMinutes": 6 } ] },
+    "computerTech":   { "core": [ { "subject": "computerTech", "title": "Digital Archive Card", "body": "Metadata JSON (title, date, provenance, tags).", "estMinutes": 12 } ], "extensions": [ { "subject": "computerTech", "title": "QR Exhibit Link", "body": "Add qrLink + short label.", "estMinutes": 6 } ] },
+    "creativeArts":   { "core": [ { "subject": "creativeArts", "title": "Seal & Crest", "body": "Design a family crest.", "estMinutes": 8 } ], "extensions": [ { "subject": "creativeArts", "title": "Exhibit Poster", "body": "Poster with hierarchy & contrast.", "estMinutes": 6 } ] },
+    "musicDiscovery": { "core": [ { "subject": "musicDiscovery", "title": "Period Music Mood", "body": "Pick 3 tracks; describe instruments.", "estMinutes": 6 } ], "extensions": [ { "subject": "musicDiscovery", "title": "Ambient Loop", "body": "10-sec humming/clap loop.", "estMinutes": 5 } ] },
+    "physicalEd":     { "core": [ { "subject": "physicalEd", "title": "Guide Walk Plan", "body": "Gentle route + safety notes.", "estMinutes": 5 } ], "extensions": [ { "subject": "physicalEd", "title": "Warm-Up Routine", "body": "Two dynamic warm-ups.", "estMinutes": 4 } ] },
+    "mentalWellness": { "core": [ { "subject": "mentalWellness", "title": "Public Speaking Calm", "body": "3 strategies for nerves.", "estMinutes": 6 } ], "extensions": [ { "subject": "mentalWellness", "title": "Kind Feedback", "body": "2 sentence starters.", "estMinutes": 4 } ] },
+    "lifeEssentials": { "core": [ { "subject": "lifeEssentials", "title": "Event Plan (4 steps)", "body": "Permissions, safety, signage, schedule.", "estMinutes": 8 } ], "extensions": [ { "subject": "lifeEssentials", "title": "Volunteer Roles", "body": "3 roles + 1 responsibility each.", "estMinutes": 6 } ] }
   },
-  "progressionPath": [
-    {
-      "stage": "historical-research",
-      "duration": 20,
-      "subjects": ["historyReligion"]
-    },
-    {
-      "stage": "architectural-planning",
-      "duration": 25,
-      "subjects": ["mathematics", "creativeArts"]
-    },
-    {
-      "stage": "defense-systems",
-      "duration": 20,
-      "subjects": ["science", "mathematics"]
-    },
-    {
-      "stage": "medieval-life",
-      "duration": 15,
-      "subjects": ["historyReligion", "creativeArts"]
-    }
-  ]
+  "progressTags": ["ELA","MATH","HIST","GEOG","CSTA","SEL","PE"]
 }

@@ -1,45 +1,29 @@
 {
   "adventureId": "music-festival",
-  "title": "Music Festival Organizer",
-  "intro": "Create the ultimate music festival experience! Manage budgets, design stages, coordinate logistics, and curate the perfect lineup for thousands of music fans.",
+  "title": "Music Festival Planner",
+  "ageTargets": ["1","5","9","12"],
+  "introStoryTemplate": "Your city invites student teams to plan a one-day music festival. Design it for safety, joy, and community impact.",
   "images": {
-    "cover": "/demo/music-festival-cover.jpg",
-    "scenes": ["/demo/main-stage.jpg", "/demo/crowd-dancing.jpg", "/demo/sound-booth.jpg"]
+    "coverPrompt": "cinematic, dreamy, soft bokeh lights, diverse kids/teens 6-18 planning a stage with tablets and whiteboards, photorealistic CG",
+    "scenePrompts": [
+      "stage layout review with floor plan on tablet",
+      "crowd flow map with volunteers guiding attendees at sunset"
+    ]
   },
-  "coreSubjects": ["musicDiscovery", "mathematics", "creativeArts", "lifeEssentials"],
-  "adaptiveElements": {
-    "difficulty": {
-      "emerging": "Basic music concepts and simple calculations",
-      "onLevel": "Event planning with moderate complexity",
-      "advanced": "Complex logistics and advanced music theory"
-    },
-    "learningStyle": {
-      "visual": "Stage designs and visual planning tools",
-      "auditory": "Music samples and audio production",
-      "kinesthetic": "Interactive festival simulation",
-      "readingWriting": "Event planning documents and music reviews"
-    }
+  "faithContextSlots": { "valuesHook": "joy, hospitality, service", "optionalPrayer": "{shortPrayer}", "optionalScripture": "{shortScripture}" },
+  "subjects": {
+    "nativeLanguage": { "core": [ { "subject": "nativeLanguage", "title": "Festival Concept Write-up", "body": "Describe vision, audience, values at {gradeBand} level.", "estMinutes": 10 } ], "extensions": [ { "subject": "nativeLanguage", "title": "Press Blurb", "body": "Short press paragraph.", "estMinutes": 6 } ] },
+    "mathematics":    { "core": [ { "subject": "mathematics", "title": "Ticket Math & Budget", "body": "Price, attendance, revenue & costs.", "estMinutes": 12 } ], "extensions": [ { "subject": "mathematics", "title": "Sensitivity Test", "body": "Vary attendance ±10%.", "estMinutes": 6 } ] },
+    "languageLab":    { "core": [ { "subject": "languageLab", "title": "Artist Hospitality Phrases", "body": "6 phrases; 3 polite requests.", "estMinutes": 8 } ], "extensions": [ { "subject": "languageLab", "title": "Bilingual Signage", "body": "Entry/Exit/First Aid/Info.", "estMinutes": 6 } ] },
+    "science":        { "core": [ { "subject": "science", "title": "Sound & Safety", "body": "Decibels & ear protection.", "estMinutes": 10 } ], "extensions": [ { "subject": "science", "title": "Weather Plan", "body": "Severe weather protocol.", "estMinutes": 8 } ] },
+    "historyReligion":{ "core": [ { "subject": "historyReligion", "title": "Music & Community", "body": "How events build community across eras.", "estMinutes": 10 } ], "extensions": [ { "subject": "historyReligion", "title": "Ethics of Access", "body": "Inclusion step (ASL/quiet zone/pay-it-forward).", "estMinutes": 8 } ] },
+    "geography":      { "core": [ { "subject": "geography", "title": "Venue Map", "body": "Entrances/exits/facilities/flow.", "estMinutes": 8 } ], "extensions": [ { "subject": "geography", "title": "Transit Options", "body": "3 sustainable transport modes.", "estMinutes": 6 } ] },
+    "computerTech":   { "core": [ { "subject": "computerTech", "title": "Ticketing Flow", "body": "User flow for buying/scanning.", "estMinutes": 12 } ], "extensions": [ { "subject": "computerTech", "title": "Data Fields", "body": "JSON for 'Order' record.", "estMinutes": 6 } ] },
+    "creativeArts":   { "core": [ { "subject": "creativeArts", "title": "Brand Kit", "body": "Logo, 3 colors, type; accessible.", "estMinutes": 8 } ], "extensions": [ { "subject": "creativeArts", "title": "Poster & Social Tile", "body": "A3 + 1:1 tile mock.", "estMinutes": 6 } ] },
+    "musicDiscovery": { "core": [ { "subject": "musicDiscovery", "title": "Lineup Curation", "body": "4 artists/genres; energy arc.", "estMinutes": 8 } ], "extensions": [ { "subject": "musicDiscovery", "title": "Changeover Cue", "body": "15-sec sting/jingle.", "estMinutes": 5 } ] },
+    "physicalEd":     { "core": [ { "subject": "physicalEd", "title": "Volunteer Ergonomics", "body": "Safe lifting + hydration.", "estMinutes": 5 } ], "extensions": [ { "subject": "physicalEd", "title": "Warm-up Walk", "body": "3-min route.", "estMinutes": 4 } ] },
+    "mentalWellness": { "core": [ { "subject": "mentalWellness", "title": "Stress Map", "body": "3 stress points + 1 mitigation each.", "estMinutes": 6 } ], "extensions": [ { "subject": "mentalWellness", "title": "Support Signals", "body": "Hand signals: help/ok/stop.", "estMinutes": 4 } ] },
+    "lifeEssentials": { "core": [ { "subject": "lifeEssentials", "title": "Permits & Safety", "body": "Checklist: permits/insurance/first aid/emergency.", "estMinutes": 8 } ], "extensions": [ { "subject": "lifeEssentials", "title": "Budget Roles", "body": "Roles (budget/stage/safety) + KPI.", "estMinutes": 6 } ] }
   },
-  "progressionPath": [
-    {
-      "stage": "music-curation",
-      "duration": 25,
-      "subjects": ["musicDiscovery", "creativeArts"]
-    },
-    {
-      "stage": "budget-management",
-      "duration": 20,
-      "subjects": ["mathematics", "lifeEssentials"]
-    },
-    {
-      "stage": "stage-design",
-      "duration": 25,
-      "subjects": ["creativeArts", "mathematics"]
-    },
-    {
-      "stage": "logistics-coordination",
-      "duration": 20,
-      "subjects": ["lifeEssentials", "mathematics"]
-    }
-  ]
+  "progressTags": ["ELA","MATH","SCI","CSTA","ART","MUSIC","SEL","PE"]
 }
