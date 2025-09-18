@@ -224,13 +224,6 @@ export default function TodaysAdventure() {
                   )}
                 </div>
 
-                {/* Adventure Backstory */}
-                <div className="bg-black/20 rounded-lg p-6 border border-white/10">
-                  <h3 className="text-lg font-semibold text-white mb-4">Your Adventure Begins...</h3>
-                  <p className="text-white/90 text-base leading-relaxed">
-                    {data.universe?.description || 'Join us on an exciting learning journey where you\'ll discover new concepts, solve interesting problems, and create something amazing!'}
-                  </p>
-                </div>
 
 
                 {/* Start Button */}
