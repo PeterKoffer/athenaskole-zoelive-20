@@ -1,20 +1,12 @@
-// Simplified Multi-Prompt Adventure Generation Edge Function with Budget Control
+// 12-Step Adventure Generation Pipeline with Digital-Only Materials
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { BudgetGuard, extractUsageFromLLMResponse, type StepName } from "../_shared/BudgetGuard.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-
-// Initialize Supabase client for caching
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-);
 
 // Enhanced logging
 function logInfo(message: string, data?: any) {
@@ -40,207 +32,27 @@ function logSuccess(message: string, data?: any) {
   }
 }
 
-// Budget Guard Configuration
-const PLANNED_STEPS: StepName[] = ["hook", "phaseplan", "narrative", "quiz", "writing", "scenario", "images", "exit", "validator"];
-
-function modelSpec(name: string, in_cost: number, out_cost: number, maxOut = 2048) {
-  return { name, in_per_mtok: in_cost, out_per_mtok: out_cost, max_output_tokens: maxOut };
-}
-
-const budgetGuard = new BudgetGuard({
-  plannedSteps: PLANNED_STEPS,
-  tokenBudgetTotal: Number(Deno.env.get("TOKEN_BUDGET_TOTAL") ?? "18000"),
-  costCapUSD: Deno.env.get("COST_CAP_USD") ? Number(Deno.env.get("COST_CAP_USD")) : undefined,
-  jsonMinified: (Deno.env.get("USE_JSON_MINIFIED") ?? "true").toLowerCase() === "true",
-  reserveForCritical: 1500,
-  modelMap: {
-    hook: modelSpec(Deno.env.get("MODEL_HOOK") ?? "gpt-4o-mini", 0.15, 0.6, 256),
-    phaseplan: modelSpec(Deno.env.get("MODEL_PHASEPLAN") ?? "gpt-4o-mini", 0.15, 0.6, 1024),
-    narrative: modelSpec(Deno.env.get("MODEL_NARRATIVE") ?? "gpt-4o-mini", 0.15, 0.6, 512),
-    quiz: modelSpec(Deno.env.get("MODEL_QUIZ") ?? "gpt-4o-mini", 0.15, 0.6, 700),
-    writing: modelSpec(Deno.env.get("MODEL_WRITING") ?? "gpt-4o-mini", 0.15, 0.6, 900),
-    scenario: modelSpec(Deno.env.get("MODEL_SCENARIO") ?? "gpt-4o-mini", 0.15, 0.6, 600),
-    minigame: modelSpec(Deno.env.get("MODEL_MINIGAME") ?? "gpt-4o-mini", 0.15, 0.6, 400),
-    images: modelSpec(Deno.env.get("MODEL_IMAGES") ?? "gpt-4o-mini", 0.15, 0.6, 160),
-    exit: modelSpec(Deno.env.get("MODEL_EXIT") ?? "gpt-4o-mini", 0.15, 0.6, 180),
-    validator: modelSpec(Deno.env.get("MODEL_VALIDATOR") ?? "gpt-4o-mini", 0.15, 0.6, 200),
-    enrichment: modelSpec(Deno.env.get("MODEL_ENRICH") ?? "gpt-4o-mini", 0.15, 0.6, 200),
-  },
-  stepConfig: {
-    hook: { priority: 1, default_max_output_tokens: 180 },
-    phaseplan: { priority: 1, default_max_output_tokens: 1500 },
-    narrative: { priority: 2, default_max_output_tokens: 400 },
-    quiz: { priority: 1, default_max_output_tokens: 700 },
-    writing: { priority: 1, default_max_output_tokens: 900 },
-    scenario: { priority: 2, default_max_output_tokens: 600 },
-    minigame: { priority: 3, default_max_output_tokens: 300 },
-    images: { priority: 3, default_max_output_tokens: 140 },
-    exit: { priority: 2, default_max_output_tokens: 150 },
-    validator: { priority: 1, default_max_output_tokens: 120 },
-    enrichment: { priority: 3, default_max_output_tokens: 180 },
-  },
-});
-
-// Subject-specific guidance for rich content generation
-function getSubjectSpecificGuidance(subject: string, title: string): string {
-  const guidelines = {
-    "Science": `Follow NGSS standards. Include specific scientific procedures: controlled experiments, data tables, graphs, hypothesis formation, variable identification. Use exact lab equipment (microscopes, beakers, thermometers, pH strips). Include scientific vocabulary (independent/dependent variables, hypothesis, conclusion, peer review). Connect to real scientists and current research. Include safety protocols and lab procedures.`,
-    
-    "Mathematics": `Follow Common Core/state math standards. Include step-by-step problem-solving procedures, specific formulas, mathematical proofs, and calculations. Use exact mathematical tools (graphing calculators, rulers, protractors, geometric shapes). Include precise mathematical vocabulary (coefficients, equations, theorems, proofs). Provide real-world applications with actual data and statistics.`,
-    
-    "Arts": `Follow National Visual Arts Standards. Include specific art techniques (watercolor washes, perspective drawing, clay wedging, printmaking). Use exact art materials (acrylic paints, charcoal, canvas, sculpting tools). Include art history context with specific artists, movements, and time periods. Teach art criticism vocabulary (composition, color theory, balance, contrast).`,
-    
-    "Technology": `Follow ISTE standards for students. Include specific coding languages (Scratch, Python, HTML/CSS), engineering design process steps, digital citizenship principles. Use exact tech tools (Raspberry Pi, Arduino, 3D printers, design software). Include programming vocabulary (algorithms, loops, variables, debugging). Connect to real tech careers and current innovations.`,
-    
-    "English": `Follow Common Core ELA standards. Include specific reading strategies (close reading, annotation, text evidence), writing processes (brainstorming, drafting, revising, editing), grammar rules, and literary devices. Use specific texts, cite evidence, analyze themes. Include vocabulary instruction with context clues and word roots.`,
-    
-    "Social Studies": `Follow NCSS standards. Include specific historical analysis skills, primary source examination, map reading, timeline creation. Use exact historical evidence, dates, and factual information. Include geography skills (latitude/longitude, map scales, physical features). Connect to current events and civic participation.`,
-    
-    "Civics": `Follow civics education standards. Include specific government processes (how a bill becomes law, branches of government, Constitution articles), civic engagement activities, current policy analysis. Use real government documents, court cases, and civic participation examples. Include rights and responsibilities with specific examples.`
-  };
-  
-  const specificGuidance = guidelines[subject] || `Focus on authentic ${subject} concepts, skills, and real-world applications appropriate for this grade level.`;
-  return `${specificGuidance}\nFor "${title}": Make this deeply connected to specific ${subject} content, not generic educational activities.`;
-}
-
-// Cache key generation for lesson content
-function generateLessonCacheKey(context: any): string {
-  const keyData = {
-    title: context.title,
-    subject: context.subject,
-    gradeLevel: context.gradeLevel,
-    interests: context.interests?.sort() || [],
-    version: 'v2.0' // Update when prompt changes
-  };
-  return btoa(JSON.stringify(keyData));
-}
-
-// Cache key generation for images  
-function generateImageCacheKey(prompt: string): string {
-  const normalizedPrompt = prompt.toLowerCase().trim().replace(/\s+/g, ' ');
-  return btoa(normalizedPrompt);
-}
-
-// Check for cached lesson content
-async function getCachedLesson(cacheKey: string) {
-  try {
-    const { data, error } = await supabase
-      .from('adventure_lesson_cache')
-      .select('lesson_data, created_at')
-      .eq('content_hash', cacheKey)
-      .maybeSingle();
-    
-    if (error) {
-      logError('Error checking lesson cache:', error);
-      return null;
-    }
-    
-    if (data) {
-      logSuccess(`✅ Found cached lesson from ${data.created_at}`);
-      return data.lesson_data;
-    }
-    
-    return null;
-  } catch (error) {
-    logError('Cache lookup failed:', error);
-    return null;
-  }
-}
-
-// Save lesson to cache
-async function saveLessonToCache(cacheKey: string, lessonData: any, context: any) {
-  try {
-    const { error } = await supabase
-      .from('adventure_lesson_cache')
-      .upsert({
-        content_hash: cacheKey,
-        adventure_title: context.title,
-        subject: context.subject,
-        grade_level: context.gradeLevel,
-        lesson_data: lessonData
-      });
-    
-    if (error) {
-      logError('Error saving to lesson cache:', error);
-    } else {
-      logSuccess('✅ Lesson saved to cache');
-    }
-  } catch (error) {
-    logError('Cache save failed:', error);
-  }
-}
-
-// Check for cached image
-async function getCachedImage(promptHash: string) {
-  try {
-    const { data, error } = await supabase
-      .from('adventure_image_cache')
-      .select('image_url, image_data, created_at')
-      .eq('prompt_hash', promptHash)
-      .maybeSingle();
-    
-    if (error) {
-      logError('Error checking image cache:', error);
-      return null;
-    }
-    
-    if (data) {
-      logSuccess(`✅ Found cached image from ${data.created_at}`);
-      return data.image_url || data.image_data;
-    }
-    
-    return null;
-  } catch (error) {
-    logError('Image cache lookup failed:', error);
-    return null;
-  }
-}
-
-// Save image to cache
-async function saveImageToCache(promptHash: string, prompt: string, imageUrl: string, adventureTitle: string) {
-  try {
-    const { error } = await supabase
-      .from('adventure_image_cache')
-      .upsert({
-        prompt_hash: promptHash,
-        adventure_title: adventureTitle,
-        prompt: prompt,
-        image_url: imageUrl
-      });
-    
-    if (error) {
-      logError('Error saving to image cache:', error);
-    } else {
-      logSuccess('✅ Image saved to cache');
-    }
-  } catch (error) {
-    logError('Image cache save failed:', error);
-  }
-}
-
-// Budget-aware AI call
-async function callOpenAI(model: string, system: string, user: string, max_tokens: number): Promise<{text: string; usage?: any; raw: any}> {
+// Digital-only AI call
+async function callOpenAI(system: string, user: string, maxTokens = 1500): Promise<{text: string; usage?: any}> {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
     logError('OpenAI API key not configured');
     throw new Error('OpenAI API key not configured');
   }
 
-  logInfo(`🤖 Calling OpenAI (${model}, max_tokens: ${max_tokens})...`);
+  logInfo(`🤖 Calling OpenAI (max_tokens: ${maxTokens})...`);
 
   try {
-    const requestBody: any = {
-      model,
+    const requestBody = {
+      model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: system + ' You MUST return valid JSON only. No additional text before or after the JSON object.' },
+        { role: 'system', content: system },
         { role: 'user', content: user }
       ],
-      max_tokens,
+      max_tokens: maxTokens,
       temperature: 0.3,
       response_format: { type: "json_object" }
     };
-
-    logInfo(`🤖 Calling OpenAI (${model}, max_tokens: ${max_tokens})...`);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -258,740 +70,560 @@ async function callOpenAI(model: string, system: string, user: string, max_token
     }
 
     const data = await response.json();
-    let text = data.choices?.[0]?.message?.content ?? "";
-    const usage = extractUsageFromLLMResponse(data);
-    
-    // Since we're using json_object mode, the text should be pure JSON
-    text = text.trim();
+    const text = data.choices?.[0]?.message?.content?.trim() ?? "";
+    const usage = data.usage;
     
     logSuccess('✅ OpenAI response received');
-    logInfo(`📝 Raw response for JSON parsing: ${text.substring(0, 300)}...`);
-    
-    return { text, usage, raw: data };
+    return { text, usage };
 
   } catch (error) {
     logError('Error calling OpenAI', error);
-    
-    // Check if it's a quota/billing error
-    if (error?.message?.includes('quota') || error?.message?.includes('billing')) {
-      logError('❌ OpenAI quota/billing limit reached - using fallback response');
-      throw new Error('QUOTA_EXCEEDED');
-    }
-    
     throw error;
   }
 }
 
-// Generate hook step
-async function generateHook(context: any) {
-  const begin = budgetGuard.beginStep("hook");
-  if (!begin.allowed) {
-    logInfo(`❌ Hook step skipped: ${begin.reason}`);
-    return { skipped: true, reason: begin.reason };
-  }
+// P0 - System prompt (used for all calls)
+const SYSTEM_PROMPT = `Du er didaktisk chefkonsulent for faget "{subject}" og klassetrin "{gradeBand}".
+Sprog: {language}. Du må KUN svare med gyldig JSON, uden markdown og uden øvrig tekst.
+Tider angives i minutter. Materialer skal være realistiske for en normal skole.
 
-  const system = `You are an inspiring teacher who creates engaging lesson introductions. You must create curiosity and motivation in students. Return only valid JSON format with no additional text.`;
-  
-  const user = `Write an inspiring and engaging introduction to the lesson "${context.title}" for grade ${context.gradeLevel} in the subject ${context.subject}.
+POLICY_DIGITAL_ONLY:
+Alt arbejde skal kunne gennemføres 100% på en computer/tablet (skærm). 
+"Materials" må KUN indeholde digitale ressourcer (apps, websites, skabeloner, filer) eller indbyggede enhedsfunktioner (fx kamera, mikrofon, skærmoptagelse, web-timer). 
+Forbudt: fysiske materialer (papir, saks, lim, tusch, whiteboard, LEGO, målebånd, lineal, batterier, snor, papirclips, osv.). 
+Hvis en aktivitet typisk ville bruge fysiske ting, SKAL du foreslå en digital erstatning (fx måling via billedanalyse, virtuel simulator, interaktivt værktøj, formular/skabelon).
+Alle opgaver, scripts og vurderinger skal kunne løses på skærmen uden nødvendigt fysisk udstyr.
 
-REQUIREMENTS:
-- Start with an exciting scenario, problem, or question that captures students' attention
-- Explain why this topic is relevant to students in their daily lives
-- Ask provocative questions that make students think
-- Use language appropriate for the age group
-- Create anticipation and curiosity
+Alle checkpoints/succeskriterier skal være observerbare og målbare.
+Returnér KUN JSON – hvis du ikke kan opfylde kravet, returnér {"error":"..."}.`;
 
-Return JSON format only (no markdown formatting):
+// P1 - Metadata & Framework
+async function generateMetadata(context: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Generér rammesætning for et Adventure.
+Alle "materials_global" skal følge POLICY_DIGITAL_ONLY og derfor KUN være digitale ressourcer eller indbyggede enhedsfunktioner.
+
+Returnér JSON med: bigIdea (1 sætning), essentialQuestion (1 spørgsmål),
+vocabulary (5–10 begreber), standards (2–4 relevante standarder), materials_global (liste).
+
+Input: ${JSON.stringify(context)}
+
+OUTPUT JSON schema:
 {
-  "text": "Engaging and inspiring introduction text that motivates students (150-200 words)",
-  "hook_question": "A provocative question that starts discussion",
-  "real_world_connection": "How the topic relates to students' everyday lives",
-  "image_prompt": "Description for generating an inspiring image that supports the intro"
+  "bigIdea": "string",
+  "essentialQuestion": "string", 
+  "vocabulary": ["string", "..."],
+  "standards": ["string", "..."],
+  "materials_global": ["string", "..."]
 }`;
 
-  try {
-    const { text, usage } = await callOpenAI(begin.model.name, system, user, begin.max_tokens);
-    budgetGuard.finishStep(begin.logIndex, usage);
-
-    // Parse JSON response with enhanced error handling
-    let data;
-    try {
-      data = JSON.parse(text);
-      logSuccess(`✅ Hook JSON parsed successfully: ${JSON.stringify(data).substring(0, 100)}...`);
-    } catch (parseError) {
-      logError(`❌ Error generating hook ${parseError}`);
-      logError(`❌ Raw OpenAI response: ${text}`);
-      // Return enhanced hook fallback
-      return {
-        data: {
-          text: `Welcome to your exciting ${context.title} adventure! You've stumbled upon something incredible that needs your ${context.subject} expertise. The challenge ahead will test your knowledge, creativity, and problem-solving skills. Are you ready to prove what you can do and make a real difference? Let's discover what amazing discoveries await!`,
-          beats: ["Exciting discovery", "Challenge presentation", "Call to adventure"],
-          image_prompt: `adventure learning environment for ${context.subject}, students engaged in discovery, warm inspiring atmosphere`,
-          reading_time_sec: 45
-        }
-      };
-    }
-    
-    logSuccess('✅ Hook generated successfully');
-    return { data };
-  } catch (error) {
-    budgetGuard.finishStep(begin.logIndex, null);
-    
-    if (error?.message === 'QUOTA_EXCEEDED') {
-      logError('❌ OpenAI quota exceeded - using enhanced fallback');
-      return { 
-        data: { 
-          text: `Ready to explore ${context.subject}? Let's dive into "${context.title}" and discover amazing things together!`,
-          hook_question: `What do you already know about ${context.title.toLowerCase()}?`,
-          real_world_connection: `Understanding ${context.title.toLowerCase()} helps us in our daily lives and future careers.`,
-          image_prompt: `students exploring ${context.subject} topic together with excitement and curiosity` 
-        } 
-      };
-    }
-    
-    logError('Error generating hook', error);
-    return { 
-      data: { 
-        text: "Welcome to an exciting learning adventure!", 
-        image_prompt: "students learning together" 
-      } 
-    };
-  }
+  const { text } = await callOpenAI(system, user, 800);
+  return JSON.parse(text);
 }
 
-// Generate phase plan step
-async function generatePhaseplan(context: any) {
-  const begin = budgetGuard.beginStep("phaseplan");
-  if (!begin.allowed) {
-    logInfo(`❌ Phaseplan step skipped: ${begin.reason}`);
-    return { skipped: true, reason: begin.reason };
-  }
+// P2 - Phase Plan (12 steps)
+async function generatePhaseplan(context: any, metadata: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
 
-  const system = `You are an expert ${context.subject} teacher and curriculum designer. You create detailed, subject-specific learning experiences that deeply engage students with authentic ${context.subject} content and real-world applications. 
+  const user = `Skab en 12-trins faseplan for undervisningen, der samlet ca. matcher ${context.duration_minutes} minutter (±10%).
+For hvert stage gælder POLICY_DIGITAL_ONLY: "materials" må KUN være digitale ressourcer eller indbyggede enhedsfunktioner. 
+Hvis en naturlig aktivitet typisk er analog, skal du give en konkret digital erstatning.
 
-FOR ${context.subject.toUpperCase()}:
-${getSubjectSpecificGuidance(context.subject, context.title)}
+Trin og rækkefølge (ID og navn skal være præcist som her):
+1-hook, 2-goals, 3-diagnose, 4-mini, 5-guided, 6-create, 7-cfu, 8-share, 9-reflect, 10-diff, 11-assess, 12-home.
 
-You must respond with valid JSON only - no markdown, no explanations, just the raw JSON object.`;
-  
-  logInfo(`📝 Using subject-specific prompt for ${context.subject}: "${context.title}"`);
-  logInfo(`🎯 Subject guidance: ${getSubjectSpecificGuidance(context.subject, context.title).substring(0, 200)}...`);
-  
-  const prompt = `Create a comprehensive ${context.subject} learning experience: "${context.title}" for grade ${context.gradeLevel}.
+Metadata: ${JSON.stringify(metadata)}
+Context: ${JSON.stringify(context)}
 
-CRITICAL REQUIREMENTS - MUST BE SPECIFIC AND EDUCATIONAL:
-- MUST include specific ${context.subject} curriculum standards and skills
-- MUST include detailed step-by-step procedures and methods
-- MUST specify exact materials, tools, and equipment students will use
-- MUST include specific learning outcomes with measurable objectives  
-- MUST connect to real ${context.subject} careers and professionals
-- MUST include authentic assessment methods and evaluation criteria
-- MUST provide differentiation strategies for diverse learners
-- MUST include specific vocabulary terms and key concepts students should master
-- Use ${context.subject}-appropriate vocabulary and thinking skills
-- Include authentic ${context.subject} scenarios and case studies
-
-SPECIFIC TO ${context.subject.toUpperCase()}:
-${getSubjectSpecificGuidance(context.subject, context.title)}
-
-Return ONLY valid JSON in this exact structure (no markdown formatting):
+OUTPUT JSON schema:
 {
-  "title": "${context.title}",
-  "description": "Detailed description of the entire learning sequence (100-150 words)",
-  "learning_objectives": [
-    "Concrete learning objective 1",
-    "Concrete learning objective 2", 
-    "Concrete learning objective 3"
-  ],
-  "phases": [
+  "stages": [
     {
-      "name": "Phase name",
-      "duration": 30,
-      "type": "introduction|exploration|practice|reflection|assessment",
-      "description": "Brief description of the phase's purpose",
-      "activities": [
-        {
-          "name": "Activity name",
-          "duration": 10,
-          "type": "discussion|exercise|game|project|quiz|reflection",
-          "instructions": "Detailed step-by-step instructions for the activity",
-          "materials": ["necessary materials"],
-          "interaction": "individual|pairs|groups|class"
-        }
-      ],
-      "assessment": "How students' learning is evaluated in this phase",
-      "reflection_questions": ["Reflection questions for students"]
+      "id": "1-hook",
+      "name": "Hook",
+      "time_min": 5,
+      "objective": "string",
+      "teacher_script": "string",
+      "student_tasks": ["string","..."],
+      "materials": ["string","..."],
+      "checkpoints": ["string","..."],
+      "differentiation": { "scaffold": ["string","..."], "extend": ["string","..."] },
+      "assessment": { "type":"string", "success":"string" },
+      "outputs": ["string","..."]
     }
-  ],
-  "total_duration": 180,
-  "key_concepts": ["Important concepts that are learned"],
-  "extension_activities": ["Extra activities for fast learners"]
+  ]
 }`;
 
-  try {
-    const { text, usage } = await callOpenAI(begin.model.name, system, prompt, begin.max_tokens);
-    budgetGuard.finishStep(begin.logIndex, usage);
+  const { text } = await callOpenAI(system, user, 2000);
+  return JSON.parse(text);
+}
 
-    // Parse JSON response directly since we're using json_object mode
-    let data;
-    try {
-      logInfo(`🔍 Parsing OpenAI JSON response: ${text.substring(0, 500)}...`);
-      data = JSON.parse(text);
-      logSuccess('✅ Phaseplan JSON parsed successfully');
-      
-      // Validate that we have the expected structure
-      if (!data.phases || !Array.isArray(data.phases) || data.phases.length === 0) {
-        throw new Error('Invalid lesson structure: missing or empty phases array');
-      }
-      
-      logInfo(`📚 Generated lesson with ${data.phases.length} phases: ${data.phases.map(p => p.name).join(', ')}`);
-      return { data };
-      
-    } catch (parseError) {
-      logError(`❌ JSON parsing failed for phaseplan: ${parseError}`);
-      logError(`❌ Failed JSON text: ${text.substring(0, 1000)}`);
-      // Return comprehensive 12-step educational structure
-      return {
-        data: {
-          title: context.title,
-          description: `A deep exploration of ${context.subject} through "${context.title}" - connecting authentic ${context.subject} concepts to real-world applications and student interests.`,
-          learning_objectives: [
-            `Master key ${context.subject} concepts through "${context.title}" investigation`,
-            `Apply ${context.subject} thinking skills and methodologies`,
-            `Connect ${context.subject} learning to real-world problems and solutions`
-          ],
-          phases: [
-            {
-              name: "🎯 Adventure Hook",
-              duration: 10,
-              type: "hook", 
-              description: "Capture curiosity with an intriguing challenge that connects to real-world applications",
-              activities: [{
-                name: "Mission Discovery",
-                duration: 10,
-                type: "discussion",
-                instructions: `Welcome to your ${context.subject} adventure! You've discovered something amazing that needs your expertise. Let's explore what makes this challenge exciting and how your skills will help solve it.`,
-                materials: ["Adventure scenario", "Discussion prompts"],
-                interaction: "class",
-                engagement_element: "Real-world problem that students want to solve"
-              }],
-              assessment: "Observe student curiosity and initial engagement with the topic",
-              differentiation: "Use visuals, storytelling, and interactive elements to engage all learners"
-            },
-            {
-              name: "🧠 Knowledge Activation",
-              duration: 15,
-              type: "exploration",
-              description: "Connect new learning to existing knowledge and experiences", 
-              activities: [{
-                name: "What We Know",
-                duration: 15,
-                type: "hands-on",
-                instructions: `Share what you already know about ${context.subject}! Work with a partner to create a mind map of your existing knowledge and experiences related to today's challenge.`,
-                materials: ["Mind map templates", "Colored markers", "Sticky notes"],
-                interaction: "pairs",
-                engagement_element: "Students become experts by sharing their knowledge"
-              }],
-              assessment: "Listen to student discussions and review mind maps",
-              differentiation: "Allow multiple ways to share knowledge: drawing, writing, speaking"
-            },
-            {
-              name: "🚀 Hands-On Investigation", 
-              duration: 25,
-              type: "exploration",
-              description: "Students discover key concepts through guided investigation",
-              activities: [{
-                name: "Expert Investigation",
-                duration: 25,
-                type: "hands-on",
-                instructions: `Time to become a ${context.subject} expert! Work in teams to investigate the core concepts through hands-on activities. Use the investigation materials to explore, test, and discover key principles.`,
-                materials: ["Investigation kit", "Recording sheets", "Digital tools", "Reference materials"],
-                interaction: "groups",
-                engagement_element: "Students act as real experts making authentic discoveries"
-              }],
-              assessment: "Observe student discoveries and check understanding through questioning",
-              differentiation: "Provide different complexity levels and multiple investigation paths"
-            },
-            {
-              name: "💡 Concept Mastery",
-              duration: 20,
-              type: "instruction",
-              description: "Connect discoveries to formal learning and key concepts",
-              activities: [{
-                name: "Making Connections", 
-                duration: 20,
-                type: "discussion",
-                instructions: "Share your discoveries with the class! Let's connect what you found to the key concepts and see how everything fits together. You'll create a class knowledge bank of insights.",
-                materials: ["Concept connection charts", "Key vocabulary cards", "Digital collaboration tools"],
-                interaction: "class",
-                engagement_element: "Student discoveries become the foundation for formal learning"
-              }],
-              assessment: "Check understanding through concept mapping and peer explanations",
-              differentiation: "Use multiple representations: visual, verbal, kinesthetic"
-            },
-            {
-              name: "🎨 Creative Challenge",
-              duration: 30,
-              type: "practice",
-              description: "Apply learning creatively to solve authentic problems",
-              activities: [{
-                name: "Innovation Challenge",
-                duration: 30,
-                type: "creative",
-                instructions: `Now for the ultimate challenge! Use everything you've learned to create an innovative solution. You can build, design, write, or create something that demonstrates your mastery of ${context.subject} concepts.`,
-                materials: ["Creation supplies", "Building materials", "Art supplies", "Technology tools", "Design templates"],
-                interaction: "individual", 
-                engagement_element: "Students showcase learning through personal creativity and innovation"
-              }],
-              assessment: "Evaluate creativity, accuracy of content, and application of concepts",
-              differentiation: "Offer multiple creation options to suit different strengths and interests"
-            },
-            {
-              name: "🎯 Reflection & Next Steps",
-              duration: 15,
-              type: "reflection",
-              description: "Students reflect on learning and plan future applications",
-              activities: [{
-                name: "Adventure Reflection",
-                duration: 15,
-                type: "reflection",
-                instructions: "Reflect on your learning journey! What did you discover? What surprised you? How will you use this knowledge in the future? Share your biggest insights and next steps.",
-                materials: ["Reflection journals", "Digital reflection tools", "Peer sharing protocols"],
-                interaction: "individual",
-                engagement_element: "Students celebrate their growth and plan future learning"
-              }],
-              assessment: "Review reflection responses and plan follow-up activities", 
-              differentiation: "Offer multiple reflection formats: writing, drawing, video, verbal"
-            }
-          ],
-          total_duration: 115,
-          key_concepts: [
-            `Core ${context.subject} principles and concepts`,
-            "Critical thinking and problem-solving strategies",
-            "Real-world application and transfer", 
-            "Creative innovation and design thinking"
-          ],
-          success_criteria: [
-            "Students can explain key concepts in their own words",
-            "Students can apply learning to solve new problems", 
-            "Students can work effectively with others and communicate ideas",
-            "Students demonstrate creative thinking and innovation"
-          ],
-          extension_activities: [
-            "Advanced challenge problems for fast finishers",
-            "Independent research and exploration project",
-            "Peer teaching and mentoring opportunities",
-            "Community connection and real-world application"
-          ]
-        }
-      };
+// P3 - Mini-lesson (elaborate step 4)
+async function generateMiniLesson(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Forbedr trin "4-mini" med: explanation (kort faglig gennemgang),
+modelled_example (trinvis lærer-eksempel),
+misconceptions (3 typiske misforståelser + korrektion).
+Sørg for, at "modelled_example" er gennemførbar på skærm alene, og at evt. visualiseringer/skitser laves i digitale værktøjer (fx tegneværktøj, præsentation, online whiteboard).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id": "4-mini",
+  "explanation": "string",
+  "modelled_example": ["trin 1", "trin 2", "..."],
+  "misconceptions": [
+    { "misconception":"string", "correction":"string" },
+    { "misconception":"string", "correction":"string" },
+    { "misconception":"string", "correction":"string" }
+  ]
+}`;
+
+  const { text } = await callOpenAI(system, user, 1000);
+  return JSON.parse(text);
+}
+
+// P4 - Guided Practice (elaborate step 5)
+async function generateGuidedPractice(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Uddyb trin "5-guided" i formatet I-do → We-do → You-do.
+"I-do/We-do/You-do" skal kunne udføres på skærm (skærmdeling, delt dokument, online whiteboard, formular/skabelon). 
+Tjekspørgsmål besvares i et digitalt format (fx afkrydsning/tekstfelt).
+Inkludér 3–5 tjekspørgsmål og forventede svar.
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id": "5-guided",
+  "sequence": {
+    "i_do": ["trin","..."],
+    "we_do": ["trin","..."],
+    "you_do": ["trin","..."]
+  },
+  "checks": [
+    { "q":"string", "expected":"string" },
+    { "q":"string", "expected":"string" }
+  ]
+}`;
+
+  const { text } = await callOpenAI(system, user, 1000);
+  return JSON.parse(text);
+}
+
+// P5 - Create/Investigate (elaborate step 6)
+async function generateCreateStep(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Uddyb trin "6-create" som undersøgelse/projekt:
+"project_brief" og "data_sheet" skal være 100% digitale (formularer, skabeloner, regneark). 
+"Sikkerhed" nævnes kun hvis relevant for brug af kamera/mikrofon/skærmoptagelse; ingen fysiske værktøjer. 
+"team_roles" beskriver samarbejde i delte dokumenter/boards.
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id":"6-create",
+  "project_brief":"string",
+  "safety": ["string","..."],
+  "data_sheet": ["felt1","felt2","..."],
+  "success_criteria": ["string","..."],
+  "team_roles": [
+    {"role":"string","responsibility":"string"},
+    {"role":"string","responsibility":"string"}
+  ]
+}`;
+
+  const { text } = await callOpenAI(system, user, 1000);
+  return JSON.parse(text);
+}
+
+// P6 - Check for Understanding (elaborate step 7)
+async function generateCFU(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Lav 6–10 hurtige CFU-spørgsmål (enkelt-svar). Angiv korrekt svar kort.
+Spørgsmål besvares i et digitalt format (quiz, formular, klikbare svar).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id":"7-cfu",
+  "items":[
+    {"q":"string","answer":"string"},
+    {"q":"string","answer":"string"}
+  ]
+}`;
+
+  const { text } = await callOpenAI(system, user, 800);
+  return JSON.parse(text);
+}
+
+// P7 - Share & Feedback (elaborate step 8)
+async function generateShareFeedback(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Design en struktur for deling og peer-feedback:
+Deling og feedback sker via skærm (delte præsentationer, optaget demo, link til produkt) og en digital feedback-protokol (kommentarer/tjekliste-skema).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id":"8-share",
+  "presentation_structure":["trin","..."],
+  "feedback_protocol":"string",
+  "criteria":["string","..."]
+}`;
+
+  const { text } = await callOpenAI(system, user, 800);
+  return JSON.parse(text);
+}
+
+// P8 - Reflection (elaborate step 9)
+async function generateReflection(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Lav 5 refleksionsspørgsmål (forskellige kognitive niveauer) + selvevaluering med 5-punkts Likert.
+Refleksion skrives/indtales digitalt (tekstfelt, lydoptagelse, kort video).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id":"9-reflect",
+  "prompts":["string","..."],
+  "self_eval": { "prompt":"string", "scale":["1","2","3","4","5"] }
+}`;
+
+  const { text } = await callOpenAI(system, user, 800);
+  return JSON.parse(text);
+}
+
+// P9 - Differentiation (elaborate step 10)
+async function generateDifferentiation(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Uddyb differentiering:
+Alle stilladser/udfordringer skal have digitale alternativer (læse-/lytningstilpasninger, skabeloner, diktering, oversættelse, mm.).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id":"10-diff",
+  "scaffold":["string","..."],
+  "extend":["string","..."],
+  "grouping":["string","..."]
+}`;
+
+  const { text } = await callOpenAI(system, user, 800);
+  return JSON.parse(text);
+}
+
+// P10 - Assessment & Rubric (elaborate step 11)
+async function generateAssessment(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Skab en summativ opgave + rubrik (2–4 kriterier × 3 niveauer: Fremragende, God, På vej).
+Summativ opgave afleveres digitalt (fil/link). Rubrik anvendes i et digitalt vurderingsark.
+Tilføj 1–2 eksempelbesvarelser (kort).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "stage_id":"11-assess",
+  "task":"string",
+  "rubric":[
+    {
+      "criterion":"string",
+      "levels":[
+        {"name":"Fremragende","desc":"string"},
+        {"name":"God","desc":"string"},
+        {"name":"På vej","desc":"string"}
+      ]
+    }
+  ],
+  "exemplars": ["string","..."]
+}`;
+
+  const { text } = await callOpenAI(system, user, 1200);
+  return JSON.parse(text);
+}
+
+// P11 - Quiz & Handouts
+async function generateQuizHandouts(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Lav 5–8 MC-spørgsmål (1 korrekt svar, angiv index for correct), 1 enkelt arbejdsark (felter som labels),
+og 1 lærernote (tips, faldgruber, timing).
+Quiz og arbejdsark leveres som digitale elementer (valgspørgsmål med answer_index, udfyldelige felter). 
+"Lærer-note" beskriver digitale workflows (fx hvordan man udleverer og indsamler links).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "quiz":[
+    {"q":"string","choices":["a","b","c","d"],"answer_index": 2},
+    {"q":"string","choices":["a","b","c","d"],"answer_index": 0}
+  ],
+  "worksheet": {
+    "title":"string",
+    "fields":["felt1","felt2","..."]
+  },
+  "teacher_notes": ["tip","faldgrube","timing-hint"]
+}`;
+
+  const { text } = await callOpenAI(system, user, 1200);
+  return JSON.parse(text);
+}
+
+// P12 - Home/Parents Summary (elaborate step 12)
+async function generateParentSummary(context: any, stages: any) {
+  const system = SYSTEM_PROMPT
+    .replace('{subject}', context.subject)
+    .replace('{gradeBand}', context.gradeBand)
+    .replace('{language}', context.language);
+
+  const user = `Skriv en forældre-opsummering i 3–5 korte linjer, uden jargon, plus 3 "spørg derhjemme"-forslag.
+Forslag til hjemmearbejde skal kunne løses på skærm alene (ingen indkøb eller analoge materialer).
+
+Stages: ${JSON.stringify(stages)}
+
+OUTPUT JSON schema:
+{
+  "parent_summary":"string",
+  "ask_at_home":["string","string","string"]
+}`;
+
+  const { text } = await callOpenAI(system, user, 600);
+  return JSON.parse(text);
+}
+
+// Assemble final Adventure JSON
+function assembleAdventure(context: any, results: any) {
+  const metadata = results.metadata;
+  const phaseplan = results.phaseplan;
+  
+  // Merge all elaborations into stages
+  const stages = phaseplan.stages.map((stage: any) => {
+    const stageId = stage.id;
+    
+    // Add elaborations based on stage ID
+    if (stageId === "4-mini" && results.miniLesson) {
+      return { ...stage, ...results.miniLesson };
+    }
+    if (stageId === "5-guided" && results.guidedPractice) {
+      return { ...stage, ...results.guidedPractice };
+    }
+    if (stageId === "6-create" && results.createStep) {
+      return { ...stage, ...results.createStep };
+    }
+    if (stageId === "7-cfu" && results.cfu) {
+      return { ...stage, ...results.cfu };
+    }
+    if (stageId === "8-share" && results.shareFeedback) {
+      return { ...stage, ...results.shareFeedback };
+    }
+    if (stageId === "9-reflect" && results.reflection) {
+      return { ...stage, ...results.reflection };
+    }
+    if (stageId === "10-diff" && results.differentiation) {
+      return { ...stage, ...results.differentiation };
+    }
+    if (stageId === "11-assess" && results.assessment) {
+      return { ...stage, ...results.assessment };
     }
     
-    logSuccess('✅ Phaseplan generated successfully');
-    return { data };
+    return stage;
+  });
+
+  return {
+    adventure: {
+      title: context.title,
+      subject: context.subject,
+      gradeBand: context.gradeBand,
+      bigIdea: metadata.bigIdea,
+      essentialQuestion: metadata.essentialQuestion,
+      vocabulary: metadata.vocabulary,
+      standards: metadata.standards,
+      duration_minutes: context.duration_minutes,
+      materials_global: metadata.materials_global,
+      stages: stages,
+      summative: results.assessment || {},
+      quiz: results.quizHandouts?.quiz || [],
+      worksheet: results.quizHandouts?.worksheet || {},
+      teacher_notes: results.quizHandouts?.teacher_notes || [],
+      parent_summary: results.parentSummary?.parent_summary || "",
+      ask_at_home: results.parentSummary?.ask_at_home || []
+    }
+  };
+}
+
+// Main generation function
+async function generateAdventure(context: any) {
+  logInfo('Starting 12-step Adventure generation with digital-only materials');
+  
+  const results: any = {};
+  
+  try {
+    // P1 - Metadata & Framework
+    logInfo('Step 1: Generating metadata...');
+    results.metadata = await generateMetadata(context);
+    
+    // P2 - Phase Plan (12 steps)
+    logInfo('Step 2: Generating phase plan...');
+    results.phaseplan = await generatePhaseplan(context, results.metadata);
+    
+    // P3 - Mini-lesson (step 4)
+    logInfo('Step 3: Elaborating mini-lesson...');
+    results.miniLesson = await generateMiniLesson(context, results.phaseplan.stages);
+    
+    // P4 - Guided Practice (step 5)
+    logInfo('Step 4: Elaborating guided practice...');
+    results.guidedPractice = await generateGuidedPractice(context, results.phaseplan.stages);
+    
+    // P5 - Create/Investigate (step 6)
+    logInfo('Step 5: Elaborating create step...');
+    results.createStep = await generateCreateStep(context, results.phaseplan.stages);
+    
+    // P6 - Check for Understanding (step 7)
+    logInfo('Step 6: Generating CFU...');
+    results.cfu = await generateCFU(context, results.phaseplan.stages);
+    
+    // P7 - Share & Feedback (step 8)
+    logInfo('Step 7: Generating share & feedback...');
+    results.shareFeedback = await generateShareFeedback(context, results.phaseplan.stages);
+    
+    // P8 - Reflection (step 9)
+    logInfo('Step 8: Generating reflection...');
+    results.reflection = await generateReflection(context, results.phaseplan.stages);
+    
+    // P9 - Differentiation (step 10)
+    logInfo('Step 9: Generating differentiation...');
+    results.differentiation = await generateDifferentiation(context, results.phaseplan.stages);
+    
+    // P10 - Assessment & Rubric (step 11)
+    logInfo('Step 10: Generating assessment...');
+    results.assessment = await generateAssessment(context, results.phaseplan.stages);
+    
+    // P11 - Quiz & Handouts
+    logInfo('Step 11: Generating quiz & handouts...');
+    results.quizHandouts = await generateQuizHandouts(context, results.phaseplan.stages);
+    
+    // P12 - Home/Parents Summary (step 12)
+    logInfo('Step 12: Generating parent summary...');
+    results.parentSummary = await generateParentSummary(context, results.phaseplan.stages);
+    
+    // Assemble final Adventure
+    logInfo('Assembling final Adventure JSON...');
+    const adventure = assembleAdventure(context, results);
+    
+    logSuccess('✅ 12-step Adventure generation completed');
+    return adventure;
+    
   } catch (error) {
-    budgetGuard.finishStep(begin.logIndex, null);
+    logError('Error in Adventure generation pipeline:', error);
     
-    if (error?.message === 'QUOTA_EXCEEDED') {
-      logError('❌ OpenAI quota exceeded - using enhanced phaseplan fallback');
-      return {
-        data: {
-          title: context.title,
-          description: `An engaging ${context.subject} adventure that combines hands-on learning with real-world applications. Students will explore ${context.title.toLowerCase()} through interactive activities, collaborative projects, and meaningful discussions.`,
-          learning_objectives: [
-            `Understand key concepts related to ${context.title.toLowerCase()}`,
-            `Apply ${context.subject} knowledge to solve real-world problems`,
-            `Develop critical thinking and collaboration skills`,
-            `Reflect on learning and make connections to daily life`
-          ],
-          phases: [
-            {
-              name: "Exploration & Discovery",
-              duration: 45,
-              type: "exploration",
-              description: "Students explore the topic through hands-on activities and guided discovery",
-              activities: [
-                {
-                  name: "Interactive Investigation",
-                  duration: 25,
-                  type: "hands-on",
-                  instructions: `Investigate ${context.title.toLowerCase()} through practical exploration and observation`,
-                  materials: ["Investigation materials", "Notebooks", "Collaboration tools"],
-                  interaction: "small_groups"
-                },
-                {
-                  name: "Knowledge Sharing",
-                  duration: 20,
-                  type: "discussion",
-                  instructions: "Share discoveries and build collective understanding",
-                  materials: ["Presentation space", "Sharing tools"],
-                  interaction: "class"
-                }
-              ]
-            },
-            {
-              name: "Application & Practice",
-              duration: 50,
-              type: "application",
-              description: "Students apply their learning through practical projects and challenges",
-              activities: [
-                {
-                  name: "Creative Challenge",
-                  duration: 35,
-                  type: "project",
-                  instructions: `Create a project that demonstrates understanding of ${context.title.toLowerCase()}`,
-                  materials: ["Project materials", "Creative supplies", "Planning sheets"],
-                  interaction: "individual_pairs"
-                },
-                {
-                  name: "Peer Review",
-                  duration: 15,
-                  type: "collaboration",
-                  instructions: "Present projects and provide constructive feedback",
-                  materials: ["Feedback forms", "Presentation space"],
-                  interaction: "class"
-                }
-              ]
-            },
-            {
-              name: "Reflection & Connection",
-              duration: 25,
-              type: "reflection",
-              description: "Students reflect on their learning and make connections to the real world",
-              activities: [
-                {
-                  name: "Learning Reflection",
-                  duration: 15,
-                  type: "reflection",
-                  instructions: "Think about what you learned and how it connects to your life",
-                  materials: ["Reflection journals", "Guiding questions"],
-                  interaction: "individual"
-                },
-                {
-                  name: "Future Planning",
-                  duration: 10,
-                  type: "discussion",
-                  instructions: "Discuss how this learning will help in future studies and life",
-                  materials: ["Discussion prompts"],
-                  interaction: "class"
-                }
-              ]
-            }
-          ]
-        }
-      };
-    }
-    
-    logError('Error generating phaseplan', error);
-    // Enhanced 12-step fallback structure
+    // Return error JSON as specified
     return {
-      data: {
-        title: context.title,
-        description: `An in-depth ${context.subject} exploration: "${context.title}" - authentic learning experiences connecting subject expertise to real-world applications.`,
-        learning_objectives: [
-          `Develop mastery of ${context.subject} concepts through hands-on investigation`,
-          `Apply ${context.subject} methodologies to solve authentic problems`,
-          `Connect ${context.subject} learning to career paths and real-world impact`
-        ],
-        phases: [
-          {
-            name: "🎯 Adventure Hook",
-            duration: 10,
-            type: "hook",
-            description: "Capture curiosity with an intriguing challenge",
-            activities: [
-              {
-                name: "Mystery Challenge",
-                duration: 10,
-                type: "discussion",
-                instructions: "Present students with an interesting problem or scenario related to the topic that they'll solve throughout the lesson.",
-                materials: ["Presentation slides", "Props or visuals"],
-                interaction: "class",
-                engagement_element: "Real-world mystery that students want to solve"
-              }
-            ],
-            assessment: "Observe student curiosity and initial engagement",
-            differentiation: "Use visuals and verbal explanations to support all learners"
-          },
-          {
-            name: "🔍 Knowledge Activation", 
-            duration: 10,
-            type: "exploration",
-            description: "Connect new learning to existing knowledge",
-            activities: [
-              {
-                name: "What Do We Know?",
-                duration: 10,
-                type: "discussion",
-                instructions: "Have students share what they already know about the topic through think-pair-share.",
-                materials: ["Sticky notes", "Chart paper"],
-                interaction: "pairs",
-                engagement_element: "Students become the experts by sharing knowledge"
-              }
-            ],
-            assessment: "Listen to student discussions to gauge prior knowledge",
-            differentiation: "Allow multiple ways to share (drawing, writing, speaking)"
-          },
-          {
-            name: "🎯 Mission Objectives",
-            duration: 5,
-            type: "instruction", 
-            description: "Set clear, student-friendly learning goals",
-            activities: [
-              {
-                name: "Today's Mission",
-                duration: 5,
-                type: "presentation",
-                instructions: "Present learning objectives as mission goals that students will achieve.",
-                materials: ["Mission board", "Student checklists"],
-                interaction: "class",
-                engagement_element: "Frame learning as an exciting mission to complete"
-              }
-            ],
-            assessment: "Check that students understand the objectives",
-            differentiation: "Use visual mission board and verbal explanations"
-          },
-          {
-            name: "🚀 Hands-On Exploration",
-            duration: 20,
-            type: "exploration",
-            description: "Students discover key concepts through activity",
-            activities: [
-              {
-                name: "Discovery Lab",
-                duration: 20,
-                type: "hands-on",
-                instructions: "Students work in small groups to explore the topic through hands-on materials and guided questions.",
-                materials: ["Exploration materials", "Question cards", "Recording sheets"],
-                interaction: "groups",
-                engagement_element: "Students act as scientists/investigators making discoveries"
-              }
-            ],
-            assessment: "Circulate and observe student discoveries",
-            differentiation: "Provide different complexity levels of materials"
-          },
-          {
-            name: "📚 Concept Connection",
-            duration: 15,
-            type: "instruction",
-            description: "Connect discoveries to formal learning",
-            activities: [
-              {
-                name: "Making Sense",
-                duration: 15,
-                type: "discussion",
-                instructions: "Students share discoveries and teacher helps connect to key concepts and vocabulary.",
-                materials: ["Concept map", "Key vocabulary cards"],
-                interaction: "class",
-                engagement_element: "Students' discoveries become the foundation for formal learning"
-              }
-            ],
-            assessment: "Check understanding through questioning and concept mapping",
-            differentiation: "Use multiple representations (visual, verbal, kinesthetic)"
-          },
-          {
-            name: "🎨 Creative Application",
-            duration: 25,
-            type: "practice",
-            description: "Students apply learning in creative ways",
-            activities: [
-              {
-                name: "Create & Share",
-                duration: 25,
-                type: "creative",
-                instructions: "Students create something original that demonstrates their understanding (poster, model, presentation, etc.).",
-                materials: ["Art supplies", "Building materials", "Technology tools"],
-                interaction: "individual",
-                engagement_element: "Students showcase learning through personal creativity"
-              }
-            ],
-            assessment: "Evaluate creativity and accuracy of content",
-            differentiation: "Offer multiple creation options to suit different strengths"
-          },
-          {
-            name: "🎯 Mission Reflection",
-            duration: 15,
-            type: "reflection", 
-            description: "Students reflect on learning and next steps",
-            activities: [
-              {
-                name: "Adventure Debrief",
-                duration: 15,
-                type: "reflection",
-                instructions: "Students reflect on what they learned, what surprised them, and how they can use this knowledge.",
-                materials: ["Reflection journals", "Exit tickets"],
-                interaction: "individual",
-                engagement_element: "Students celebrate their learning journey"
-              }
-            ],
-            assessment: "Review reflection responses for understanding",
-            differentiation: "Offer multiple reflection formats (writing, drawing, verbal)"
-          }
-        ],
-        total_duration: 100,
-        key_concepts: ["Hands-on exploration", "Real-world application", "Creative expression", "Collaborative learning"],
-        success_criteria: [
-          "Students can explain key concepts in their own words",
-          "Students can apply learning to solve problems",
-          "Students can work effectively with others"
-        ],
-        extension_activities: [
-          "Advanced challenge problems for fast finishers",
-          "Independent research project",
-          "Peer teaching opportunity",
-          "Creative extension with technology integration"
-        ]
-      }
+      error: `Adventure generation failed: ${error.message}`,
+      step_failed: Object.keys(results).length + 1,
+      completed_steps: Object.keys(results)
     };
   }
 }
 
-// Budget-controlled adventure generator
-async function generateBudgetAdventure(context: any) {
-  logInfo('🚀 Starting budget-controlled adventure generation', context);
-  
-  // Generate hook
-  const hookResult = await generateHook(context);
-  
-  // Generate main phase plan
-  const phasePlanResult = await generatePhaseplan(context);
-  
-  // Use enhanced phaseplan data with proper 12-step structure or our rich fallback
-  const adventureData = phasePlanResult.data;
-
-  // Ensure we have a complete lesson structure
-  const completeLesson = {
-    title: adventureData.title || context.title,
-    subject: adventureData.subject || context.subject,
-    gradeLevel: context.gradeLevel || "6-8",
-    scenario: adventureData.description || "An immersive learning adventure that engages students through hands-on exploration and creative problem-solving!",
-    learningObjectives: adventureData.learning_objectives || ["Learn through hands-on experience", "Develop creative skills"],
-    stages: adventureData.phases?.map((phase: any, index: number) => ({
-      id: `stage-${index + 1}`,
-      title: phase.name || `Phase ${index + 1}`,
-      description: phase.description || "Educational activity with clear learning objectives",
-      duration: phase.duration || 15,
-      storyText: phase.description,
-      activities: phase.activities?.map((activity: any) => ({
-        type: activity.type === 'discussion' || activity.type === 'hands-on' || activity.type === 'creative' ? 'creativeTask' : 
-              activity.type === 'applied_problem_set' ? 'multipleChoice' : 'creativeTask',
-        title: activity.name || phase.name || "Learning Activity",
-        instructions: activity.instructions || "Complete this educational activity to continue your learning journey!",
-        content: activity.type === 'applied_problem_set' && activity.generated?.quiz_set ? {
-          question: activity.generated.quiz_set.items?.[0]?.stem || "What is the correct answer?",
-          options: ["Option A", "Option B", "Option C", "Option D"],
-          correctAnswer: 0,
-          explanation: activity.generated.quiz_set.items?.[0]?.explanation || "This demonstrates the concept we're learning about.",
-          points: 10
-        } : undefined
-      })) || [{
-        type: 'creativeTask',
-        title: phase.name || "Learning Activity",
-        instructions: activity?.instructions || phase.description || "Complete this educational activity to demonstrate your understanding!",
-      }],
-      materials: phase.activities?.[0]?.materials || ["Learning materials", "Activity workspace"],
-      assessmentCriteria: [phase.assessment || "Demonstrates understanding of key concepts", "Shows creative thinking and problem-solving"]
-    })) || [],
-    estimatedTime: adventureData.total_duration || 100
-  };
-
-  logSuccess('✅ Budget adventure generated successfully');
-  return completeLesson;
-}
-
-// Main request handler
+// Main serve function
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    logInfo('📋 Handling CORS preflight');
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    logInfo('🚀 Starting generate-adventure-multipart function');
-
-    const requestData = await req.json();
-    logInfo('📨 Received request data', {
-      adventure: requestData.adventure?.title,
-      subject: requestData.adventure?.subject
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+  }
 
-    // Extract context
+  try {
+    const requestData = await req.json();
+    logInfo('Adventure generation request received:', requestData);
+
+    // Extract context with defaults
     const context = {
-      title: requestData.adventure?.title || 'Learning Adventure',
-      subject: requestData.adventure?.subject || 'General',
-      gradeLevel: requestData.adventure?.gradeLevel || 7,
-      interests: requestData.studentProfile?.interests || ['learning']
+      title: requestData.title || 'Læringseventyr',
+      subject: requestData.subject || 'Science',
+      gradeBand: requestData.gradeBand || '6-8',
+      duration_minutes: requestData.duration_minutes || 75,
+      language: requestData.language || 'da-DK',
+      constraints: requestData.constraints || {
+        class_size: 24,
+        room_type: 'almindeligt klasselokale',
+        devices: 'computer/tablet per elev',
+        budget: 'lav',
+        special_needs: ['ELL', 'SPS']
+      }
     };
 
-    logInfo('📋 Adventure context', context);
+    // Generate the complete adventure
+    const adventure = await generateAdventure(context);
 
-    // Generate cache key for this lesson
-    const cacheKey = generateLessonCacheKey(context);
-    
-    // Check if we have this lesson cached
-    const cachedLesson = await getCachedLesson(cacheKey);
-    if (cachedLesson) {
-      logSuccess('🚀 Using cached lesson - no generation needed!');
-      return new Response(JSON.stringify({
-        success: true,
-        lesson: cachedLesson,
-        source: 'cache',
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      });
-    }
-
-    logInfo('🔄 No cached version found, generating new lesson...');
-
-    // Generate adventure with budget control
-    const adventure = await generateBudgetAdventure(context);
-
-    logSuccess('✅ Adventure generation completed');
-
-    // The adventure returned from generateBudgetAdventure is already a complete lesson
-    const finalLesson = adventure;
-
-    // Save to cache for future use
-    await saveLessonToCache(cacheKey, finalLesson, context);
-
-    return new Response(JSON.stringify({
-      success: true,
-      lesson: finalLesson,
-      source: 'generated',
-      generationType: 'multi-prompt-budget-controlled',
-      timestamp: new Date().toISOString(),
-      meta: {
-        budget: budgetGuard.report()
-      }
-    }), {
+    return new Response(JSON.stringify(adventure), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
     });
 
   } catch (error) {
-    logError('❌ Error in generate-adventure-multipart', error);
-    
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message || 'Unknown error occurred',
-      lesson: {
-        title: "Test Adventure",
-        description: "A simple test adventure",
-        stages: [
-          {
-            name: "Test Phase",
-            duration: 30,
-            activity: "Test activity"
-          }
-        ],
-        activities: []
-      }
+    logError('Request processing error:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Failed to process request',
+      details: error.message 
     }), {
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200, // Return 200 even on error to avoid CORS issues
     });
   }
 });
