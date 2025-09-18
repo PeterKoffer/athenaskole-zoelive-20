@@ -8,5 +8,13 @@ import queueManager from './queueManager';
 import allergenAdvisor from './allergenAdvisor';
 import speedPitch from './speedPitch';
 
-[budgetBreaker, posterLayout, bomBuilder, coldChain, phraseBuilder, queueManager, allergenAdvisor, speedPitch]
-  .forEach(registerGame);
+[
+  budgetBreaker, 
+  posterLayout, 
+  bomBuilder, 
+  coldChain, 
+  phraseBuilder, 
+  queueManager, 
+  allergenAdvisor, 
+  speedPitch
+].forEach(registerGame);

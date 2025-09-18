@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GameDefinition } from '../types';
-import { loadGame } from '../registry';
+import { getGame } from '../registry';
 import { submitScore } from '@/services/leaderboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -115,131 +115,12 @@ function SubmitScorePanel({ score, gameId, meta, onSubmitted, onClose }: SubmitS
 }
 
 export default function MicroGameHost({ gameId, params, onComplete, onClose }: MicroGameHostProps) {
-  const [gameDef, setGameDef] = useState<GameDefinition | null>(null);
-  const [gameState, setGameState] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [startTime] = useState(Date.now());
-
-  useEffect(() => {
-    let mounted = true;
-    
-    (async () => {
-      try {
-        const def = await loadGame(gameId);
-        
-        if (!mounted) return;
-        
-        if (!def) {
-          setError(`Game "${gameId}" not found`);
-          setLoading(false);
-          return;
-        }
-        
-        const seed = Math.floor(Math.random() * 1e9);
-        const initialState = def.init(seed, params);
-        
-        setGameDef(def);
-        setGameState(initialState);
-        setLoading(false);
-        
-        await logEvent('game_started', { gameId, seed, params });
-      } catch (err) {
-        if (!mounted) return;
-        
-        console.error('Failed to load game:', err);
-        setError('Failed to load game');
-        setLoading(false);
-      }
-    })();
-    
-    return () => { mounted = false; };
-  }, [gameId, params]);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center p-8">
-          <Loader2 className="w-8 h-8 animate-spin mr-2" />
-          Loading game...
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error || !gameDef || !gameState) {
-    return (
-      <Card>
-        <CardContent className="text-center p-8">
-          <div className="text-red-500 mb-4">{error || 'Failed to load game'}</div>
-          {onClose && (
-            <Button onClick={onClose} variant="outline">
-              Close
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const dispatch = (action: any) => {
-    setGameState((currentState: any) => gameDef.reducer(currentState, action));
-  };
-
-  const finished = gameDef.isFinished(gameState);
-  const currentScore = gameDef.score(gameState);
-  const progress = gameDef.getProgress ? gameDef.getProgress(gameState) : 0;
-
-  const handleScoreSubmitted = () => {
-    onComplete?.(currentScore);
-  };
-
+  // Temporarily disabled - use GameHost component instead for new game system
   return (
-    <div className="space-y-4">
-      {/* Game Header */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg">{gameDef.title}</CardTitle>
-              <div className="text-sm text-muted-foreground">{gameDef.subject}</div>
-            </div>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1">
-                <Target className="w-4 h-4" />
-                Score: {currentScore}
-              </div>
-              {!finished && progress > 0 && (
-                <div className="w-24 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all"
-                    style={{ width: `${Math.min(100, progress * 100)}%` }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Game Content */}
-      <div>
-        {gameDef.render(gameState, dispatch)}
-      </div>
-
-      {/* Score Submission Panel */}
-      {finished && (
-        <SubmitScorePanel
-          score={currentScore}
-          gameId={gameDef.id}
-          meta={{
-            durationMs: Date.now() - startTime,
-            params,
-            ...gameState.meta
-          }}
-          onSubmitted={handleScoreSubmitted}
-          onClose={onClose}
-        />
+    <div className="p-4 text-center text-muted-foreground">
+      <p>Use GameHost component for new adventure games</p>
+      {onClose && (
+        <Button onClick={onClose} className="mt-4">Close</Button>
       )}
     </div>
   );
