@@ -372,7 +372,12 @@ async function generatePhaseplan(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = `You are an expert ${context.subject} teacher and curriculum designer. You create detailed, subject-specific learning experiences that deeply engage students with authentic ${context.subject} content and real-world applications. You must respond with valid JSON only - no markdown, no explanations, just the raw JSON object.`;
+  const system = `You are an expert ${context.subject} teacher and curriculum designer. You create detailed, subject-specific learning experiences that deeply engage students with authentic ${context.subject} content and real-world applications. 
+
+FOR ${context.subject.toUpperCase()}:
+${getSubjectSpecificGuidance(context.subject, context.title)}
+
+You must respond with valid JSON only - no markdown, no explanations, just the raw JSON object.`;
   
   logInfo(`📝 Using subject-specific prompt for ${context.subject}: "${context.title}"`);
   logInfo(`🎯 Subject guidance: ${getSubjectSpecificGuidance(context.subject, context.title).substring(0, 200)}...`);
@@ -431,11 +436,13 @@ Return ONLY valid JSON in this exact structure (no markdown formatting):
     // Parse JSON response with enhanced error handling  
     let data;
     try {
-      const match = text.match(/\{[\s\S]*\}/);
-      const jsonText = match ? match[0] : text;
-      data = JSON.parse(jsonText);
+      // Since we're using JSON mode, the response should be pure JSON
+      logInfo(`🔍 Raw OpenAI response for parsing: ${text.substring(0, 500)}...`);
+      data = JSON.parse(text);
+      logSuccess('✅ Phaseplan JSON parsed successfully');
     } catch (parseError) {
-      logError('JSON parsing failed for phaseplan, using comprehensive educational fallback', parseError);
+      logError('❌ JSON parsing failed for phaseplan, using comprehensive educational fallback', parseError);
+      logError(`❌ Failed to parse JSON: ${text}`);
       // Return comprehensive 12-step educational structure
       return {
         data: {
