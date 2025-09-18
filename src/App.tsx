@@ -19,6 +19,11 @@ import AdventureRunner from "./features/adventure/pages/AdventureRunner";
 import TrainingGroundHome from "./features/training-ground/pages/TrainingGroundHome";
 import AdventureManager from "./features/admin/pages/AdventureManager";
 
+import TeacherMyClasses from "./pages/teacher/TeacherMyClasses";
+import TeacherStudentProgress from "./pages/teacher/TeacherStudentProgress";
+import TeacherAIPreferences from "./pages/teacher/TeacherAIPreferences";
+import TeacherLessonDuration from "./pages/teacher/TeacherLessonDuration";
+
 function App() {
   return (
     <BrowserRouter>
@@ -69,6 +74,22 @@ function App() {
          <Route
            path="/admin/adventures"
            element={<ProtectedRoute><AdventureManager /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/classes"
+           element={<ProtectedRoute><TeacherMyClasses /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/progress"
+           element={<ProtectedRoute><TeacherStudentProgress /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/ai-preferences"
+           element={<ProtectedRoute><TeacherAIPreferences /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/duration"
+           element={<ProtectedRoute><TeacherLessonDuration /></ProtectedRoute>}
          />
 
         {/* fallback */}

@@ -48,17 +48,53 @@ const TeacherDashboard = () => {
           <div className="w-8 h-0.5 bg-slate-600 rounded-full"></div>
           
           {/* Navigation Icons */}
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => navigate('/teacher-dashboard')}
+          >
             <BarChart3 className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => navigate('/teacher-dashboard/classes')}
+          >
+            <BookOpen className="w-5 h-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => navigate('/teacher-dashboard/progress')}
+          >
             <Users className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700">
-            <Calendar className="w-5 h-5" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => navigate('/teacher-dashboard/ai-preferences')}
+          >
+            <Brain className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700">
-            <Settings className="w-5 h-5" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => navigate('/teacher-dashboard/duration')}
+          >
+            <Clock className="w-5 h-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => navigate('/calendar')}
+          >
+            <Calendar className="w-5 h-5" />
           </Button>
         </div>
       </div>
@@ -98,34 +134,18 @@ const TeacherDashboard = () => {
               </div>
             </div>
 
-            {/* Quick Actions Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="secondary" className="bg-slate-700 hover:bg-slate-600 text-white border-slate-600">
-                  <Menu className="w-4 h-4 mr-2" />
-                  Actions
-                  <ChevronDown className="w-4 h-4 ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-slate-800 border-slate-700">
-                <DropdownMenuItem className="text-slate-200 hover:bg-slate-700" onClick={() => navigate('/teacher-dashboard/classes')}>
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  My Classes
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-slate-200 hover:bg-slate-700" onClick={() => navigate('/teacher-dashboard/progress')}>
-                  <Users className="w-4 h-4 mr-2" />
-                  Student Progress
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-slate-200 hover:bg-slate-700" onClick={() => navigate('/teacher-dashboard/ai-preferences')}>
-                  <Brain className="w-4 h-4 mr-2" />
-                  AI Content Preferences
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-slate-200 hover:bg-slate-700" onClick={() => navigate('/teacher-dashboard/duration')}>
-                  <Clock className="w-4 h-4 mr-2" />
-                  Lesson Duration
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* User Profile */}
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-xs font-semibold text-white">
+                  {user?.email?.charAt(0).toUpperCase() || 'T'}
+                </span>
+              </div>
+              <div className="text-sm">
+                <p className="text-slate-200 font-medium">{user?.email?.split('@')[0] || 'Teacher'}</p>
+                <p className="text-slate-400 text-xs">Mathematics Dept.</p>
+              </div>
+            </div>
           </div>
         </div>
 
