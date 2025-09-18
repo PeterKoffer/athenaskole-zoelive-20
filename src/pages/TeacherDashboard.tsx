@@ -164,6 +164,55 @@ const TeacherDashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Mini-Insights (moved here) */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white text-lg flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-3 text-purple-400" />
+                    Mini-Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Activity className="w-4 h-4 text-green-400" />
+                        <span className="text-lg font-bold text-green-400">92%</span>
+                      </div>
+                      <p className="text-xs text-slate-300">Engagement</p>
+                      <p className="text-xs text-slate-400">+5% from last week</p>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Target className="w-4 h-4 text-blue-400" />
+                        <span className="text-lg font-bold text-blue-400">87%</span>
+                      </div>
+                      <p className="text-xs text-slate-300">Standards Met</p>
+                      <p className="text-xs text-slate-400">On track</p>
+                    </div>
+                    
+                    <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Award className="w-4 h-4 text-yellow-400" />
+                        <span className="text-lg font-bold text-yellow-400">15</span>
+                      </div>
+                      <p className="text-xs text-slate-300">Accommodations</p>
+                      <p className="text-xs text-slate-400">Active students</p>
+                    </div>
+                    
+                    <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Zap className="w-4 h-4 text-purple-400" />
+                        <span className="text-lg font-bold text-purple-400">68%</span>
+                      </div>
+                      <p className="text-xs text-slate-300">AI Usage</p>
+                      <p className="text-xs text-slate-400">This week</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Right Column */}
@@ -219,51 +268,32 @@ const TeacherDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* 4 Mini-Insights */}
+              {/* Calendar */}
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white text-lg flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-3 text-purple-400" />
-                    Mini-Insights
+                    <Calendar className="w-5 h-5 mr-3 text-blue-400" />
+                    This Week
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <Activity className="w-4 h-4 text-green-400" />
-                        <span className="text-lg font-bold text-green-400">92%</span>
+                  <div className="space-y-3">
+                    {[
+                      { day: 'Mon 18', events: ['Math 6A (8:00)', 'Science 5B (10:00)', 'English 4A (1:00)'] },
+                      { day: 'Tue 19', events: ['Math 6B (8:30)', 'Parent Conference (3:00)'] },
+                      { day: 'Wed 20', events: ['Science 5A (9:00)', 'Math 6A (11:00)', 'Faculty Meeting (4:00)'] },
+                      { day: 'Thu 21', events: ['English 4B (8:00)', 'Math 6B (10:30)'] },
+                      { day: 'Fri 22', events: ['Science 5B (9:30)', 'Grade Review (2:00)'] }
+                    ].map((daySchedule, index) => (
+                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg">
+                        <p className="text-sm font-medium text-slate-200 mb-2">{daySchedule.day}</p>
+                        <div className="space-y-1">
+                          {daySchedule.events.map((event, eventIndex) => (
+                            <p key={eventIndex} className="text-xs text-slate-400">• {event}</p>
+                          ))}
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-300">Engagement</p>
-                      <p className="text-xs text-slate-400">+5% from last week</p>
-                    </div>
-                    
-                    <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <Target className="w-4 h-4 text-blue-400" />
-                        <span className="text-lg font-bold text-blue-400">87%</span>
-                      </div>
-                      <p className="text-xs text-slate-300">Standards Met</p>
-                      <p className="text-xs text-slate-400">On track</p>
-                    </div>
-                    
-                    <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <Award className="w-4 h-4 text-yellow-400" />
-                        <span className="text-lg font-bold text-yellow-400">15</span>
-                      </div>
-                      <p className="text-xs text-slate-300">Accommodations</p>
-                      <p className="text-xs text-slate-400">Active students</p>
-                    </div>
-                    
-                    <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <Zap className="w-4 h-4 text-purple-400" />
-                        <span className="text-lg font-bold text-purple-400">68%</span>
-                      </div>
-                      <p className="text-xs text-slate-300">AI Usage</p>
-                      <p className="text-xs text-slate-400">This week</p>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
