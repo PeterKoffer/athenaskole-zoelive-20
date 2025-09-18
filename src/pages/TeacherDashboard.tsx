@@ -98,8 +98,8 @@ const TeacherDashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {[
-                    { name: 'Math 6A', time: '8:00 AM', room: 'Room 201', students: 24, minutes: 15 },
-                    { name: 'Science 5B', time: '10:00 AM', room: 'Lab 1', students: 22, minutes: 135 },
+                    { name: 'Math 6A', time: '8:00 AM', room: 'Room 201', students: 25, minutes: 15 },
+                    { name: 'Science 5B', time: '10:00 AM', room: 'Lab 1', students: 26, minutes: 135 },
                     { name: 'English 4A', time: '1:00 PM', room: 'Room 105', students: 26, minutes: 315 }
                   ].map((classItem, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
