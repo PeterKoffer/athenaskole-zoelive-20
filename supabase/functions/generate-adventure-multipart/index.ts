@@ -68,7 +68,7 @@ const budgetGuard = new BudgetGuard({
   },
   stepConfig: {
     hook: { priority: 1, default_max_output_tokens: 180 },
-    phaseplan: { priority: 1, default_max_output_tokens: 900 },
+    phaseplan: { priority: 1, default_max_output_tokens: 1500 },
     narrative: { priority: 2, default_max_output_tokens: 400 },
     quiz: { priority: 1, default_max_output_tokens: 700 },
     writing: { priority: 1, default_max_output_tokens: 900 },
