@@ -117,6 +117,13 @@ async function callOpenAI(model: string, system: string, user: string, max_token
 
   } catch (error) {
     logError('Error calling OpenAI', error);
+    
+    // Check if it's a quota/billing error
+    if (error?.message?.includes('quota') || error?.message?.includes('billing')) {
+      logError('❌ OpenAI quota/billing limit reached - using fallback response');
+      throw new Error('QUOTA_EXCEEDED');
+    }
+    
     throw error;
   }
 }
@@ -161,11 +168,26 @@ Return JSON format:
     return { data };
   } catch (error) {
     budgetGuard.finishStep(begin.logIndex, null);
+    
+    if (error?.message === 'QUOTA_EXCEEDED') {
+      logError('❌ OpenAI quota exceeded - using enhanced fallback');
+      return { 
+        data: { 
+          text: `Ready to explore ${context.subject}? Let's dive into "${context.title}" and discover amazing things together!`,
+          hook_question: `What do you already know about ${context.title.toLowerCase()}?`,
+          real_world_connection: `Understanding ${context.title.toLowerCase()} helps us in our daily lives and future careers.`,
+          image_prompt: `students exploring ${context.subject} topic together with excitement and curiosity` 
+        } 
+      };
+    }
+    
     logError('Error generating hook', error);
     return { 
       data: { 
         text: "Welcome to an exciting learning adventure!", 
         image_prompt: "students learning together" 
+      } 
+    };
       } 
     };
   }
@@ -236,7 +258,98 @@ Return JSON format:
     logSuccess('✅ Phaseplan generated successfully');
     return { data };
   } catch (error) {
-    budgetGuard.finishStep(begin.logIndex, text);
+    budgetGuard.finishStep(begin.logIndex, null);
+    
+    if (error?.message === 'QUOTA_EXCEEDED') {
+      logError('❌ OpenAI quota exceeded - using enhanced phaseplan fallback');
+      return {
+        data: {
+          title: context.title,
+          description: `An engaging ${context.subject} adventure that combines hands-on learning with real-world applications. Students will explore ${context.title.toLowerCase()} through interactive activities, collaborative projects, and meaningful discussions.`,
+          learning_objectives: [
+            `Understand key concepts related to ${context.title.toLowerCase()}`,
+            `Apply ${context.subject} knowledge to solve real-world problems`,
+            `Develop critical thinking and collaboration skills`,
+            `Reflect on learning and make connections to daily life`
+          ],
+          phases: [
+            {
+              name: "Exploration & Discovery",
+              duration: 45,
+              type: "exploration",
+              description: "Students explore the topic through hands-on activities and guided discovery",
+              activities: [
+                {
+                  name: "Interactive Investigation",
+                  duration: 25,
+                  type: "hands-on",
+                  instructions: `Investigate ${context.title.toLowerCase()} through practical exploration and observation`,
+                  materials: ["Investigation materials", "Notebooks", "Collaboration tools"],
+                  interaction: "small_groups"
+                },
+                {
+                  name: "Knowledge Sharing",
+                  duration: 20,
+                  type: "discussion",
+                  instructions: "Share discoveries and build collective understanding",
+                  materials: ["Presentation space", "Sharing tools"],
+                  interaction: "class"
+                }
+              ]
+            },
+            {
+              name: "Application & Practice",
+              duration: 50,
+              type: "application",
+              description: "Students apply their learning through practical projects and challenges",
+              activities: [
+                {
+                  name: "Creative Challenge",
+                  duration: 35,
+                  type: "project",
+                  instructions: `Create a project that demonstrates understanding of ${context.title.toLowerCase()}`,
+                  materials: ["Project materials", "Creative supplies", "Planning sheets"],
+                  interaction: "individual_pairs"
+                },
+                {
+                  name: "Peer Review",
+                  duration: 15,
+                  type: "collaboration",
+                  instructions: "Present projects and provide constructive feedback",
+                  materials: ["Feedback forms", "Presentation space"],
+                  interaction: "class"
+                }
+              ]
+            },
+            {
+              name: "Reflection & Connection",
+              duration: 25,
+              type: "reflection",
+              description: "Students reflect on their learning and make connections to the real world",
+              activities: [
+                {
+                  name: "Learning Reflection",
+                  duration: 15,
+                  type: "reflection",
+                  instructions: "Think about what you learned and how it connects to your life",
+                  materials: ["Reflection journals", "Guiding questions"],
+                  interaction: "individual"
+                },
+                {
+                  name: "Future Planning",
+                  duration: 10,
+                  type: "discussion",
+                  instructions: "Discuss how this learning will help in future studies and life",
+                  materials: ["Discussion prompts"],
+                  interaction: "class"
+                }
+              ]
+            }
+          ]
+        }
+      };
+    }
+    
     logError('Error generating phaseplan', error);
     return {
       data: {

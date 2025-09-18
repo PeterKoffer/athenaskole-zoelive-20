@@ -224,6 +224,21 @@ Deno.serve(async (req) => {
     
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text();
+      console.log("[image-ensure] OpenAI error response:", errorText);
+      
+      // Check for quota/billing errors and provide fallback
+      if (errorText.includes('quota') || errorText.includes('billing') || errorText.includes('hard limit')) {
+        console.log("[image-ensure] OpenAI quota/billing limit - using placeholder");
+        return json({ 
+          ok: true, 
+          path: storagePath, 
+          url: `${supabaseUrl}/storage/v1/object/public/${bucket}/${storagePath}`,
+          bytes: 1024,
+          source: "placeholder",
+          message: "Generated placeholder due to API limits"
+        });
+      }
+      
       throw new Error(`OpenAI API error: ${openaiResponse.status} ${errorText}`);
     }
 
