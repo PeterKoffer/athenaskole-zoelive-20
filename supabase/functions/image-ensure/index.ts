@@ -55,15 +55,15 @@ const MAP: Array<[RegExp, string]> = [
 ];
 
 function buildAdventurePrompt({ title, subject, tags = [], mode = "pro" }: PromptInput): string {
-  // Style & composition force banner fitness (no tight crops)
+  // More stylized, illustrated approach to avoid uncanny valley
   const STYLE =
-    "cinematic hybrid photoreal with subtle Pixar warmth, global illumination, HDR, gentle film grain, no text or watermarks";
+    "vibrant illustrated style with soft cartoon warmth, bright colors, clean lines, no text or watermarks";
   const COMPOSITION =
     "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
   const SAFE_MARGINS =
     "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
   const COLOR_MOOD =
-    "rich but natural palette; inspiring, capable, modern";
+    "rich but friendly palette; inspiring, approachable, modern";
   const DIVERSITY =
     "diverse group of children and teenagers (ages 8-17) from various ethnic backgrounds, races, and nationalities working together";
 

@@ -291,7 +291,17 @@ export default function TodaysAdventure() {
                   )}
                 </div>
 
-
+                {/* Adventure Quick Overview */}
+                <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                  <h3 className="text-white font-semibold mb-2">What You'll Explore Today</h3>
+                  <div className="text-white/90 text-sm leading-relaxed space-y-1">
+                    <p>🎯 Master key concepts in {data.universe?.subject} through hands-on activities</p>
+                    <p>🎮 Solve real-world challenges and puzzles</p>
+                    <p>🚀 Build something amazing you can be proud of</p>
+                    <p>🤝 Work individually and collaborate with others</p>
+                    <p>⭐ Discover how today's learning connects to your future goals</p>
+                  </div>
+                </div>
 
                 {/* Preloading indicator */}
                 {preloadingLesson && (

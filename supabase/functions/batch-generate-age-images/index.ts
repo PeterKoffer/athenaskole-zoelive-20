@@ -82,11 +82,11 @@ const ageEnhancements = {
 };
 
 function buildUnifiedAdventurePrompt(title: string, ageGroup: AgeGroup): string {
-  // Same style & composition as main adventure system
-  const STYLE = "cinematic hybrid photoreal with subtle Pixar warmth, global illumination, HDR, gentle film grain, no text or watermarks";
+  // More stylized, less photorealistic approach to avoid uncanny valley
+  const STYLE = "vibrant illustrated style with soft cartoon warmth, bright colors, clean lines, no text or watermarks";
   const COMPOSITION = "wide establishing shot, 16:9 banner, eye-level, rule-of-thirds";
   const SAFE_MARGINS = "keep all key subjects inside central 60% of frame; 8–12% safe margins on all edges; no tight close-ups";
-  const COLOR_MOOD = "rich but natural palette; inspiring, capable, modern";
+  const COLOR_MOOD = "rich but friendly palette; inspiring, approachable, modern";
   const DIVERSITY = "diverse group of children and teenagers from various ethnic backgrounds, races, and nationalities working together";
 
   // Get adventure-specific scene
@@ -113,11 +113,11 @@ async function buildCinematicAgeGroupPrompt(
   const ageConfig = ageEnhancements[ageGroup];
   const finalPrompt = buildUnifiedAdventurePrompt(universeTitle, ageGroup);
   
-  const baseNegativePrompt = "text, watermark, logo, low-res, blurry, extra fingers, deformed hands, gore, hyperreal skin, sexualized, noisy background, posterized, oversaturated";
+  const baseNegativePrompt = "photorealistic, hyperrealistic, uncanny valley, waxy skin, strange eyes, creepy faces, text, watermark, logo, low-res, blurry, extra fingers, deformed hands, gore, sexualized, noisy background, posterized, oversaturated";
   
   return {
     prompt: finalPrompt,
-    negative_prompt: baseNegativePrompt + ', uncanny valley, waxy skin, readable text, grade signs, brand logos, classroom, school desks',
+    negative_prompt: baseNegativePrompt + ', classroom, school desks, grade signs, brand logos, adult teachers',
     size: ageConfig.size, // All use 1024x576 (16:9) now
     aspect_ratio: '16:9'
   };
