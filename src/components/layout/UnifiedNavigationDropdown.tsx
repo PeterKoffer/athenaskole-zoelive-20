@@ -84,6 +84,34 @@ const UnifiedNavigationDropdown = ({
         description: "Manage your classes and student progress", 
         icon: GraduationCap,
         show: true
+      },
+      {
+        title: "My Classes",
+        href: "/teacher-dashboard/classes",
+        description: "View and manage your class schedules",
+        icon: BookOpen,
+        show: true
+      },
+      {
+        title: "Student Progress",
+        href: "/teacher-dashboard/progress",
+        description: "Track student performance and analytics",
+        icon: Users,
+        show: true
+      },
+      {
+        title: "AI Content Preferences",
+        href: "/teacher-dashboard/ai-preferences",
+        description: "Configure AI-generated content settings",
+        icon: Settings,
+        show: true
+      },
+      {
+        title: "Lesson Duration",
+        href: "/teacher-dashboard/duration",
+        description: "Set lesson durations per class",
+        icon: Calendar,
+        show: true
       }
     ] : []),
     ...(userRole === 'parent' ? [{

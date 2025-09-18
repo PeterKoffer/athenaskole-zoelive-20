@@ -4,7 +4,7 @@ import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Users, BarChart3, Calendar, Menu, ChevronDown, GraduationCap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Users, BarChart3, Calendar, Menu, ChevronDown, GraduationCap, Clock, Settings, Brain } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import TeacherSubjectWeighting from '@/components/teacher/TeacherSubjectWeighting';
 import ClassLessonDurationSettings from '@/components/teacher/ClassLessonDurationSettings';
@@ -59,14 +59,26 @@ const TeacherDashboard = () => {
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard/classes')}>
+                <BookOpen className="w-4 h-4 mr-2" />
+                My Classes
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard/progress')}>
+                <Users className="w-4 h-4 mr-2" />
+                Student Progress
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard/ai-preferences')}>
+                <Brain className="w-4 h-4 mr-2" />
+                AI Content Preferences
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/teacher-dashboard/duration')}>
+                <Clock className="w-4 h-4 mr-2" />
+                Lesson Duration
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate('/')}>
                 <Calendar className="w-4 h-4 mr-2" />
                 Create Lesson Plan
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/communication')}>
-                <Users className="w-4 h-4 mr-2" />
-                Message Students
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate('/analytics')}>
                 <BarChart3 className="w-4 h-4 mr-2" />
@@ -220,75 +232,101 @@ const TeacherDashboard = () => {
           <ClassLessonDurationSettings />
         </div>
 
-        {/* Recent Activity and Upcoming Events */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Activity */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border">
+        {/* Calendar and Schedule Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendar Widget */}
+          <Card className="lg:col-span-2 bg-card/50 backdrop-blur-sm border-border">
             <CardHeader>
-              <CardTitle className="text-foreground">Recent Activity</CardTitle>
+              <CardTitle className="flex items-center text-foreground">
+                <Calendar className="w-5 h-5 mr-2" />
+                Weekly Schedule Overview
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Math Quiz submitted by Grade 6A</p>
-                    <p className="text-xs text-muted-foreground">2 hours ago</p>
+              <div className="grid grid-cols-7 gap-2 mb-4">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                  <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
+                    {day}
                   </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: 35 }, (_, i) => {
+                  const date = i + 1;
+                  const hasEvent = [5, 8, 12, 15, 19, 22, 26].includes(date);
+                  const isToday = date === 18;
+                  return (
+                    <div
+                      key={i}
+                      className={`
+                        aspect-square flex items-center justify-center text-sm rounded-md cursor-pointer transition-colors
+                        ${isToday ? 'bg-primary text-primary-foreground font-bold' : 
+                          hasEvent ? 'bg-blue-500/20 text-blue-400 font-medium' : 
+                          'text-muted-foreground hover:bg-muted'
+                        }
+                      `}
+                    >
+                      {date <= 31 ? date : ''}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center text-sm">
+                  <div className="w-3 h-3 bg-primary rounded mr-2"></div>
+                  <span className="text-muted-foreground">Today</span>
                 </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Science lab reports reviewed</p>
-                    <p className="text-xs text-muted-foreground">5 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Parent meeting scheduled</p>
-                    <p className="text-xs text-muted-foreground">1 day ago</p>
-                  </div>
+                <div className="flex items-center text-sm">
+                  <div className="w-3 h-3 bg-blue-500/20 border border-blue-500 rounded mr-2"></div>
+                  <span className="text-muted-foreground">Classes & Events</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Upcoming Events */}
+          {/* Today's Schedule */}
           <Card className="bg-card/50 backdrop-blur-sm border-border">
             <CardHeader>
-              <CardTitle className="text-foreground">Upcoming Events</CardTitle>
+              <CardTitle className="text-foreground">Today's Schedule</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Math Test - Grade 6A</p>
-                    <p className="text-xs text-muted-foreground">Tomorrow, 10:00 AM</p>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-3 bg-blue-500/10 rounded-lg border-l-4 border-blue-500">
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground">Math - Grade 6A</p>
+                    <p className="text-xs text-muted-foreground">8:00 - 9:30 AM</p>
+                    <p className="text-xs text-blue-400">Room 201</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-green-500" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Science Fair Planning</p>
-                    <p className="text-xs text-muted-foreground">Friday, 2:00 PM</p>
+                <div className="flex items-center space-x-3 p-3 bg-green-500/10 rounded-lg border-l-4 border-green-500">
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground">Science - Grade 5</p>
+                    <p className="text-xs text-muted-foreground">10:00 - 11:30 AM</p>
+                    <p className="text-xs text-green-400">Lab 1</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-purple-500" />
+                <div className="flex items-center space-x-3 p-3 bg-purple-500/10 rounded-lg border-l-4 border-purple-500">
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground">English - Grade 4</p>
+                    <p className="text-xs text-muted-foreground">1:00 - 2:30 PM</p>
+                    <p className="text-xs text-purple-400">Room 105</p>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">Parent-Teacher Conferences</p>
-                    <p className="text-xs text-muted-foreground">Next week</p>
+                </div>
+                <div className="flex items-center space-x-3 p-3 bg-orange-500/10 rounded-lg border-l-4 border-orange-500">
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground">Faculty Meeting</p>
+                    <p className="text-xs text-muted-foreground">3:00 - 4:00 PM</p>
+                    <p className="text-xs text-orange-400">Conference Room</p>
                   </div>
                 </div>
               </div>
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={() => navigate('/calendar')}
+              >
+                View Full Calendar
+              </Button>
             </CardContent>
           </Card>
         </div>
