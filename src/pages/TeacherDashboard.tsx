@@ -10,6 +10,7 @@ import {
   BookOpen, Brain, Settings, Clock, Target, Activity, Award, Zap 
 } from 'lucide-react';
 import TeacherSidebar from '@/components/teacher/TeacherSidebar';
+import TeacherCalendar from '@/components/teacher/TeacherCalendar';
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
@@ -85,7 +86,7 @@ const TeacherDashboard = () => {
 
         {/* Main Content Area */}
         <div className="h-[calc(100%-5rem)] bg-slate-900 p-6 overflow-y-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             
             {/* Next Classes Section */}
             <div className="lg:col-span-2 space-y-6">
@@ -216,7 +217,7 @@ const TeacherDashboard = () => {
             </div>
 
             {/* Right Column */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               {/* Quick Actions */}
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
@@ -268,35 +269,8 @@ const TeacherDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Calendar */}
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center">
-                    <Calendar className="w-5 h-5 mr-3 text-blue-400" />
-                    This Week
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { day: 'Mon 18', events: ['Math 6A (8:00)', 'Science 5B (10:00)', 'English 4A (1:00)'] },
-                      { day: 'Tue 19', events: ['Math 6B (8:30)', 'Parent Conference (3:00)'] },
-                      { day: 'Wed 20', events: ['Science 5A (9:00)', 'Math 6A (11:00)', 'Faculty Meeting (4:00)'] },
-                      { day: 'Thu 21', events: ['English 4B (8:00)', 'Math 6B (10:30)'] },
-                      { day: 'Fri 22', events: ['Science 5B (9:30)', 'Grade Review (2:00)'] }
-                    ].map((daySchedule, index) => (
-                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg">
-                        <p className="text-sm font-medium text-slate-200 mb-2">{daySchedule.day}</p>
-                        <div className="space-y-1">
-                          {daySchedule.events.map((event, eventIndex) => (
-                            <p key={eventIndex} className="text-xs text-slate-400">• {event}</p>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Enhanced Calendar */}
+              <TeacherCalendar />
             </div>
           </div>
         </div>
