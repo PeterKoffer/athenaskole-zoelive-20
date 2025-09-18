@@ -912,27 +912,8 @@ serve(async (req) => {
 
     logSuccess('✅ Adventure generation completed');
 
-    // Create the final lesson structure
-    const finalLesson = {
-      title: adventure.title,
-      subject: context.subject,
-      gradeLevel: context.gradeLevel,
-      scenario: adventure.description,
-      learningObjectives: ["Learn through hands-on experience", "Develop creative skills"],
-      stages: (adventure.phases || []).map((phase: any, index: number) => ({
-        id: `stage-${index + 1}`,
-        title: phase.name || `Stage ${index + 1}`,
-        description: phase.activity || "Adventure activity",
-        duration: phase.duration || 30,
-        storyText: phase.activity,
-        activities: [{
-          type: 'creativeTask',
-          title: phase.name || `Stage ${index + 1}`,
-          instructions: phase.activity || "Complete this stage to continue your adventure!"
-        }]
-      })),
-      estimatedTime: (adventure.phases || []).reduce((total: number, phase: any) => total + (phase.duration || 30), 0)
-    };
+    // The adventure returned from generateBudgetAdventure is already a complete lesson
+    const finalLesson = adventure;
 
     // Save to cache for future use
     await saveLessonToCache(cacheKey, finalLesson, context);
