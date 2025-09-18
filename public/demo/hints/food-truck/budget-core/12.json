@@ -1,0 +1,6 @@
+{
+  "hint": "Anvend unit economics med variable og faste omkostninger. Lav sensitivitetsanalyse på kritiske parametre.",
+  "explain_like_18": "Dette er grundlæggende business analytics: Beregn contribution margin, break-even point, og stress-test dit model med forskellige scenarier.",
+  "example": "Variable costs: $4/unit, Fixed costs: $200/day, Price: $8/unit. Break-even: $200÷($8-$4) = 50 units/day. Scenario: What if costs ↑20%?",
+  "rubric": "✔ avanceret finansiel modellering, ✔ scenarie-analyse, ✔ risiko-vurdering, ✔ professionel præsentation"
+}

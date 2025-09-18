@@ -1,64 +1,28 @@
 {
-  "adventureId": "food-truck",
-  "title": "Noah's Tech-Driven Food Empire",
-  "intro": "Noah envisions a food truck powered by cutting-edge technology - from AI-driven menu optimization to blockchain supply chain tracking. He'll merge culinary arts with computer science.",
+  "meta": { "adventureId": "food-truck", "studentId": "noah-18", "gradeBand": "12", "worldview": "christian", "faithLevel": 2 },
+  "title": "Food Truck Challenge",
+  "intro": "I designer en 'social enterprise' food truck med fokus på sund mad og lokal impact.",
   "images": {
-    "cover": "/demo/tech-food-truck.jpg",
-    "scenes": ["/demo/ai-kitchen.jpg", "/demo/mobile-app.jpg"]
+    "coverPrompt": "cinematic older teens 17-18, soft filmic, business planning at night, retro van with LED menu",
+    "scenePrompts": ["unit economics whiteboard","launch with community service booth"]
+  },
+  "faithBlock": {
+    "prayer": "Gud, lær os at lede med retfærdighed og omtanke. Amen.",
+    "scripture": ""Søg byens bedste." (Jer 29:7, kort)"
   },
   "tasks": [
-    {
-      "subject": "computerTech",
-      "title": "AI Menu Optimization System",
-      "body": "Design an AI system that optimizes menu items based on weather, local events, and historical sales data. Create a basic algorithm and explain machine learning principles.",
-      "checks": ["Understands ML concepts", "Creates functional algorithm", "Explains decision trees"],
-      "estMinutes": 45,
-      "id": "ai-system",
-      "progressTags": ["CS.12.AP.17", "machine-learning"]
-    },
-    {
-      "subject": "mathematics",
-      "title": "Supply Chain Optimization",
-      "body": "Use calculus to optimize delivery routes and inventory management. Model profit functions and find maximum efficiency points using derivatives.",
-      "checks": ["Applies calculus correctly", "Optimizes complex systems", "Interprets mathematical models"],
-      "estMinutes": 40,
-      "id": "calculus-optimization",
-      "progressTags": ["Math.12.F.IF.7", "optimization"]
-    },
-    {
-      "subject": "science",
-      "title": "Food Science & Technology",
-      "body": "Research molecular gastronomy techniques and food preservation technology. Design experiments to test optimal cooking temperatures and food safety protocols.",
-      "checks": ["Applies scientific method", "Understands food chemistry", "Designs valid experiments"],
-      "estMinutes": 35,
-      "id": "food-science",
-      "progressTags": ["Science.12.PS1.2", "chemistry"]
-    },
-    {
-      "subject": "lifeEssentials",
-      "title": "Entrepreneurship & Ethics",
-      "body": "Develop a comprehensive business strategy including ethical considerations of data privacy, fair labor practices, and environmental impact. Create investor pitch.",
-      "checks": ["Addresses ethical considerations", "Creates viable business model", "Presents professionally"],
-      "estMinutes": 30,
-      "id": "business-ethics",
-      "progressTags": ["LifeSkills.12.3", "entrepreneurship"]
-    }
+    { "subject": "nativeLanguage",  "title": "Executive summary (250–300 ord)", "body": "Klar problem/solution, målgruppe, sociale mål.", "checks": ["250–300 ord","sociale KPIer"], "estMinutes": 14 },
+    { "subject": "mathematics",     "title": "Unit economics & sensitivitet",   "body": "Pris-elasticitet, variable/faste omk., break-even + scenarier.", "checks": ["2 scenarier"], "estMinutes": 16 },
+    { "subject": "languageLab",     "title": "Bilingual pitch EN/ES (60 sek)", "body": "Manus med nøglefortrin og call-to-action.", "checks": ["tosproget manus"], "estMinutes": 10 },
+    { "subject": "science",         "title": "Næringsberegning & HACCP-skitse","body": "Analyser 1 ret (makro) og lav kritiske kontrolpunkter.", "checks": ["HACCP nævnt"], "estMinutes": 12 },
+    { "subject": "historyReligion", "title": "Diakoni & social innovation",    "body": "Kort essay om kirkelige køkkener og moderne impact-modeller.", "checks": ["historie+nutid"], "estMinutes": 12 },
+    { "subject": "geography",       "title": "Lokal sourcing-analyse",         "body": "Kortlæg leverandører (≤50 km) og CO₂-estimater.", "checks": ["3 leverandører"], "estMinutes": 10 },
+    { "subject": "computerTech",    "title": "POS/Inventory prototypen",       "body": "Datamodeller + UI-flow; eksportér som JSON-skitse.", "checks": ["models+flow"], "estMinutes": 14 },
+    { "subject": "creativeArts",    "title": "Brand guideline (1-pager)",     "body": "Logo-variationer, farver, typografi, brug på køretøj.", "checks": ["1-pager"], "estMinutes": 10 },
+    { "subject": "musicDiscovery",  "title": "Soundscape vs. salgsdata",       "body": "Hypotese: tempo/genre påvirker salg—design A/B test.", "checks": ["A/B design"], "estMinutes": 8 },
+    { "subject": "physicalEd",      "title": "Ergonomi & skiftplan",           "body": "Plan for rotation, løft, restitution; KPI for træning.", "checks": ["skiftplan"], "estMinutes": 8 },
+    { "subject": "mentalWellness",  "title": "Psykoedukation for team",        "body": "Psykologiske sikkerhedsprincipper + refleksionsspørgsmål.", "checks": ["3 principper"], "estMinutes": 8 },
+    { "subject": "lifeEssentials",  "title": "Jura & finans",                  "body": "Etableringsform, forsikring, skatter, betalingsgateways.", "checks": ["tjekliste"], "estMinutes": 12 }
   ],
-  "faithBlock": {
-    "prayer": "God, grant us wisdom to use technology responsibly and to serve our community with integrity and innovation.",
-    "scripture": "In their hearts humans plan their course, but the Lord establishes their steps (Proverbs 16:9)"
-  },
-  "assessmentHints": [
-    "Can Noah explain complex technical concepts clearly?",
-    "Does he consider ethical implications of his technology choices?",
-    "Is his business strategy both innovative and realistic?"
-  ],
-  "totalMinutes": 150,
-  "targetMinutes": 160,
-  "timePlan": [
-    { "subject": "computerTech", "minutes": 50 },
-    { "subject": "mathematics", "minutes": 45 },
-    { "subject": "science", "minutes": 40 },
-    { "subject": "lifeEssentials", "minutes": 35 }
-  ]
+  "progressTags": ["ELA.11-12.W","HSF.IF","NGSS.HS","CSTA.HS","SEL.11-12"]
 }

@@ -1,10 +1,6 @@
 {
-  "hint": "Brug regnemaskinen til store tal, men tænk over hvad tallene betyder først!",
-  "explain_like_5": "Tænk på det som at spare op - hvor lang tid tager det at tjene nok til at betale for trucken?",
-  "example": "Indtægter per dag: 180 kr × 8 timer = 1440 kr per dag",
-  "check_answer": "Hvis indtægter er 1440 kr/dag × 30 dage = 43.200 kr/måned, og omkostninger er 8.500 kr/måned, så er overskud 34.700 kr/måned.",
-  "common_mistakes": [
-    "Husk at trække driftsomkostninger fra indtægter",
-    "Break-even er når samlet overskud = indkøbspris (45.000 kr)"
-  ]
+  "hint": "Start med at lægge råvareudgifterne sammen. Tjek derefter 30% oveni.",
+  "explain_like_11": "Hvis du bruger 120 kr., er 30% = 36 kr. Så skal prisen mindst være 156 kr. for at ramme målet.",
+  "example": "Indkøb: 100 kr. → Salgspris 130 kr. = 30 kr. overskud (30%).",
+  "rubric": "✔ korrekt sum, ✔ profit ≥30%, ✔ vis udregning trin-for-trin"
 }

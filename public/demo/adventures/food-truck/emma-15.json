@@ -1,64 +1,28 @@
 {
-  "adventureId": "food-truck",
-  "title": "Emma's Sustainable Food Journey",
-  "intro": "Emma wants to create a food truck that tells the story of sustainable eating while serving delicious, locally-sourced meals. She'll explore food history, nutrition science, and environmental impact.",
+  "meta": { "adventureId": "food-truck", "studentId": "emma-15", "gradeBand": "9", "worldview": "christian", "faithLevel": 2 },
+  "title": "Food Truck Challenge",
+  "intro": "Kommunen åbner for street-food zoner. I har en uge til at bevise jeres idé med en pop-up food truck.",
   "images": {
-    "cover": "/demo/sustainable-food-truck.jpg",
-    "scenes": ["/demo/local-farm.jpg", "/demo/nutrition-chart.jpg"]
+    "coverPrompt": "cinematic teens 14-16, soft haze, budgeting spreadsheet on tablet, street-food setup",
+    "scenePrompts": ["teens planning at dusk, city lights","first service rush hour, teamwork focus"]
+  },
+  "faithBlock": {
+    "prayer": "Gud, hjælp os at tjene byen med kvalitet og omsorg. Amen.",
+    "scripture": ""Alt hvad I gør, gør det af hjertet." (Kol 3:23, kort)"
   },
   "tasks": [
-    {
-      "subject": "historyReligion",
-      "title": "Food Traditions Research",
-      "body": "Research the historical significance of 3 traditional dishes from different cultures. How have immigration patterns influenced American cuisine? Write a 300-word analysis.",
-      "checks": ["Identifies cultural influences", "Connects history to modern food", "Uses proper citations"],
-      "estMinutes": 30,
-      "id": "food-history",
-      "progressTags": ["History.9.4", "cultural-analysis"]
-    },
-    {
-      "subject": "science",
-      "title": "Nutrition & Biochemistry",
-      "body": "Analyze the nutritional content of your menu items. Calculate protein, carbohydrate, and fat percentages. Explain how macronutrients function in the body.",
-      "checks": ["Accurate nutritional calculations", "Explains biochemical processes", "Creates balanced meal plans"],
-      "estMinutes": 35,
-      "id": "nutrition-science",
-      "progressTags": ["Science.9.LS1.7", "biochemistry"]
-    },
-    {
-      "subject": "mathematics",
-      "title": "Business Model & Statistics",
-      "body": "Create a comprehensive business plan with projected costs, revenues, and profit margins. Include statistical analysis of local food preferences based on survey data.",
-      "checks": ["Complex financial modeling", "Statistical interpretation", "Data visualization"],
-      "estMinutes": 40,
-      "id": "business-analysis",
-      "progressTags": ["Math.9.A.CED.3", "statistics"]
-    },
-    {
-      "subject": "nativeLanguage",
-      "title": "Marketing Campaign Creation",
-      "body": "Write compelling marketing content including social media posts, menu descriptions, and a brand story. Focus on persuasive writing techniques and audience analysis.",
-      "checks": ["Persuasive writing techniques", "Audience-appropriate tone", "Creative storytelling"],
-      "estMinutes": 25,
-      "id": "marketing-writing",
-      "progressTags": ["ELA.9.W.1", "persuasive-writing"]
-    }
+    { "subject": "nativeLanguage",  "title": "Brand-manifest (150–200 ord)", "body": "Positionér konceptet, værdier og målgruppe.", "checks": ["150–200 ord","målgruppe klar"], "estMinutes": 12 },
+    { "subject": "mathematics",     "title": "Dækningsbidrag & break-even", "body": "Regn DB pr. vare og beregn break-even ved faste omk. $200.", "checks": ["DB beregnet","BE beregnet"], "estMinutes": 14 },
+    { "subject": "languageLab",     "title": "Kundeservice EN/ES",         "body": "Skriv 6 sætninger: 3 EN + 3 ES til kundedialog.", "checks": ["6 sætninger"], "estMinutes": 10 },
+    { "subject": "science",         "title": "Varmeledning & fødevaresikkerhed","body": "Forklar hvorfor kernetemp. og nedkøling er kritisk.", "checks": ["forklaring med begreb"], "estMinutes": 10 },
+    { "subject": "historyReligion", "title": "Næstekærlighed i praksis",    "body": "Ca. 180 ord om måltider som omsorg (valgfrie reference).", "checks": ["eksempel + refleksion"], "estMinutes": 12 },
+    { "subject": "geography",       "title": "Supply-chain kort",          "body": "Kortlæg 4 råvarer, afstande og CO₂-overvejelse.", "checks": ["4 ruter"], "estMinutes": 10 },
+    { "subject": "computerTech",    "title": "POS-mock",                    "body": "Skitsér et simpelt kassesystem/UI-flow (wireframe).", "checks": ["flow beskrevet"], "estMinutes": 12 },
+    { "subject": "creativeArts",    "title": "Menu-design (komposition)",   "body": "Lav layout med typografi, hierarki og tilgængelighed.", "checks": ["hierarki","kontrast"], "estMinutes": 10 },
+    { "subject": "musicDiscovery",  "title": "Lydbrand",                    "body": "Vælg 4 tracks, beskriv tempo/genre og kunderejse.", "checks": ["4 tracks","begrundelse"], "estMinutes": 8 },
+    { "subject": "physicalEd",      "title": "Skadesforebyggelse",          "body": "Plan for løft, pauser og stræk i serviceperioder.", "checks": ["plan med tidsrum"], "estMinutes": 6 },
+    { "subject": "mentalWellness",  "title": "Stress-strategier",           "body": "Beskriv 3 mikropauser og 1 støtte-signal i teamet.", "checks": ["3+1"], "estMinutes": 6 },
+    { "subject": "lifeEssentials",  "title": "Tilladelser & compliance",    "body": "Tjekliste for kommunale krav, allergenmærkning, betaling.", "checks": ["tjekliste"], "estMinutes": 10 }
   ],
-  "faithBlock": {
-    "prayer": "Lord, help us to be good stewards of the resources You've provided and to serve others with excellence and love.",
-    "scripture": "Whatever you do, work at it with all your heart, as working for the Lord (Colossians 3:23)"
-  },
-  "assessmentHints": [
-    "Does Emma show deep understanding of cultural connections?",
-    "Can she explain complex scientific concepts clearly?",
-    "Is her business analysis realistic and well-reasoned?"
-  ],
-  "totalMinutes": 130,
-  "targetMinutes": 140,
-  "timePlan": [
-    { "subject": "historyReligion", "minutes": 35 },
-    { "subject": "science", "minutes": 40 },
-    { "subject": "mathematics", "minutes": 45 },
-    { "subject": "nativeLanguage", "minutes": 30 }
-  ]
+  "progressTags": ["ELA.9-10.W","HSF.LE","NGSS.HS","CSTA.9","SEL.9-10"]
 }

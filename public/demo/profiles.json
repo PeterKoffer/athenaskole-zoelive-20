@@ -1,44 +1,8 @@
 {
   "students": [
-    {
-      "id": "ingrid-7",
-      "name": "Ingrid",
-      "age": 7,
-      "gradeBand": "2",
-      "ability": "onLevel",
-      "learningStyle": "visual",
-      "interests": ["art", "animals", "stories"],
-      "preferredLanguage": "da-DK"
-    },
-    {
-      "id": "lauge-11",
-      "name": "Lauge",
-      "age": 11,
-      "gradeBand": "5",
-      "ability": "advanced",
-      "learningStyle": "kinesthetic",
-      "interests": ["science", "building", "experiments"],
-      "preferredLanguage": "da-DK"
-    },
-    {
-      "id": "emma-15",
-      "name": "Emma",
-      "age": 15,
-      "gradeBand": "9",
-      "ability": "onLevel",
-      "learningStyle": "readingWriting",
-      "interests": ["writing", "history", "music"],
-      "preferredLanguage": "da-DK"
-    },
-    {
-      "id": "noah-18",
-      "name": "Noah",
-      "age": 18,
-      "gradeBand": "12",
-      "ability": "emerging",
-      "learningStyle": "auditory",
-      "interests": ["sports", "technology", "gaming"],
-      "preferredLanguage": "en-US"
-    }
+    { "id": "noah-18", "name": "Noah", "age": 18, "gradeBand": "12", "ability": "advanced", "learningStyle": "readingWriting", "interests": ["economics","history","debate"], "preferredLanguage": "en-US" },
+    { "id": "emma-15", "name": "Emma", "age": 15, "gradeBand": "9",  "ability": "onLevel",  "learningStyle": "auditory",       "interests": ["music","sports","friends"],     "preferredLanguage": "en-US" },
+    { "id": "lauge-11", "name": "Lauge", "age": 11, "gradeBand": "5",  "ability": "advanced", "learningStyle": "kinesthetic",    "interests": ["technology","math","games"],   "preferredLanguage": "en-US" },
+    { "id": "ingrid-7", "name": "Ingrid", "age": 7,  "gradeBand": "1",  "ability": "onLevel",  "learningStyle": "visual",         "interests": ["animals","drawing"],           "preferredLanguage": "en-US" }
   ]
 }

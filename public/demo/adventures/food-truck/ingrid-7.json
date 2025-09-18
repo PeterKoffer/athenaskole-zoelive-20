@@ -1,64 +1,31 @@
 {
-  "adventureId": "food-truck",
-  "title": "Ingrids Isfogn-Eventyr",
-  "intro": "Ingrid drømmer om at lave den perfekte isfogn! Hun skal lære at regne med penge, forstå varme og kulde, og tegne den smukkeste isfogn i hele byen.",
+  "meta": { "adventureId": "food-truck", "studentId": "ingrid-7", "gradeBand": "1", "worldview": "christian", "faithLevel": 2 },
+  "title": "Food Truck Challenge",
+  "intro": "Du og dine venner finder en gammel varevogn. Kan den blive til en lille madbod til byens marked?",
   "images": {
-    "cover": "/demo/food-truck-cover.jpg",
-    "scenes": ["/demo/ice-cream-truck.jpg", "/demo/money-counting.jpg"]
+    "coverPrompt": "cinematic dreamy soft light, diverse kids age 6-8, retro van becoming food truck, golden hour, hopeful",
+    "scenePrompts": [
+      "kids sketching colorful menus on tablets, stickers, simple icons",
+      "market day with friendly crowd, joyful atmosphere"
+    ]
+  },
+  "faithBlock": {
+    "prayer": "Gud, hjælp os være venlige og dele med andre. Amen.",
+    "scripture": ""Elsk din næste som dig selv." (Matt 22:39)"
   },
   "tasks": [
-    {
-      "subject": "mathematics",
-      "title": "Tæl ismønter",
-      "body": "Hjælp Ingrid med at tælle, hvor mange kroner hun har. Hun har 5 femkroner og 3 tokroner. Hvor mange kroner har hun i alt?",
-      "checks": ["Kan tælle op til 31", "Forstår addition med enkle tal"],
-      "estMinutes": 15,
-      "id": "budget-core",
-      "progressTags": ["Math.2.OA.1", "counting-money"]
-    },
-    {
-      "subject": "science",
-      "title": "Is smelter i varmen",
-      "body": "Hvorfor smelter is, når det er varmt? Tegn hvad der sker med is i solen og is i fryseren.",
-      "checks": ["Kan forklare varme og kulde", "Tegner før/efter billeder"],
-      "estMinutes": 20,
-      "id": "temperature-basics",
-      "progressTags": ["Science.2.PS1.4", "states-of-matter"]
-    },
-    {
-      "subject": "creativeArts",
-      "title": "Tegn din drømme-isfogn",
-      "body": "Tegn hvordan Ingrids isfogn skal se ud. Hvilke farver skal den have? Hvilke is-slags sælger hun?",
-      "checks": ["Tegner kreativt", "Bruger mange farver", "Fortæller om sine valg"],
-      "estMinutes": 25,
-      "id": "design-truck",
-      "progressTags": ["Arts.2.VA.Cr1.1", "creative-design"]
-    },
-    {
-      "subject": "nativeLanguage",
-      "title": "Skriv dit ismenu",
-      "body": "Hjælp Ingrid med at skrive en menu. Hvilke is-slags vil hun sælge? Skriv navnet på 4 forskellige slags is.",
-      "checks": ["Staver enkle ord", "Skriver læselige bogstaver", "Laver en liste"],
-      "estMinutes": 15,
-      "id": "menu-writing",
-      "progressTags": ["ELA.2.L.2", "writing-lists"]
-    }
+    { "subject": "nativeLanguage",  "title": "Navngiv madboden", "body": "Vælg et navn og skriv én sætning om, hvad I sælger.", "checks": ["1 kort sætning"], "estMinutes": 5 },
+    { "subject": "mathematics",     "title": "Tæl ingredienser", "body": "Tæl 10 tomater og 5 boller: Hvor mange i alt?", "checks": ["rigtigt antal"], "estMinutes": 5 },
+    { "subject": "languageLab",     "title": "2 ord på engelsk", "body": "Lær 'bread' og 'cheese'. Sig og skriv dem.", "checks": ["2 ord skrevet"], "estMinutes": 5 },
+    { "subject": "science",         "title": "Hold maden kold", "body": "Sæt ✓ ved ting der skal i køleskab.", "checks": ["korrekte ✓"], "estMinutes": 5 },
+    { "subject": "historyReligion", "title": "Dele et måltid",  "body": "Se billede af fællesspisning. Fortæl 1 ting man deler.", "checks": ["1 ting nævnt"], "estMinutes": 5 },
+    { "subject": "geography",       "title": "Hvor er markedet?", "body": "Peg på kortet hvor byen er.", "checks": ["by markeret"], "estMinutes": 5 },
+    { "subject": "computerTech",    "title": "Lav et ikon",      "body": "Vælg et emoji-ikon til jeres menu.", "checks": ["ikon valgt"], "estMinutes": 5 },
+    { "subject": "creativeArts",    "title": "Farvelæg menu",    "body": "Farvelæg 3 retter på tabletten.", "checks": ["3 farver brugt"], "estMinutes": 5 },
+    { "subject": "musicDiscovery",  "title": "Markedssang",      "body": "Lyt til 30 sek. musik og klap takten.", "checks": ["takten klappet"], "estMinutes": 5 },
+    { "subject": "physicalEd",      "title": "Leveringsleg",     "body": "Rejs dig og gå 1 runde i rummet som 'levering'.", "checks": ["runde gået"], "estMinutes": 3 },
+    { "subject": "mentalWellness",  "title": "Vennekort",        "body": "Sig 1 venlig sætning til en klassekammerat.", "checks": ["1 sætning"], "estMinutes": 3 },
+    { "subject": "lifeEssentials",  "title": "Rengør hænder",    "body": "Se 20-sek. håndvaskvideo og øv bevægelserne.", "checks": ["video set"], "estMinutes": 4 }
   ],
-  "faithBlock": {
-    "prayer": "Kære Gud, tak for at vi kan være kreative og hjælpe andre. Hjælp Ingrid med at dele glæde gennem sin isfogn.",
-    "scripture": "Alt det gode kommer fra Gud (Jakobs Brev 1:17)"
-  },
-  "assessmentHints": [
-    "Kan Ingrid forklare sine matematiske tanker?",
-    "Forstår hun forskellen mellem varmt og koldt?",
-    "Viser hun kreativitet i sine tegninger?"
-  ],
-  "totalMinutes": 75,
-  "targetMinutes": 90,
-  "timePlan": [
-    { "subject": "mathematics", "minutes": 20 },
-    { "subject": "science", "minutes": 25 },
-    { "subject": "creativeArts", "minutes": 30 },
-    { "subject": "nativeLanguage", "minutes": 15 }
-  ]
+  "progressTags": ["ELA.K.W.1","MATH.1.OA","SCI.K-1.Health","SEL.K"]
 }

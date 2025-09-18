@@ -1,0 +1,6 @@
+{
+  "hint": "Beregn enhedsomkostninger og tilføj 30% margin. Husk at inkludere faste omkostninger i break-even.",
+  "explain_like_15": "Tænk på det som en simpel forretningsmodel: Dine direkte omkostninger + overhead + fortjeneste = salgspris.",
+  "example": "Råvarer: $80, Overhead: $40/dag ÷ 20 portioner = $2/portion. Total: $82 + 30% = $106.60 minimum pris.",
+  "rubric": "✔ korrekt dækningsbidrag, ✔ break-even beregning, ✔ realistiske antagelser, ✔ vis alle trin"
+}

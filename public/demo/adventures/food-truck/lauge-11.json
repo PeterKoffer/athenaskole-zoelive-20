@@ -1,63 +1,28 @@
 {
-  "adventureId": "food-truck",
-  "title": "Lauges Food Truck Empire",
-  "intro": "Lauge vil bygge den mest innovative food truck med solceller og avanceret køling. Han skal mestre budgetter, kemi og programmering for at skabe den perfekte mobile restaurant.",
+  "meta": { "adventureId": "food-truck", "studentId": "lauge-11", "gradeBand": "5", "worldview": "christian", "faithLevel": 2 },
+  "title": "Food Truck Challenge",
+  "intro": "I finder en gammel varevogn bag kulturhuset. Byens weekendmarked mangler mad—kan I gøre den klar?",
   "images": {
-    "cover": "/demo/advanced-food-truck.jpg",
-    "scenes": ["/demo/solar-panels.jpg", "/demo/chemistry-lab.jpg"]
+    "coverPrompt": "cinematic dreamy kids 10-12, tablets, budgeting board, retro van conversion",
+    "scenePrompts": ["menu design sprint on tablets","market launch with first happy customers"]
+  },
+  "faithBlock": {
+    "prayer": "Gud, giv os kreativitet og omtanke for vores by. Amen.",
+    "scripture": ""Tjen hinanden, hver med den nådegave han har fået." (1 Pet 4:10, kort)"
   },
   "tasks": [
-    {
-      "subject": "mathematics",
-      "title": "Budget og overskudsberegning",
-      "body": "Lauges truck koster 45.000 kr at købe og 8.500 kr/måned at drive. Han sælger mad for 180 kr i timen i 8 timer dagligt. Hvornår går han i plus?",
-      "checks": ["Kan beregne månedlige indtægter", "Forstår break-even point", "Viser arbejdsgang"],
-      "estMinutes": 25,
-      "id": "budget-advanced",
-      "progressTags": ["Math.5.NBT.5", "business-calculations"]
-    },
-    {
-      "subject": "science",
-      "title": "Solenergi og batterisystem",
-      "body": "Design et solcellesystem til trucken. 4 paneler giver 1.200W, trucken bruger 800W. Hvor stort batteri skal der til for 3 timers drift uden sol?",
-      "checks": ["Forstår watt og energilagring", "Kan beregne energibehov", "Designer system"],
-      "estMinutes": 30,
-      "id": "solar-energy",
-      "progressTags": ["Science.5.PS3.1", "renewable-energy"]
-    },
-    {
-      "subject": "computerTech",
-      "title": "Bestillingssystem i Scratch",
-      "body": "Program et simpelt bestillingssystem hvor kunder kan vælge menu-emner og se total-pris. Brug variable og input/output.",
-      "checks": ["Bruger variable korrekt", "Laver input-validering", "Tester program"],
-      "estMinutes": 35,
-      "id": "ordering-system",
-      "progressTags": ["CS.5.AP.10", "programming-basics"]
-    },
-    {
-      "subject": "science",
-      "title": "Fødevaresikkerhed og bakterier",
-      "body": "Undersøg hvorfor mad skal holdes under 4°C. Hvad sker der med bakterier ved forskellige temperaturer? Design kølesystem.",
-      "checks": ["Forstår bakterievækst", "Kan forklare temperaturs betydning", "Designer løsning"],
-      "estMinutes": 20,
-      "id": "food-safety",
-      "progressTags": ["Science.5.LS1.1", "microbiology"]
-    }
+    { "subject": "nativeLanguage",  "title": "Pitch tekst (80–100 ord)", "body": "Skriv en kort beskrivelse af jeres koncept og målgruppe.", "checks": ["80–100 ord","målgruppe nævnt"], "estMinutes": 10 },
+    { "subject": "mathematics",     "title": "Budget + profit",          "body": "Til $120 råvarekøb: Lav 3 menuer og beregn 30% fortjeneste.", "checks": ["sum ≤ 120","profit ≥ 30%"], "estMinutes": 12 },
+    { "subject": "languageLab",     "title": "Spansk menu-gloser",       "body": "Lær 5 madgloser (es, en) og brug 3 i sætninger.", "checks": ["5 gloser","3 sætninger"], "estMinutes": 8 },
+    { "subject": "science",         "title": "Fødevarehygiejne",         "body": "Lav tjekliste: temperaturer, krydskontaminering, håndvask.", "checks": ["3 punkter"], "estMinutes": 8 },
+    { "subject": "historyReligion", "title": "Fællesspisning i historien","body": "120–150 ord om fællesspisning/velgørenhed (1 eksempel).", "checks": ["1 historisk eksempel"], "estMinutes": 10 },
+    { "subject": "geography",       "title": "Råvarekort",               "body": "Kortlæg hvor 3 ingredienser kommer fra og transporttype.", "checks": ["3 steder"], "estMinutes": 8 },
+    { "subject": "computerTech",    "title": "Digital menu (HTML/kort)", "body": "Lav en enkelt side/kort med priser + allergener + QR-felt.", "checks": ["priser","allergener","QR"], "estMinutes": 12 },
+    { "subject": "creativeArts",    "title": "Visuel identitet",         "body": "Lav logo-skitse og farvepalette (3 farver).", "checks": ["logo","3 farver"], "estMinutes": 8 },
+    { "subject": "musicDiscovery",  "title": "Marked-playliste",         "body": "Vælg 3 sange (instrumental) og begrund stemning.", "checks": ["3 sange","1 begrundelse"], "estMinutes": 6 },
+    { "subject": "physicalEd",      "title": "Skånsom løfterutine",      "body": "Se kort video om ergonomi og beskriv 2 nøglepunkter.", "checks": ["2 punkter"], "estMinutes": 5 },
+    { "subject": "mentalWellness",  "title": "Team-roller",              "body": "Definér roller (kok, kasserer, vært) og 1 styrke pr. person.", "checks": ["3 roller","styrker"], "estMinutes": 6 },
+    { "subject": "lifeEssentials",  "title": "Lanceringstrin (4)",       "body": "Tilladelser, sikkerhed, prissætning, markedsføring.", "checks": ["4 trin"], "estMinutes": 8 }
   ],
-  "faithBlock": {
-    "prayer": "Gud, hjælp os med at bruge vores talenter til at tjene andre og passe godt på din skabelse gennem bæredygtige løsninger.",
-    "scripture": "Vi skal forvalte Guds gaver klogt (1. Peter 4:10)"
-  },
-  "assessmentHints": [
-    "Kan Lauge forklare sine beregninger logisk?",
-    "Forstår han sammenhængen mellem energi og miljø?",
-    "Viser han systematisk problemløsning?"
-  ],
-  "totalMinutes": 110,
-  "targetMinutes": 120,
-  "timePlan": [
-    { "subject": "mathematics", "minutes": 30 },
-    { "subject": "science", "minutes": 50 },
-    { "subject": "computerTech", "minutes": 40 }
-  ]
+  "progressTags": ["ELA.5.W.2","MATH.5.NF","NGSS.5-PS","CSTA.5","SEL.5"]
 }

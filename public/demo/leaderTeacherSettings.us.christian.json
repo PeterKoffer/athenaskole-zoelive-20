@@ -5,29 +5,23 @@
     "worldview": "christian",
     "faithIntegrationLevel": 2,
     "subjectWeights": {
-      "mathematics": 0.25,
-      "nativeLanguage": 0.20,
-      "science": 0.15,
-      "historyReligion": 0.15,
-      "creativeArts": 0.10,
-      "lifeEssentials": 0.15
+      "nativeLanguage": 12, "mathematics": 16, "languageLab": 8, "science": 12,
+      "historyReligion": 12, "geography": 6, "computerTech": 8, "creativeArts": 8,
+      "musicDiscovery": 4, "physicalEd": 4, "mentalWellness": 5, "lifeEssentials": 5
     },
     "policy": {
       "allowPrayerContent": true,
       "allowScriptureCitations": true,
       "creationCareFocus": true,
       "serviceLearningFocus": true,
-      "publicDemoSafeMode": true
+      "publicDemoSafeMode": false
     }
   },
   "teacher": {
     "dayLessonMinutes": 180,
-    "subjectEmphasis": {
-      "mathematics": 0.3,
-      "science": 0.25
-    },
-    "classroomValues": ["respect", "curiosity", "collaboration", "perseverance"],
-    "constraints": ["screen-only", "individual-work-preferred"],
-    "calendarKeywords": ["spring-season", "easter-approaching"]
+    "subjectEmphasis": { "mathematics": 10, "nativeLanguage": 10, "historyReligion": 8, "science": 6, "computerTech": 6 },
+    "classroomValues": ["kindness","service","integrity","teamwork"],
+    "constraints": ["screen-only","no-printing"],
+    "calendarKeywords": ["harvest","community","stewardship"]
   }
 }

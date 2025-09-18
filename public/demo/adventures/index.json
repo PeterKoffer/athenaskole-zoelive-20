@@ -1,39 +1,9 @@
 {
   "adventures": [
-    {
-      "id": "food-truck",
-      "title": "Food Truck Challenge",
-      "description": "Design and run your own food truck business",
-      "subjects": ["mathematics", "science", "creativeArts", "lifeEssentials"],
-      "gradeBands": ["2", "5", "9", "12"]
-    },
-    {
-      "id": "space-mission",
-      "title": "Mars Mission Planning",
-      "description": "Plan a mission to Mars with your team",
-      "subjects": ["science", "mathematics", "geography", "computerTech"],
-      "gradeBands": ["5", "9", "12"]
-    },
-    {
-      "id": "medieval-castle",
-      "title": "Medieval Castle Builder",
-      "description": "Design and defend a medieval castle",
-      "subjects": ["historyReligion", "mathematics", "creativeArts", "science"],
-      "gradeBands": ["2", "5", "9"]
-    },
-    {
-      "id": "music-festival",
-      "title": "Music Festival Organizer",
-      "description": "Organize and manage your own music festival",
-      "subjects": ["musicDiscovery", "mathematics", "creativeArts", "lifeEssentials"],
-      "gradeBands": ["5", "9", "12"]
-    },
-    {
-      "id": "basketball-manager",
-      "title": "Basketball Team Manager",
-      "description": "Manage stats, strategy, and team performance",
-      "subjects": ["mathematics", "physicalEd", "lifeEssentials", "computerTech"],
-      "gradeBands": ["5", "9", "12"]
-    }
+    { "id": "food-truck", "title": "Food Truck Challenge" },
+    { "id": "space-mission", "title": "Mission to Mars" },
+    { "id": "medieval-castle", "title": "Medieval Castle Mystery" },
+    { "id": "music-festival", "title": "Music Festival Planner" },
+    { "id": "basketball-manager", "title": "Basketball Team Manager" }
   ]
 }
