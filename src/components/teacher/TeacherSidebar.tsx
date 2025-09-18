@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BarChart3, BookOpen, Users, Brain, Clock, Calendar } from 'lucide-react';
+import { ArrowLeft, BarChart3, BookOpen, Users, Brain, Clock, Calendar, Scale } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface TeacherSidebarProps {
@@ -25,6 +25,11 @@ const TeacherSidebar = ({ showBackButton = true }: TeacherSidebarProps) => {
       icon: Users,
       path: '/teacher-dashboard/progress',
       label: 'Student Progress'
+    },
+    {
+      icon: Scale,
+      path: '/teacher-dashboard/subject-weighting',
+      label: 'Subject Weighting'
     },
     {
       icon: Brain,

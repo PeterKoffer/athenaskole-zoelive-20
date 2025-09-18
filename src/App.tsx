@@ -21,6 +21,7 @@ import AdventureManager from "./features/admin/pages/AdventureManager";
 
 import TeacherMyClasses from "./pages/teacher/TeacherMyClasses";
 import TeacherStudentProgress from "./pages/teacher/TeacherStudentProgress";
+import TeacherSubjectWeighting from "./pages/teacher/TeacherSubjectWeighting";
 import TeacherAIPreferences from "./pages/teacher/TeacherAIPreferences";
 import TeacherLessonDuration from "./pages/teacher/TeacherLessonDuration";
 
@@ -82,6 +83,10 @@ function App() {
          <Route
            path="/teacher-dashboard/progress"
            element={<ProtectedRoute><TeacherStudentProgress /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/subject-weighting"
+           element={<ProtectedRoute><TeacherSubjectWeighting /></ProtectedRoute>}
          />
          <Route
            path="/teacher-dashboard/ai-preferences"
