@@ -59,6 +59,69 @@ export type Database = {
         }
         Relationships: []
       }
+      adventure_image_cache: {
+        Row: {
+          adventure_title: string
+          created_at: string | null
+          id: string
+          image_data: string | null
+          image_url: string
+          prompt: string
+          prompt_hash: string
+        }
+        Insert: {
+          adventure_title: string
+          created_at?: string | null
+          id?: string
+          image_data?: string | null
+          image_url: string
+          prompt: string
+          prompt_hash: string
+        }
+        Update: {
+          adventure_title?: string
+          created_at?: string | null
+          id?: string
+          image_data?: string | null
+          image_url?: string
+          prompt?: string
+          prompt_hash?: string
+        }
+        Relationships: []
+      }
+      adventure_lesson_cache: {
+        Row: {
+          adventure_title: string
+          content_hash: string
+          created_at: string | null
+          grade_level: string
+          id: string
+          lesson_data: Json
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          adventure_title: string
+          content_hash: string
+          created_at?: string | null
+          grade_level: string
+          id?: string
+          lesson_data: Json
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          adventure_title?: string
+          content_hash?: string
+          created_at?: string | null
+          grade_level?: string
+          id?: string
+          lesson_data?: Json
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       adventure_settings: {
         Row: {
           adventure_id: string
