@@ -373,11 +373,15 @@ You must respond with valid JSON only - no markdown, no explanations, just the r
   
   const prompt = `Create a comprehensive ${context.subject} learning experience: "${context.title}" for grade ${context.gradeLevel}.
 
-CRITICAL REQUIREMENTS:
-- MUST be deeply rooted in authentic ${context.subject} concepts, terminology, and methodologies
-- Connect to real-world ${context.subject} applications and career paths
-- Include subject-specific tools, materials, and assessment methods
-- Design interactive ${context.subject} investigations and problem-solving
+CRITICAL REQUIREMENTS - MUST BE SPECIFIC AND EDUCATIONAL:
+- MUST include specific ${context.subject} curriculum standards and skills
+- MUST include detailed step-by-step procedures and methods
+- MUST specify exact materials, tools, and equipment students will use
+- MUST include specific learning outcomes with measurable objectives  
+- MUST connect to real ${context.subject} careers and professionals
+- MUST include authentic assessment methods and evaluation criteria
+- MUST provide differentiation strategies for diverse learners
+- MUST include specific vocabulary terms and key concepts students should master
 - Use ${context.subject}-appropriate vocabulary and thinking skills
 - Include authentic ${context.subject} scenarios and case studies
 
