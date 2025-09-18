@@ -641,6 +641,133 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_shares: {
+        Row: {
+          calendar_id: string
+          created_at: string | null
+          id: string
+          permission: string
+          share_target: string
+          share_type: string
+        }
+        Insert: {
+          calendar_id: string
+          created_at?: string | null
+          id?: string
+          permission: string
+          share_target: string
+          share_type: string
+        }
+        Update: {
+          calendar_id?: string
+          created_at?: string | null
+          id?: string
+          permission?: string
+          share_target?: string
+          share_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_shares_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "calendars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calendar_subscriptions: {
+        Row: {
+          calendar_id: string
+          created_at: string | null
+          id: string
+          is_visible: boolean | null
+          user_id: string
+        }
+        Insert: {
+          calendar_id: string
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          user_id: string
+        }
+        Update: {
+          calendar_id?: string
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_subscriptions_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "calendars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calendars: {
+        Row: {
+          calendar_type: string | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          owner_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          calendar_type?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          owner_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          calendar_type?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          owner_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      class_memberships: {
+        Row: {
+          class_id: string
+          created_at: string | null
+          id: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string | null
+          id?: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string | null
+          id?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       class_overrides: {
         Row: {
           class_id: string
@@ -850,6 +977,41 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      event_shares: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          permission: string
+          share_target: string
+          share_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          permission: string
+          share_target: string
+          share_type: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          permission?: string
+          share_target?: string
+          share_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_shares_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "layered_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
@@ -1086,6 +1248,59 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      layered_events: {
+        Row: {
+          all_day: boolean | null
+          calendar_id: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_time: string
+          id: string
+          location: string | null
+          metadata: Json | null
+          start_time: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          all_day?: boolean | null
+          calendar_id: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_time: string
+          id?: string
+          location?: string | null
+          metadata?: Json | null
+          start_time: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          all_day?: boolean | null
+          calendar_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_time?: string
+          id?: string
+          location?: string | null
+          metadata?: Json | null
+          start_time?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layered_events_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "calendars"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2359,6 +2574,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       keyword_event: {
@@ -2396,6 +2632,14 @@ export type Database = {
       }
     }
     Functions: {
+      can_edit_calendar: {
+        Args: { _calendar_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_calendar: {
+        Args: { _calendar_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_recent_cover_images: {
         Args: { _limit?: number }
         Returns: {
@@ -2408,8 +2652,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_classes: {
+        Args: { _user_id: string }
+        Returns: string[]
+      }
       has_role: {
-        Args: { role: string; uid: string }
+        Args:
+          | { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }
+          | { role: string; uid: string }
         Returns: boolean
       }
       jwt_claim: {
@@ -2503,7 +2753,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "parent" | "teacher" | "staff" | "leader"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2630,6 +2880,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "parent", "teacher", "staff", "leader"],
+    },
   },
 } as const
