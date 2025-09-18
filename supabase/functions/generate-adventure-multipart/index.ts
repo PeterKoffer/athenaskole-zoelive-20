@@ -522,11 +522,47 @@ async function generateBudgetAdventure(context: any) {
   // Generate main phase plan
   const phasePlanResult = await generatePhaseplan(context);
   
-  // Use enhanced phaseplan data with proper 12-step structure
+  // Use enhanced phaseplan data with proper 12-step structure or our rich fallback
   const adventureData = phasePlanResult.data;
 
+  // Ensure we have a complete lesson structure
+  const completeLesson = {
+    title: adventureData.title || context.title,
+    subject: adventureData.subject || context.subject,
+    gradeLevel: context.gradeLevel || "6-8",
+    scenario: adventureData.description || "An immersive learning adventure that engages students through hands-on exploration and creative problem-solving!",
+    learningObjectives: adventureData.learning_objectives || ["Learn through hands-on experience", "Develop creative skills"],
+    stages: adventureData.phases?.map((phase: any, index: number) => ({
+      id: `stage-${index + 1}`,
+      title: phase.name || `Phase ${index + 1}`,
+      description: phase.description || "Educational activity with clear learning objectives",
+      duration: phase.duration || 15,
+      storyText: phase.description,
+      activities: phase.activities?.map((activity: any) => ({
+        type: activity.type === 'discussion' || activity.type === 'hands-on' || activity.type === 'creative' ? 'creativeTask' : 
+              activity.type === 'applied_problem_set' ? 'multipleChoice' : 'creativeTask',
+        title: activity.name || phase.name || "Learning Activity",
+        instructions: activity.instructions || "Complete this educational activity to continue your learning journey!",
+        content: activity.type === 'applied_problem_set' && activity.generated?.quiz_set ? {
+          question: activity.generated.quiz_set.items?.[0]?.stem || "What is the correct answer?",
+          options: ["Option A", "Option B", "Option C", "Option D"],
+          correctAnswer: 0,
+          explanation: activity.generated.quiz_set.items?.[0]?.explanation || "This demonstrates the concept we're learning about.",
+          points: 10
+        } : undefined
+      })) || [{
+        type: 'creativeTask',
+        title: phase.name || "Learning Activity",
+        instructions: activity?.instructions || phase.description || "Complete this educational activity to demonstrate your understanding!",
+      }],
+      materials: phase.activities?.[0]?.materials || ["Learning materials", "Activity workspace"],
+      assessmentCriteria: [phase.assessment || "Demonstrates understanding of key concepts", "Shows creative thinking and problem-solving"]
+    })) || [],
+    estimatedTime: adventureData.total_duration || 100
+  };
+
   logSuccess('✅ Budget adventure generated successfully');
-  return adventureData;
+  return completeLesson;
 }
 
 // Main request handler
