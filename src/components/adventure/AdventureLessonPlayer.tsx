@@ -205,21 +205,43 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Debug info - remove later */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="bg-red-500/20 p-4 rounded text-white text-xs">
-                    <p>Debug - Activity Type: {activity.type}</p>
-                    <p>Debug - Has Content: {activity.content ? 'Yes' : 'No'}</p>
-                    <p>Debug - Activity Keys: {Object.keys(activity).join(', ')}</p>
-                  </div>
-                )}
+                {/* Show rich educational content */}
+                <div className="bg-gradient-to-r from-blue-900/60 to-purple-900/60 p-6 rounded-lg border border-blue-400/50">
+                  <h3 className="font-semibold text-white mb-4 text-lg flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">🎯</span>
+                    </div>
+                    {stage.title}
+                  </h3>
+                  <p className="text-white/90 mb-4 leading-relaxed">{stage.description}</p>
+                  
+                  {/* Show materials if available */}
+                  {stage.materials && stage.materials.length > 0 && (
+                    <div className="mb-4 p-4 bg-black/20 rounded-lg border border-white/20">
+                      <h4 className="font-semibold text-white mb-2">📋 Materials Needed:</h4>
+                      <ul className="list-disc list-inside space-y-1 text-white/90">
+                        {stage.materials.map((material, index) => (
+                          <li key={index}>{material}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Show assessment criteria if available */}
+                  {stage.assessmentCriteria && stage.assessmentCriteria.length > 0 && (
+                    <div className="mb-4 p-4 bg-green-500/20 rounded-lg border border-green-400/30">
+                      <h4 className="font-semibold text-white mb-2">✅ Success Criteria:</h4>
+                      <ul className="list-disc list-inside space-y-1 text-white/90">
+                        {stage.assessmentCriteria.map((criteria, index) => (
+                          <li key={index}>{criteria}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
                 
                 {activity.type === 'multipleChoice' && activity.content && (
-                  <>
-                    <div className="bg-gradient-to-r from-blue-900/60 to-purple-900/60 p-6 rounded-lg border border-blue-400/50">
-                      <h3 className="font-semibold text-white mb-3 text-lg">{activity.content.question}</h3>
-                    </div>
-                    
+                  <>                    
                      <div className="grid gap-3">
                        {activity.content.options?.map((option, index) => (
                          <Button
@@ -307,56 +329,28 @@ export default function AdventureLessonPlayer({ lessonData, onBack, onComplete }
                   </div>
                 )}
                 
-                {/* Fallback rendering for any unhandled activity types */}
+                {/* Enhanced activity display for structured activities */}
                 {!['multipleChoice', 'creativeTask'].includes(activity.type) && (
-                  <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 rounded-lg border border-blue-400/30">
-                    <h3 className="font-semibold text-white mb-3 text-lg">Activity: {activity.title}</h3>
-                    <p className="text-white/90 mb-4">{activity.instructions}</p>
-                    
-                    {/* Show any content if available */}
-                    {activity.content && (
-                      <div className="space-y-4">
-                        {activity.content.question && (
-                          <div className="bg-white/10 p-4 rounded-lg">
-                            <h4 className="text-white font-medium mb-2">Question:</h4>
-                            <p className="text-white/90">{activity.content.question}</p>
-                          </div>
-                        )}
-                        
-                        {activity.content.options && Array.isArray(activity.content.options) && (
-                          <div className="space-y-2">
-                            <h4 className="text-white font-medium">Options:</h4>
-                            {activity.content.options.map((option: string, index: number) => (
-                              <Button
-                                key={index}
-                                onClick={() => handleAnswerSelect(index)}
-                                disabled={hasAnswered}
-                                variant="outline"
-                                className="w-full text-left justify-start border-white/30 text-white hover:bg-white/10"
-                              >
-                                {String.fromCharCode(65 + index)}. {option}
-                              </Button>
-                            ))}
-                          </div>
-                        )}
-                        
-                        {showExplanation && activity.content.explanation && (
-                          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-4 rounded-lg border border-green-400/30">
-                            <p className="text-white/95">{activity.content.explanation}</p>
-                          </div>
-                        )}
+                  <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 p-6 rounded-lg border border-indigo-400/30">
+                    <h3 className="font-semibold text-white mb-3 text-lg flex items-center gap-2">
+                      <div className="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">🎯</span>
                       </div>
-                    )}
+                      {activity.title}
+                    </h3>
+                    <p className="text-white/90 mb-4 leading-relaxed">{activity.instructions}</p>
                     
-                    {/* Generic activity completion button */}
-                    {!activity.content?.options && (
+                    {/* Interactive activity completion */}
+                    <div className="bg-black/30 p-4 rounded-lg border border-white/20">
+                      <p className="text-white font-medium mb-3">Complete this step to continue your adventure!</p>
                       <Button 
                         onClick={() => setCompletedActivities(prev => new Set(prev).add(currentStage))}
-                        className="mt-4 bg-gradient-to-r from-purple-500 to-blue-500"
+                        className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium"
+                        disabled={completedActivities.has(currentStage)}
                       >
-                        Mark as Complete
+                        {completedActivities.has(currentStage) ? '✅ Completed!' : 'Mark as Complete'}
                       </Button>
-                    )}
+                    </div>
                   </div>
                 )}
               </CardContent>
