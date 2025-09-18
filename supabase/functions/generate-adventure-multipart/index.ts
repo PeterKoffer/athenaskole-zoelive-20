@@ -81,6 +81,22 @@ const budgetGuard = new BudgetGuard({
   },
 });
 
+// Subject-specific guidance for rich content generation
+function getSubjectSpecificGuidance(subject: string, title: string): string {
+  const guidelines = {
+    "Science": `Focus on scientific method, experiments, data collection, hypothesis testing. Include lab equipment, observations, variables, and scientific reasoning. Connect to real scientific discoveries and careers.`,
+    "Mathematics": `Focus on mathematical reasoning, problem-solving strategies, calculations, proofs, and patterns. Include mathematical tools, formulas, word problems, and real-world mathematical applications.`,
+    "Arts": `Focus on artistic techniques, creative expression, art history, criticism, and production. Include art materials, different media, artistic styles, and connections to culture and society.`,
+    "Technology": `Focus on engineering design process, coding, digital literacy, innovation, and problem-solving. Include tech tools, programming concepts, design thinking, and emerging technologies.`,
+    "English": `Focus on reading comprehension, writing skills, literary analysis, grammar, and communication. Include diverse texts, writing processes, vocabulary development, and language mechanics.`,
+    "Social Studies": `Focus on historical analysis, geography, civics, economics, and cultural understanding. Include primary sources, maps, timelines, government systems, and cultural perspectives.`,
+    "Civics": `Focus on government systems, civic engagement, rights and responsibilities, democratic processes, and community involvement. Include current events, policy analysis, and civic action.`
+  };
+  
+  const specificGuidance = guidelines[subject] || `Focus on authentic ${subject} concepts, skills, and real-world applications appropriate for this grade level.`;
+  return `${specificGuidance}\nFor "${title}": Make this deeply connected to specific ${subject} content, not generic educational activities.`;
+}
+
 // Cache key generation for lesson content
 function generateLessonCacheKey(context: any): string {
   const keyData = {
@@ -354,18 +370,22 @@ async function generatePhaseplan(context: any) {
     return { skipped: true, reason: begin.reason };
   }
 
-  const system = `You are an experienced education expert and teacher trainer. You design detailed, engaging learning sequences with concrete learning activities. Always return valid JSON.`;
+  const system = `You are an expert ${context.subject} teacher and curriculum designer. You create detailed, subject-specific learning experiences that deeply engage students with authentic ${context.subject} content and real-world applications. ALWAYS return valid JSON only.`;
   
-  const prompt = `Design a complete learning sequence for "${context.title}" for grade ${context.gradeLevel} in the subject ${context.subject}.
+  const prompt = `Create a comprehensive ${context.subject} learning experience: "${context.title}" for grade ${context.gradeLevel}.
 
-REQUIREMENTS FOR LEARNING CONTENT:
-- Each phase should contain concrete learning activities with step-by-step instructions
-- Include practical exercises, discussions, and hands-on activities  
-- Add reflection questions and learning evaluation
-- Design should be interactive and student-engaging
-- Include both individual and group tasks
+CRITICAL REQUIREMENTS:
+- MUST be deeply rooted in authentic ${context.subject} concepts, terminology, and methodologies
+- Connect to real-world ${context.subject} applications and career paths
+- Include subject-specific tools, materials, and assessment methods
+- Design interactive ${context.subject} investigations and problem-solving
+- Use ${context.subject}-appropriate vocabulary and thinking skills
+- Include authentic ${context.subject} scenarios and case studies
 
-Return JSON format:
+SPECIFIC TO ${context.subject.toUpperCase()}:
+${getSubjectSpecificGuidance(context.subject, context.title)}
+
+Return ONLY this JSON structure:
 {
   "title": "${context.title}",
   "description": "Detailed description of the entire learning sequence (100-150 words)",
@@ -415,11 +435,11 @@ Return JSON format:
       return {
         data: {
           title: context.title,
-          description: "An immersive learning adventure that engages students through hands-on exploration and creative problem-solving!",
+          description: `A deep exploration of ${context.subject} through "${context.title}" - connecting authentic ${context.subject} concepts to real-world applications and student interests.`,
           learning_objectives: [
-            `Master key concepts in ${context.subject} through interactive activities`,
-            "Develop critical thinking and problem-solving skills", 
-            "Apply knowledge to real-world scenarios and challenges"
+            `Master key ${context.subject} concepts through "${context.title}" investigation`,
+            `Apply ${context.subject} thinking skills and methodologies`,
+            `Connect ${context.subject} learning to real-world problems and solutions`
           ],
           phases: [
             {
@@ -648,11 +668,11 @@ Return JSON format:
     return {
       data: {
         title: context.title,
-        description: "An immersive learning adventure that engages students through hands-on exploration and creative problem-solving!",
+        description: `An in-depth ${context.subject} exploration: "${context.title}" - authentic learning experiences connecting subject expertise to real-world applications.`,
         learning_objectives: [
-          "Develop deep understanding through hands-on exploration",
-          "Apply knowledge to solve real-world challenges", 
-          "Collaborate effectively and communicate ideas clearly"
+          `Develop mastery of ${context.subject} concepts through hands-on investigation`,
+          `Apply ${context.subject} methodologies to solve authentic problems`,
+          `Connect ${context.subject} learning to career paths and real-world impact`
         ],
         phases: [
           {
