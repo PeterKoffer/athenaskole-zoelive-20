@@ -85,21 +85,25 @@ async function callOpenAI(model: string, system: string, user: string, max_token
   logInfo(`🤖 Calling OpenAI (${model}, max_tokens: ${max_tokens})...`);
 
   try {
+    const requestBody: any = {
+      model,
+      messages: [
+        { role: 'system', content: system + ' You MUST return valid JSON only. No additional text before or after the JSON.' },
+        { role: 'user', content: user }
+      ],
+      max_tokens,
+      temperature: 0.3
+    };
+
+    logInfo(`🤖 Calling OpenAI (${model}, max_tokens: ${max_tokens})...`);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: user }
-        ],
-        max_tokens,
-        temperature: 0.7
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -109,10 +113,26 @@ async function callOpenAI(model: string, system: string, user: string, max_token
     }
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content ?? "";
+    let text = data.choices?.[0]?.message?.content ?? "";
     const usage = extractUsageFromLLMResponse(data);
     
+    // Clean up the response text to extract only JSON
+    text = text.trim();
+    if (text.startsWith('```json')) {
+      text = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (text.startsWith('```')) {
+      text = text.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+    
+    // Extract JSON from text if there's extra content
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      text = jsonMatch[0];
+    }
+    
     logSuccess('✅ OpenAI response received');
+    logInfo(`📝 Cleaned response: ${text.substring(0, 200)}...`);
+    
     return { text, usage, raw: data };
 
   } catch (error) {
@@ -162,11 +182,10 @@ Return JSON format:
     // Parse JSON response with enhanced error handling
     let data;
     try {
-      const match = text.match(/\{[\s\S]*\}/);
-      const jsonText = match ? match[0] : text;
-      data = JSON.parse(jsonText);
+      data = JSON.parse(text);
     } catch (parseError) {
-      logError('JSON parsing failed for hook, using enhanced fallback', parseError);
+      logError(`❌ Error generating hook ${parseError}`);
+      logError(`❌ Raw OpenAI response: ${text}`);
       // Return enhanced hook fallback
       return {
         data: {
