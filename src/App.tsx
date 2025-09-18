@@ -24,6 +24,8 @@ import TeacherStudentProgress from "./pages/teacher/TeacherStudentProgress";
 import TeacherSubjectWeighting from "./pages/teacher/TeacherSubjectWeighting";
 import TeacherAIPreferences from "./pages/teacher/TeacherAIPreferences";
 import TeacherLessonDuration from "./pages/teacher/TeacherLessonDuration";
+import TeacherAssignments from "./pages/teacher/TeacherAssignments";
+import TeacherLibrary from "./pages/teacher/TeacherLibrary";
 
 function App() {
   return (
@@ -95,6 +97,14 @@ function App() {
          <Route
            path="/teacher-dashboard/duration"
            element={<ProtectedRoute><TeacherLessonDuration /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/assignments"
+           element={<ProtectedRoute><TeacherAssignments /></ProtectedRoute>}
+         />
+         <Route
+           path="/teacher-dashboard/library"
+           element={<ProtectedRoute><TeacherLibrary /></ProtectedRoute>}
          />
 
         {/* fallback */}

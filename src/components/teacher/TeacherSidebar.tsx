@@ -1,5 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BarChart3, BookOpen, Users, Brain, Clock, Calendar, Scale } from 'lucide-react';
+import { 
+  ArrowLeft, BarChart3, BookOpen, Users, Brain, Clock, Calendar, Scale, 
+  FileText, Library, Map, MessageSquare, Shield, ClipboardCheck 
+} from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface TeacherSidebarProps {
@@ -43,8 +46,33 @@ const TeacherSidebar = ({ showBackButton = true }: TeacherSidebarProps) => {
     },
     {
       icon: Calendar,
-      path: '/calendar',
+      path: '/teacher-dashboard/calendar',
       label: 'Calendar'
+    },
+    {
+      icon: ClipboardCheck,
+      path: '/teacher-dashboard/assignments',
+      label: 'Assignments & Assessment'
+    },
+    {
+      icon: Library,
+      path: '/teacher-dashboard/library',
+      label: 'Library'
+    },
+    {
+      icon: Map,
+      path: '/teacher-dashboard/curriculum-map',
+      label: 'Curriculum Map'
+    },
+    {
+      icon: MessageSquare,
+      path: '/teacher-dashboard/communication',
+      label: 'Communication'
+    },
+    {
+      icon: Shield,
+      path: '/teacher-dashboard/accessibility',
+      label: 'Accessibility'
     }
   ];
 

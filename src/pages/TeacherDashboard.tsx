@@ -3,8 +3,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, Calendar, Users } from 'lucide-react';
+import { 
+  BarChart3, Calendar, Users, Play, AlertTriangle, TrendingUp, 
+  BookOpen, Brain, Settings, Clock, Target, Activity, Award, Zap 
+} from 'lucide-react';
 import TeacherSidebar from '@/components/teacher/TeacherSidebar';
 
 const TeacherDashboard = () => {
@@ -81,87 +85,100 @@ const TeacherDashboard = () => {
 
         {/* Main Content Area */}
         <div className="h-[calc(100%-5rem)] bg-slate-900 p-6 overflow-y-auto">
-          <div className="grid grid-cols-4 gap-6 h-full">
-            {/* Calendar Section */}
-            <div className="col-span-2 space-y-6">
-              <Card className="bg-slate-800 border-slate-700 h-full">
-                <CardHeader className="pb-3">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            {/* Next Classes Section */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
                   <CardTitle className="flex items-center text-white text-lg">
-                    <Calendar className="w-5 h-5 mr-3 text-blue-400" />
-                    Weekly Schedule
+                    <Play className="w-5 h-5 mr-3 text-green-400" />
+                    Next Classes
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-0">
-                  <div className="px-6 pb-4">
-                    <div className="grid grid-cols-7 gap-1 mb-3">
-                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-                        <div key={day} className="text-center text-xs font-medium text-slate-400 p-2">
-                          {day}
+                <CardContent className="space-y-3">
+                  {[
+                    { name: 'Math 6A', time: '8:00 AM', room: 'Room 201', students: 24, minutes: 15 },
+                    { name: 'Science 5B', time: '10:00 AM', room: 'Lab 1', students: 22, minutes: 135 },
+                    { name: 'English 4A', time: '1:00 PM', room: 'Room 105', students: 26, minutes: 315 }
+                  ].map((classItem, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                          <span className="text-xs font-semibold text-white">{classItem.name.slice(0, 2)}</span>
                         </div>
-                      ))}
+                        <div>
+                          <p className="text-sm font-medium text-slate-200">{classItem.name}</p>
+                          <p className="text-xs text-slate-400">{classItem.time} • {classItem.room} • {classItem.students} students</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="text-slate-300 border-slate-600">
+                          {classItem.minutes < 60 ? `${classItem.minutes}m` : `${Math.floor(classItem.minutes/60)}h ${classItem.minutes%60}m`}
+                        </Badge>
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                          <Play className="w-3 h-3 mr-1" />
+                          Start
+                        </Button>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {Array.from({ length: 28 }, (_, i) => {
-                        const date = i + 1;
-                        const hasClass = [2, 4, 6, 9, 11, 13, 16, 18, 20, 23, 25, 27].includes(date);
-                        const isToday = date === 18;
-                        return (
-                          <div
-                            key={i}
-                            className={`
-                              aspect-square flex items-center justify-center text-xs rounded cursor-pointer transition-all
-                              ${isToday ? 'bg-blue-500 text-white font-bold shadow-lg shadow-blue-500/30' : 
-                                hasClass ? 'bg-slate-700 text-slate-200 border border-slate-600' : 
-                                'text-slate-500 hover:bg-slate-700/50'
-                              }
-                            `}
-                          >
-                            {date}
-                          </div>
-                        );
-                      })}
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Alerts Section */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-white text-lg">
+                    <AlertTriangle className="w-5 h-5 mr-3 text-red-400" />
+                    Alerts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-red-400">Missing Work</p>
+                        <p className="text-xs text-slate-300">3 students haven't submitted Math homework</p>
+                      </div>
+                      <Badge className="bg-red-500 text-white">3</Badge>
                     </div>
                   </div>
-                  
-                  {/* Today's Classes Timeline */}
-                  <div className="border-t border-slate-700 px-6 py-4">
-                    <h4 className="text-sm font-medium text-slate-200 mb-3">Today's Classes</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-3 p-2 bg-blue-500/10 rounded border-l-2 border-blue-500">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-200">Math 6A</p>
-                          <p className="text-xs text-slate-400">8:00-9:30 • Room 201</p>
-                        </div>
+                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-yellow-400">Low Mastery</p>
+                        <p className="text-xs text-slate-300">5 students below 70% in fractions</p>
                       </div>
-                      <div className="flex items-center space-x-3 p-2 bg-green-500/10 rounded border-l-2 border-green-500">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-200">Science 5B</p>
-                          <p className="text-xs text-slate-400">10:00-11:30 • Lab 1</p>
-                        </div>
+                      <Badge className="bg-yellow-500 text-white">5</Badge>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-orange-400">Moderation Flag</p>
+                        <p className="text-xs text-slate-300">AI content flagged for review</p>
                       </div>
-                      <div className="flex items-center space-x-3 p-2 bg-purple-500/10 rounded border-l-2 border-purple-500">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-200">English 4A</p>
-                          <p className="text-xs text-slate-400">13:00-14:30 • Room 105</p>
-                        </div>
-                      </div>
+                      <Badge className="bg-orange-500 text-white">1</Badge>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Control Panels */}
-            <div className="col-span-2 space-y-6">
+            {/* Right Column */}
+            <div className="lg:col-span-2 space-y-6">
               {/* Quick Actions */}
               <Card className="bg-slate-800 border-slate-700">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white text-lg flex items-center">
-                    <BarChart3 className="w-5 h-5 mr-3 text-green-400" />
-                    Control Panel
+                <CardHeader>
+                  <CardTitle className="text-white text-lg flex items-center justify-between">
+                    <span className="flex items-center">
+                      <Settings className="w-5 h-5 mr-3 text-blue-400" />
+                      Quick Actions
+                    </span>
+                    <Button size="sm" variant="outline" className="text-xs bg-slate-700 border-slate-600 text-slate-300">
+                      Customize
+                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -169,73 +186,83 @@ const TeacherDashboard = () => {
                     <Button 
                       variant="outline" 
                       className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600 justify-start h-12"
-                      onClick={() => navigate('/')}
+                      onClick={() => navigate('/teacher-dashboard/assignments')}
                     >
                       <Calendar className="w-4 h-4 mr-2" />
-                      New Lesson
+                      Create Assignment
                     </Button>
                     <Button 
                       variant="outline" 
                       className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600 justify-start h-12"
-                      onClick={() => navigate('/announcements')}
+                      onClick={() => navigate('/teacher-dashboard/communication')}
                     >
                       <Users className="w-4 h-4 mr-2" />
-                      Announce
+                      Message Parents
                     </Button>
                     <Button 
                       variant="outline" 
                       className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600 justify-start h-12"
-                      onClick={() => navigate('/analytics')}
+                      onClick={() => navigate('/teacher-dashboard/library')}
+                    >
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Lesson Templates
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600 justify-start h-12"
+                      onClick={() => navigate('/teacher-dashboard/progress')}
                     >
                       <BarChart3 className="w-4 h-4 mr-2" />
-                      Analytics
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600 justify-start h-12"
-                      onClick={() => navigate('/communication')}
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      Message
+                      View Analytics
                     </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Activity Feed */}
-              <Card className="bg-slate-800 border-slate-700 flex-1">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white text-lg">System Activity</CardTitle>
+              {/* 4 Mini-Insights */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white text-lg flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-3 text-purple-400" />
+                    Mini-Insights
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3 p-3 bg-slate-700/50 rounded-lg">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-200 truncate">Quiz submitted: Math 6A</p>
-                        <p className="text-xs text-slate-400">2 hours ago • 24 responses</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Activity className="w-4 h-4 text-green-400" />
+                        <span className="text-lg font-bold text-green-400">92%</span>
                       </div>
+                      <p className="text-xs text-slate-300">Engagement</p>
+                      <p className="text-xs text-slate-400">+5% from last week</p>
                     </div>
-                    <div className="flex items-start space-x-3 p-3 bg-slate-700/50 rounded-lg">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-200 truncate">Lab reports reviewed</p>
-                        <p className="text-xs text-slate-400">5 hours ago • Science 5B</p>
+                    
+                    <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Target className="w-4 h-4 text-blue-400" />
+                        <span className="text-lg font-bold text-blue-400">87%</span>
                       </div>
+                      <p className="text-xs text-slate-300">Standards Met</p>
+                      <p className="text-xs text-slate-400">On track</p>
                     </div>
-                    <div className="flex items-start space-x-3 p-3 bg-slate-700/50 rounded-lg">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-200 truncate">Parent meeting scheduled</p>
-                        <p className="text-xs text-slate-400">1 day ago • Thompson, J.</p>
+                    
+                    <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Award className="w-4 h-4 text-yellow-400" />
+                        <span className="text-lg font-bold text-yellow-400">15</span>
                       </div>
+                      <p className="text-xs text-slate-300">Accommodations</p>
+                      <p className="text-xs text-slate-400">Active students</p>
                     </div>
-                    <div className="flex items-start space-x-3 p-3 bg-slate-700/50 rounded-lg">
-                      <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-200 truncate">Weekly report generated</p>
-                        <p className="text-xs text-slate-400">1 day ago • All classes</p>
+                    
+                    <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <Zap className="w-4 h-4 text-purple-400" />
+                        <span className="text-lg font-bold text-purple-400">68%</span>
                       </div>
+                      <p className="text-xs text-slate-300">AI Usage</p>
+                      <p className="text-xs text-slate-400">This week</p>
                     </div>
                   </div>
                 </CardContent>
