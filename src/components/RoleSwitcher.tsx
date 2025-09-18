@@ -77,16 +77,16 @@ const RoleSwitcher = () => {
         <div className="space-y-2">
           <label className="text-sm font-medium">Select New Role:</label>
           <Select value={selectedRole} onValueChange={setSelectedRole}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-background border-border text-foreground">
               <SelectValue placeholder="Select a role" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="student">Student</SelectItem>
-              <SelectItem value="teacher">Teacher</SelectItem>
-              <SelectItem value="parent">Parent</SelectItem>
-              <SelectItem value="school_staff">School Staff</SelectItem>
-              <SelectItem value="school_leader">School Leader</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
+            <SelectContent className="bg-background border-border z-50">
+              <SelectItem value="student" className="text-foreground hover:bg-accent">Student</SelectItem>
+              <SelectItem value="teacher" className="text-foreground hover:bg-accent">Teacher</SelectItem>
+              <SelectItem value="parent" className="text-foreground hover:bg-accent">Parent</SelectItem>
+              <SelectItem value="school_staff" className="text-foreground hover:bg-accent">School Staff</SelectItem>
+              <SelectItem value="school_leader" className="text-foreground hover:bg-accent">School Leader</SelectItem>
+              <SelectItem value="admin" className="text-foreground hover:bg-accent">Admin</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -94,7 +94,7 @@ const RoleSwitcher = () => {
         <Button 
           onClick={handleRoleUpdate}
           disabled={isUpdating || selectedRole === userRole}
-          className="w-full"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           {isUpdating ? 'Updating...' : 'Update Role'}
         </Button>

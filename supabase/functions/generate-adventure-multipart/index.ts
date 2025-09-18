@@ -1,6 +1,7 @@
 // Simplified Multi-Prompt Adventure Generation Edge Function with Budget Control
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { BudgetGuard, extractUsageFromLLMResponse, type StepName } from "../_shared/BudgetGuard.ts";
 
 const corsHeaders = {
@@ -8,6 +9,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+
+// Initialize Supabase client for caching
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
 
 // Enhanced logging
 function logInfo(message: string, data?: any) {
@@ -73,6 +80,121 @@ const budgetGuard = new BudgetGuard({
     enrichment: { priority: 3, default_max_output_tokens: 180 },
   },
 });
+
+// Cache key generation for lesson content
+function generateLessonCacheKey(context: any): string {
+  const keyData = {
+    title: context.title,
+    subject: context.subject,
+    gradeLevel: context.gradeLevel,
+    interests: context.interests?.sort() || [],
+    version: 'v2.0' // Update when prompt changes
+  };
+  return btoa(JSON.stringify(keyData));
+}
+
+// Cache key generation for images  
+function generateImageCacheKey(prompt: string): string {
+  const normalizedPrompt = prompt.toLowerCase().trim().replace(/\s+/g, ' ');
+  return btoa(normalizedPrompt);
+}
+
+// Check for cached lesson content
+async function getCachedLesson(cacheKey: string) {
+  try {
+    const { data, error } = await supabase
+      .from('adventure_lesson_cache')
+      .select('lesson_data, created_at')
+      .eq('content_hash', cacheKey)
+      .maybeSingle();
+    
+    if (error) {
+      logError('Error checking lesson cache:', error);
+      return null;
+    }
+    
+    if (data) {
+      logSuccess(`✅ Found cached lesson from ${data.created_at}`);
+      return data.lesson_data;
+    }
+    
+    return null;
+  } catch (error) {
+    logError('Cache lookup failed:', error);
+    return null;
+  }
+}
+
+// Save lesson to cache
+async function saveLessonToCache(cacheKey: string, lessonData: any, context: any) {
+  try {
+    const { error } = await supabase
+      .from('adventure_lesson_cache')
+      .upsert({
+        content_hash: cacheKey,
+        adventure_title: context.title,
+        subject: context.subject,
+        grade_level: context.gradeLevel,
+        lesson_data: lessonData
+      });
+    
+    if (error) {
+      logError('Error saving to lesson cache:', error);
+    } else {
+      logSuccess('✅ Lesson saved to cache');
+    }
+  } catch (error) {
+    logError('Cache save failed:', error);
+  }
+}
+
+// Check for cached image
+async function getCachedImage(promptHash: string) {
+  try {
+    const { data, error } = await supabase
+      .from('adventure_image_cache')
+      .select('image_url, image_data, created_at')
+      .eq('prompt_hash', promptHash)
+      .maybeSingle();
+    
+    if (error) {
+      logError('Error checking image cache:', error);
+      return null;
+    }
+    
+    if (data) {
+      logSuccess(`✅ Found cached image from ${data.created_at}`);
+      return data.image_url || data.image_data;
+    }
+    
+    return null;
+  } catch (error) {
+    logError('Image cache lookup failed:', error);
+    return null;
+  }
+}
+
+// Save image to cache
+async function saveImageToCache(promptHash: string, prompt: string, imageUrl: string, adventureTitle: string) {
+  try {
+    const { error } = await supabase
+      .from('adventure_image_cache')
+      .upsert({
+        prompt_hash: promptHash,
+        adventure_title: adventureTitle,
+        prompt: prompt,
+        image_url: imageUrl
+      });
+    
+    if (error) {
+      logError('Error saving to image cache:', error);
+    } else {
+      logSuccess('✅ Image saved to cache');
+    }
+  } catch (error) {
+    logError('Image cache save failed:', error);
+  }
+}
 
 // Budget-aware AI call
 async function callOpenAI(model: string, system: string, user: string, max_tokens: number): Promise<{text: string; usage?: any; raw: any}> {
@@ -765,33 +887,60 @@ serve(async (req) => {
 
     logInfo('📋 Adventure context', context);
 
+    // Generate cache key for this lesson
+    const cacheKey = generateLessonCacheKey(context);
+    
+    // Check if we have this lesson cached
+    const cachedLesson = await getCachedLesson(cacheKey);
+    if (cachedLesson) {
+      logSuccess('🚀 Using cached lesson - no generation needed!');
+      return new Response(JSON.stringify({
+        success: true,
+        lesson: cachedLesson,
+        source: 'cache',
+        timestamp: new Date().toISOString()
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    logInfo('🔄 No cached version found, generating new lesson...');
+
     // Generate adventure with budget control
     const adventure = await generateBudgetAdventure(context);
 
     logSuccess('✅ Adventure generation completed');
 
+    // Create the final lesson structure
+    const finalLesson = {
+      title: adventure.title,
+      subject: context.subject,
+      gradeLevel: context.gradeLevel,
+      scenario: adventure.description,
+      learningObjectives: ["Learn through hands-on experience", "Develop creative skills"],
+      stages: (adventure.phases || []).map((phase: any, index: number) => ({
+        id: `stage-${index + 1}`,
+        title: phase.name || `Stage ${index + 1}`,
+        description: phase.activity || "Adventure activity",
+        duration: phase.duration || 30,
+        storyText: phase.activity,
+        activities: [{
+          type: 'creativeTask',
+          title: phase.name || `Stage ${index + 1}`,
+          instructions: phase.activity || "Complete this stage to continue your adventure!"
+        }]
+      })),
+      estimatedTime: (adventure.phases || []).reduce((total: number, phase: any) => total + (phase.duration || 30), 0)
+    };
+
+    // Save to cache for future use
+    await saveLessonToCache(cacheKey, finalLesson, context);
+
     return new Response(JSON.stringify({
       success: true,
-      lesson: {
-        title: adventure.title,
-        subject: context.subject,
-        gradeLevel: context.gradeLevel,
-        scenario: adventure.description,
-        learningObjectives: ["Learn through hands-on experience", "Develop creative skills"],
-        stages: (adventure.phases || []).map((phase: any, index: number) => ({
-          id: `stage-${index + 1}`,
-          title: phase.name || `Stage ${index + 1}`,
-          description: phase.activity || "Adventure activity",
-          duration: phase.duration || 30,
-          storyText: phase.activity,
-          activities: [{
-            type: 'creativeTask',
-            title: phase.name || `Stage ${index + 1}`,
-            instructions: phase.activity || "Complete this stage to continue your adventure!"
-          }]
-        })),
-        estimatedTime: (adventure.phases || []).reduce((total: number, phase: any) => total + (phase.duration || 30), 0)
-      },
+      lesson: finalLesson,
+      source: 'generated',
       generationType: 'multi-prompt-budget-controlled',
       timestamp: new Date().toISOString(),
       meta: {
