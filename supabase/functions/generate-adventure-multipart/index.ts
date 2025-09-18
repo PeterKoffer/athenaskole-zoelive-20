@@ -255,22 +255,11 @@ async function callOpenAI(model: string, system: string, user: string, max_token
     let text = data.choices?.[0]?.message?.content ?? "";
     const usage = extractUsageFromLLMResponse(data);
     
-    // Clean up the response text to extract only JSON
+    // Since we're using json_object mode, the text should be pure JSON
     text = text.trim();
-    if (text.startsWith('```json')) {
-      text = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-    } else if (text.startsWith('```')) {
-      text = text.replace(/^```\s*/, '').replace(/\s*```$/, '');
-    }
-    
-    // Extract JSON from text if there's extra content
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      text = jsonMatch[0];
-    }
     
     logSuccess('✅ OpenAI response received');
-    logInfo(`📝 Cleaned response: ${text.substring(0, 200)}...`);
+    logInfo(`📝 Raw response for JSON parsing: ${text.substring(0, 300)}...`);
     
     return { text, usage, raw: data };
 
@@ -433,16 +422,24 @@ Return ONLY valid JSON in this exact structure (no markdown formatting):
     const { text, usage } = await callOpenAI(begin.model.name, system, prompt, begin.max_tokens);
     budgetGuard.finishStep(begin.logIndex, usage);
 
-    // Parse JSON response with enhanced error handling  
+    // Parse JSON response directly since we're using json_object mode
     let data;
     try {
-      // Since we're using JSON mode, the response should be pure JSON
-      logInfo(`🔍 Raw OpenAI response for parsing: ${text.substring(0, 500)}...`);
+      logInfo(`🔍 Parsing OpenAI JSON response: ${text.substring(0, 500)}...`);
       data = JSON.parse(text);
       logSuccess('✅ Phaseplan JSON parsed successfully');
+      
+      // Validate that we have the expected structure
+      if (!data.phases || !Array.isArray(data.phases) || data.phases.length === 0) {
+        throw new Error('Invalid lesson structure: missing or empty phases array');
+      }
+      
+      logInfo(`📚 Generated lesson with ${data.phases.length} phases: ${data.phases.map(p => p.name).join(', ')}`);
+      return { data };
+      
     } catch (parseError) {
-      logError('❌ JSON parsing failed for phaseplan, using comprehensive educational fallback', parseError);
-      logError(`❌ Failed to parse JSON: ${text}`);
+      logError(`❌ JSON parsing failed for phaseplan: ${parseError}`);
+      logError(`❌ Failed JSON text: ${text.substring(0, 1000)}`);
       // Return comprehensive 12-step educational structure
       return {
         data: {
