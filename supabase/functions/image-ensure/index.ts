@@ -214,8 +214,9 @@ Deno.serve(async (req) => {
         prompt: fullPrompt,
         n: 1,
         size: "1536x1024", // True 16:9 ratio for perfect banner framing (OpenAI supported)
-        quality: "high",
+        quality: "medium", // Changed from "high" to "medium" for much faster generation
         output_format: "webp",
+        output_compression: 85, // Optimize file size without quality loss
       }),
     });
 
