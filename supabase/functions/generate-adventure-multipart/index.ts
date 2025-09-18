@@ -84,13 +84,19 @@ const budgetGuard = new BudgetGuard({
 // Subject-specific guidance for rich content generation
 function getSubjectSpecificGuidance(subject: string, title: string): string {
   const guidelines = {
-    "Science": `Focus on scientific method, experiments, data collection, hypothesis testing. Include lab equipment, observations, variables, and scientific reasoning. Connect to real scientific discoveries and careers.`,
-    "Mathematics": `Focus on mathematical reasoning, problem-solving strategies, calculations, proofs, and patterns. Include mathematical tools, formulas, word problems, and real-world mathematical applications.`,
-    "Arts": `Focus on artistic techniques, creative expression, art history, criticism, and production. Include art materials, different media, artistic styles, and connections to culture and society.`,
-    "Technology": `Focus on engineering design process, coding, digital literacy, innovation, and problem-solving. Include tech tools, programming concepts, design thinking, and emerging technologies.`,
-    "English": `Focus on reading comprehension, writing skills, literary analysis, grammar, and communication. Include diverse texts, writing processes, vocabulary development, and language mechanics.`,
-    "Social Studies": `Focus on historical analysis, geography, civics, economics, and cultural understanding. Include primary sources, maps, timelines, government systems, and cultural perspectives.`,
-    "Civics": `Focus on government systems, civic engagement, rights and responsibilities, democratic processes, and community involvement. Include current events, policy analysis, and civic action.`
+    "Science": `Follow NGSS standards. Include specific scientific procedures: controlled experiments, data tables, graphs, hypothesis formation, variable identification. Use exact lab equipment (microscopes, beakers, thermometers, pH strips). Include scientific vocabulary (independent/dependent variables, hypothesis, conclusion, peer review). Connect to real scientists and current research. Include safety protocols and lab procedures.`,
+    
+    "Mathematics": `Follow Common Core/state math standards. Include step-by-step problem-solving procedures, specific formulas, mathematical proofs, and calculations. Use exact mathematical tools (graphing calculators, rulers, protractors, geometric shapes). Include precise mathematical vocabulary (coefficients, equations, theorems, proofs). Provide real-world applications with actual data and statistics.`,
+    
+    "Arts": `Follow National Visual Arts Standards. Include specific art techniques (watercolor washes, perspective drawing, clay wedging, printmaking). Use exact art materials (acrylic paints, charcoal, canvas, sculpting tools). Include art history context with specific artists, movements, and time periods. Teach art criticism vocabulary (composition, color theory, balance, contrast).`,
+    
+    "Technology": `Follow ISTE standards for students. Include specific coding languages (Scratch, Python, HTML/CSS), engineering design process steps, digital citizenship principles. Use exact tech tools (Raspberry Pi, Arduino, 3D printers, design software). Include programming vocabulary (algorithms, loops, variables, debugging). Connect to real tech careers and current innovations.`,
+    
+    "English": `Follow Common Core ELA standards. Include specific reading strategies (close reading, annotation, text evidence), writing processes (brainstorming, drafting, revising, editing), grammar rules, and literary devices. Use specific texts, cite evidence, analyze themes. Include vocabulary instruction with context clues and word roots.`,
+    
+    "Social Studies": `Follow NCSS standards. Include specific historical analysis skills, primary source examination, map reading, timeline creation. Use exact historical evidence, dates, and factual information. Include geography skills (latitude/longitude, map scales, physical features). Connect to current events and civic participation.`,
+    
+    "Civics": `Follow civics education standards. Include specific government processes (how a bill becomes law, branches of government, Constitution articles), civic engagement activities, current policy analysis. Use real government documents, court cases, and civic participation examples. Include rights and responsibilities with specific examples.`
   };
   
   const specificGuidance = guidelines[subject] || `Focus on authentic ${subject} concepts, skills, and real-world applications appropriate for this grade level.`;
