@@ -20,9 +20,10 @@ const Index = () => {
     student: "/adventure",
   };
 
-  // Handle role-based redirects for non-student roles (only if not manually set to student)
+  // Handle role-based redirects for non-student roles ONLY from the homepage
   useEffect(() => {
-    if (user && userRole && userRole !== 'student' && !isManualRoleChange()) {
+    const currentPath = window.location.pathname;
+    if (user && userRole && userRole !== 'student' && currentPath === '/' && !isManualRoleChange()) {
       const targetPath = targetPaths[userRole];
       if (targetPath) {
         navigate(targetPath);

@@ -45,6 +45,10 @@ function App() {
          <Route
            path="/training-ground-new"
            element={<ProtectedRoute><TrainingGroundHome /></ProtectedRoute>}
+          />
+         <Route
+           path="/adventure"
+           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
          />
          <Route
            path="/adventure/:adventureId"
