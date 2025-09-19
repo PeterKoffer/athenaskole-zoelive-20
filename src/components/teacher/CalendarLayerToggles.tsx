@@ -133,7 +133,7 @@ export default function CalendarLayerToggles({
                            getCalendarTypeColor(calendar.calendar_type || 'default')
                          )}
                       >
-                        {calendar.calendar_type}
+                        {calendar.calendar_type || 'default'}
                       </Badge>
                     </div>
                   </div>
