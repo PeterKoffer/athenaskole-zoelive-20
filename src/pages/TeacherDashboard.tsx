@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import TeacherSidebar from '@/components/teacher/TeacherSidebar';
 import TeacherCalendar from '@/components/teacher/TeacherCalendar';
+import RoleSwitcher from '@/components/RoleSwitcher';
 
 const TeacherDashboard = () => {
   const { user, loading } = useAuth();
@@ -274,6 +275,11 @@ const TeacherDashboard = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Role Switcher - Fixed position */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <RoleSwitcher />
       </div>
     </div>
   );
