@@ -50,12 +50,14 @@ export default function CalendarLayerToggles({
 }: CalendarLayerTogglesProps) {
   const handleToggleAll = (visible: boolean) => {
     calendars.forEach(calendar => {
-      onToggle(calendar.id, visible);
+      if (calendar.id) {
+        onToggle(calendar.id, visible);
+      }
     });
   };
 
-  const allVisible = calendars.length > 0 && calendars.every(cal => visibleCalendars.has(cal.id));
-  const noneVisible = calendars.every(cal => !visibleCalendars.has(cal.id));
+  const allVisible = calendars.length > 0 && calendars.every(cal => cal.id && visibleCalendars.has(cal.id));
+  const noneVisible = calendars.every(cal => !cal.id || !visibleCalendars.has(cal.id));
 
   return (
     <Card>
@@ -100,7 +102,7 @@ export default function CalendarLayerToggles({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {calendars.map((calendar) => {
-              const isVisible = visibleCalendars.has(calendar.id);
+              const isVisible = calendar.id ? visibleCalendars.has(calendar.id) : false;
               
               return (
                 <div
@@ -113,9 +115,9 @@ export default function CalendarLayerToggles({
                   )}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <div className="text-sm">
-                      {getCalendarTypeIcon(calendar.calendar_type)}
-                    </div>
+                     <div className="text-sm">
+                       {getCalendarTypeIcon(calendar.calendar_type || 'default')}
+                     </div>
                     <div 
                       className="w-3 h-3 rounded-full border flex-shrink-0"
                       style={{ backgroundColor: calendar.color || '#3b82f6' }}
@@ -126,10 +128,10 @@ export default function CalendarLayerToggles({
                       </div>
                       <Badge 
                         variant="secondary" 
-                        className={cn(
-                          'text-xs h-4 px-1.5',
-                          getCalendarTypeColor(calendar.calendar_type)
-                        )}
+                         className={cn(
+                           'text-xs h-4 px-1.5',
+                           getCalendarTypeColor(calendar.calendar_type || 'default')
+                         )}
                       >
                         {calendar.calendar_type}
                       </Badge>
@@ -137,7 +139,7 @@ export default function CalendarLayerToggles({
                   </div>
                   <Switch
                     checked={isVisible}
-                    onCheckedChange={(checked) => onToggle(calendar.id, checked)}
+                    onCheckedChange={(checked) => calendar.id && onToggle(calendar.id, checked)}
                     className="ml-2 flex-shrink-0"
                   />
                 </div>
