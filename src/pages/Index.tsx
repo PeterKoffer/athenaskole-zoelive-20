@@ -8,7 +8,7 @@ import TodaysAdventure from "@/features/adventure/pages/TodaysAdventure";
 
 const Index = () => {
   const { user } = useAuth();
-  const { userRole } = useRoleAccess();
+  const { userRole, isManualRoleChange } = useRoleAccess();
   const navigate = useNavigate();
 
   const targetPaths: Record<string, string> = {
@@ -20,15 +20,15 @@ const Index = () => {
     student: "/adventure",
   };
 
-  // Handle role-based redirects for non-student roles
+  // Handle role-based redirects for non-student roles (only if not manually set to student)
   useEffect(() => {
-    if (user && userRole && userRole !== 'student') {
+    if (user && userRole && userRole !== 'student' && !isManualRoleChange()) {
       const targetPath = targetPaths[userRole];
       if (targetPath) {
         navigate(targetPath);
       }
     }
-  }, [user, userRole, navigate]);
+  }, [user, userRole, navigate, isManualRoleChange]);
 
   const handleGetStarted = () => {
     if (user) {

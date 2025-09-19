@@ -7,23 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 
 const RoleSwitcher = () => {
-  const { user, updateUserRole } = useAuth();
-  const { userRole } = useRoleAccess();
+  const { user } = useAuth();
+  const { userRole, setUserRoleManually } = useRoleAccess();
   const { toast } = useToast();
   const [selectedRole, setSelectedRole] = useState<string>(userRole || 'student');
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleRoleUpdate = async () => {
+  const handleRoleUpdate = () => {
     if (!selectedRole || selectedRole === userRole) {
       return;
     }
 
     setIsUpdating(true);
     try {
-      await updateUserRole(selectedRole);
+      setUserRoleManually(selectedRole as any);
       toast({
         title: "Role Updated Successfully!",
-        description: `You are now logged in as a ${selectedRole}. Redirecting...`,
+        description: `You are now temporarily viewing as a ${selectedRole}. Redirecting...`,
       });
       
       // Wait a bit, then redirect to the appropriate dashboard
@@ -34,10 +34,10 @@ const RoleSwitcher = () => {
           'school_staff': '/school-dashboard',
           'teacher': '/teacher-dashboard',
           'parent': '/parent-dashboard',
-          'student': '/adventure'
+          'student': '/'
         };
         
-        const targetPath = targetPaths[selectedRole] || '/adventure';
+        const targetPath = targetPaths[selectedRole] || '/';
         window.location.href = targetPath; // Force full page navigation
       }, 1500);
     } catch (error) {
