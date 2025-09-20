@@ -54,6 +54,10 @@ function App() {
            path="/adventure/:adventureId"
            element={<ProtectedRoute><AdventureRunner /></ProtectedRoute>}
          />
+         <Route
+           path="/daily-program"
+           element={<ProtectedRoute><TodaysAdventure /></ProtectedRoute>}
+         />
         <Route
           path="/school-dashboard"
           element={<ProtectedRoute><SchoolDashboard /></ProtectedRoute>}

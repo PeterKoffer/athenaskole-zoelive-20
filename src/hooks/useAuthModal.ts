@@ -16,7 +16,7 @@ export function useAuthModal(user: any) : UseAuthModalResult {
 
   const handleGetStarted = useCallback(() => {
     if (user) {
-      navigate('/daily-program');
+      navigate('/adventure');
     } else {
       setShowAuthModal(true);
     }
@@ -28,7 +28,7 @@ export function useAuthModal(user: any) : UseAuthModalResult {
 
   const handleLogin = useCallback(() => {
     setShowAuthModal(false);
-    navigate('/daily-program');
+    navigate('/adventure');
   }, [navigate]);
 
   return {

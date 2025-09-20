@@ -19,8 +19,8 @@ export const useAuthRedirect = () => {
       school_staff: "/school-dashboard",
       teacher: "/teacher-dashboard",
       parent: "/parent-dashboard",
-      student: "/daily-program",
-      unknown: "/daily-program",
+      student: "/adventure",
+      unknown: "/adventure",
     };
 
     const target = targets[userRole ?? "unknown"] ?? "/daily-program";
